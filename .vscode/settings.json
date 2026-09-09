@@ -1,0 +1,28 @@
+{
+  "python.defaultInterpreterPath": "E:\\minoconda\\envs\\myenv\\python.exe",
+  "python.terminal.activateEnvironment": true,
+  "terminal.integrated.defaultProfile.windows": "PowerShell",
+  "terminal.integrated.profiles.windows": {
+    "PowerShell": {
+      "source": "PowerShell",
+      "args": [
+        "-NoExit",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "& 'E:\\minoconda\\shell\\condabin\\conda-hook.ps1'; conda activate myenv"
+      ]
+    },
+    "Command Prompt": {
+      "path": [
+        "${env:windir}\\Sysnative\\cmd.exe",
+        "${env:windir}\\System32\\cmd.exe"
+      ],
+      "args": [
+        "/K",
+        "E:\\minoconda\\Scripts\\activate.bat E:\\minoconda\\envs\\myenv"
+      ],
+      "icon": "terminal-cmd"
+    }
+  }
+}
