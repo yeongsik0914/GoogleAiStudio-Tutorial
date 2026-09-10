@@ -187,6 +187,7 @@
   },
   "active": "6b65572e680213c6",
   "lastOpenFiles": [
+    "youtube-stt-service/__pycache__/app.cpython-314.pyc",
     "ai-youtube-searcher/downloads/IbhBAZNAHvk.m4a.part",
     "ai-youtube-searcher/__pycache__/transcribe_engine.cpython-314.pyc",
     "ai-youtube-searcher/__pycache__/qa_engine.cpython-314.pyc",
@@ -197,7 +198,6 @@
     "ai-youtube-searcher/__pycache__/downloader.cpython-312.pyc",
     "ai-youtube-searcher/__pycache__/qa_engine.cpython-312.pyc",
     "ai-youtube-searcher/__pycache__/transcribe_engine.cpython-312.pyc",
-    "ai-youtube-searcher/__pycache__/app.cpython-312.pyc",
     "ai-youtube-searcher/README.md",
     "gemini-31-tts/README.md",
     "implementation_plan.md",

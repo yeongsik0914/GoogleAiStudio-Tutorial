@@ -145,6 +145,43 @@ st.markdown("""
         font-size: 0.92rem;
         border-left: 3px solid #ff4b4b;
     }
+    
+    /* 유튜브 공식 알약 검색창 스타일 */
+    div[data-testid="stForm"] {
+        border: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        background: transparent !important;
+    }
+    .stTextInput input {
+        background-color: #121212 !important;
+        color: #f1f1f1 !important;
+        border: 1px solid #333333 !important;
+        border-radius: 20px 0 0 20px !important;
+        height: 38px !important;
+        padding-left: 16px !important;
+        font-size: 0.86rem !important;
+    }
+    .stTextInput input:focus {
+        border-color: #3ea6ff !important;
+        box-shadow: 0 0 0 1px #3ea6ff !important;
+    }
+    div[data-testid="stForm"] .stButton button {
+        background-color: #222222 !important;
+        border: 1px solid #333333 !important;
+        border-left: none !important;
+        border-radius: 0 20px 20px 0 !important;
+        color: #f1f1f1 !important;
+        font-weight: 700 !important;
+        font-size: 0.86rem !important;
+        height: 38px !important;
+        transition: all 0.2s ease !important;
+    }
+    div[data-testid="stForm"] .stButton button:hover {
+        background-color: #ff0000 !important;
+        border-color: #ff0000 !important;
+        color: #ffffff !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -206,19 +243,19 @@ with st.sidebar:
     os.makedirs(download_dir, exist_ok=True)
 
 
-# --- 상단 검색 입력창 (유튜브 검색창 스타일) ---
-col_logo, col_search, col_btn = st.columns([1, 8, 2])
-with col_logo:
-    st.write(" ")
-    st.markdown("### 🔍 URL")
-with col_search:
-    youtube_url = st.text_input(
-        "유튜브 URL 입력창",
-        placeholder="분석하고 싶은 유튜브 영상 URL을 입력하세요 (예: https://www.youtube.com/watch?v=...)",
-        label_visibility="collapsed",
-    )
-with col_btn:
-    start_btn = st.button("🚀 오디오 & 자막 추출", type="primary", use_container_width=True)
+# --- 상단 중앙 검색 입력창 (유튜브 공식 알약형 중앙 정렬) ---
+col_pad_l, col_center, col_pad_r = st.columns([1.5, 7, 1.5], gap="small")
+with col_center:
+    with st.form("stt_search_form", clear_on_submit=False, border=False):
+        c_input, c_btn = st.columns([80, 20], gap="small")
+        with c_input:
+            youtube_url = st.text_input(
+                "유튜브 URL 입력창",
+                placeholder="분석하고 싶은 유튜브 영상 URL을 입력하세요 (예: https://www.youtube.com/watch?v=...)",
+                label_visibility="collapsed",
+            )
+        with c_btn:
+            start_btn = st.form_submit_button("🚀 자막 추출", type="primary", use_container_width=True)
 
 
 # --- 변환 실행 로직 ---
