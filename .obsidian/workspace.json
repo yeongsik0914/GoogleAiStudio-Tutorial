@@ -11,10 +11,14 @@
             "id": "6b65572e680213c6",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {},
+              "type": "markdown",
+              "state": {
+                "file": "implementation_plan.md",
+                "mode": "source",
+                "source": false
+              },
               "icon": "lucide-file",
-              "title": "새 탭"
+              "title": "implementation_plan"
             }
           }
         ]
@@ -182,5 +186,20 @@
     }
   },
   "active": "6b65572e680213c6",
-  "lastOpenFiles": []
+  "lastOpenFiles": [
+    "youtube-stt-service/downloads/gLguyhGBbsQ.m4a",
+    "youtube-stt-service/downloads/gLguyhGBbsQ.m4a.part",
+    "tmp6fgrs3k4.tmp-Frag1",
+    "tmp6fgrs3k4.tmp",
+    "youtube-stt-service/__pycache__/app.cpython-312.pyc",
+    "youtube-stt-service/downloads/jNQXAC9IVRw.m4a.part",
+    "youtube-stt-service/downloads/jNQXAC9IVRw.m4a",
+    "youtube-stt-service/__pycache__/transcriber.cpython-312.pyc",
+    "youtube-stt-service/__pycache__/downloader.cpython-312.pyc",
+    "youtube-stt-service/__pycache__",
+    "youtube-stt-service/README.md",
+    "youtube-stt-service/requirements.txt",
+    "implementation_plan.md",
+    "README.md"
+  ]
 }
