@@ -10,6 +10,14 @@ from dotenv import load_dotenv
 from downloader import extract_video_id, get_video_info, download_audio
 from transcribe_engine import transcribe_with_timestamps, format_seconds
 from qa_engine import answer_question_with_timestamps, extract_video_chapters
+from cache_manager import (
+    save_to_cache,
+    load_from_cache,
+    has_cache,
+    get_all_cached_videos,
+    delete_from_cache,
+    clear_all_cache,
+)
 
 # Windows 환경 한글 출력 인코딩 대응
 if sys.platform == "win32":
@@ -106,51 +114,112 @@ st.markdown("""
         position: relative !important;
         z-index: 100 !important;
     }
-    .yt-logo-group {
+    /* 유튜브 공식 상단 네비바 헤더 좌측 (메뉴 아이콘 + 유튜브 로고) */
+    .yt-nav-header-left {
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 16px;
+        height: 40px;
+    }
+    .yt-menu-icon {
+        width: 38px;
+        height: 38px;
+        min-width: 38px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: background-color 0.15s ease;
+        text-decoration: none !important;
+        color: #ffffff !important;
+    }
+    .yt-menu-icon:hover {
+        background-color: #272727;
+    }
+    .yt-logo-link {
+        display: flex;
+        align-items: center;
+        text-decoration: none !important;
         cursor: pointer;
         user-select: none;
     }
-    .yt-logo-text {
-        font-size: 1.18rem;
-        font-weight: 800;
-        letter-spacing: -0.5px;
-        color: #ffffff;
-        display: flex;
-        align-items: center;
-    }
-    .badge-gemini {
-        background: linear-gradient(135deg, #ff0000 0%, #ff4b4b 100%);
-        color: white;
-        padding: 2px 7px;
-        border-radius: 10px;
-        font-size: 0.68rem;
+    .yt-wordmark {
+        font-family: 'Roboto', 'Pretendard', sans-serif;
         font-weight: 700;
-        letter-spacing: 0.3px;
-        margin-left: 6px;
+        font-size: 1.25rem;
+        color: #ffffff;
+        letter-spacing: -0.8px;
+        margin-left: 4px;
     }
+    .yt-country-code {
+        font-size: 0.65rem;
+        color: #aaaaaa;
+        font-weight: 400;
+        vertical-align: top;
+        margin-top: -6px;
+        margin-left: 3px;
+    }
+    
+    /* 상단 우측 퀵 버튼 및 유저 아바타 */
     .yt-nav-header-right {
         display: flex;
         align-items: center;
         justify-content: flex-end;
-        height: 38px;
-        gap: 6px;
-        position: relative !important;
-        z-index: 100 !important;
+        gap: 10px;
+        height: 40px;
     }
-    .header-chip-status {
-        background: #1c1c1f;
-        border: 1px solid #2e2e34;
-        color: #3ea6ff;
-        padding: 4px 10px;
-        border-radius: 14px;
-        font-size: 0.72rem;
+    .yt-create-btn {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: #272727;
+        border-radius: 20px;
+        padding: 0 14px;
+        height: 36px;
+        color: #f1f1f1;
+        font-size: 0.86rem;
         font-weight: 600;
+        cursor: pointer;
+        transition: background 0.15s ease;
+        user-select: none;
+    }
+    .yt-create-btn:hover {
+        background: #383838;
+    }
+    .yt-icon-round-btn {
+        width: 38px;
+        height: 38px;
+        min-width: 38px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: background 0.15s ease;
+        color: #f1f1f1;
+    }
+    .yt-icon-round-btn:hover {
+        background: #272727;
+    }
+    .yt-avatar-circle {
+        width: 32px;
+        height: 32px;
+        min-width: 32px;
+        border-radius: 50%;
+        background: #7c4dff;
+        color: #ffffff;
+        font-size: 0.85rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        user-select: none;
+        margin-left: 4px;
     }
     
-    /* 유튜브 공식 알약 검색창 & 버튼 스타일 (호버 위치값 및 클릭 완벽 보장) */
+    /* 유튜브 공식 일체형 검색창 & 마이크 버튼 (Image 2 완벽 구현) */
     div[data-testid="stForm"] {
         border: none !important;
         padding: 0 !important;
@@ -158,10 +227,13 @@ st.markdown("""
         background: transparent !important;
         position: relative !important;
         z-index: 100 !important;
-        pointer-events: auto !important;
+    }
+    div[data-testid="stForm"] [data-testid="stHorizontalBlock"] {
+        gap: 0px !important;
+        align-items: center !important;
     }
     
-    /* 인풋창 스타일 - 둥근 알약형 (20px) 전체 래퍼 및 내부 인풋 완벽 매핑 */
+    /* 검색 인풋창 (좌측 둥근 알약 + 우측 직각 연결) */
     .stTextInput {
         margin: 0 !important;
         padding: 0 !important;
@@ -173,42 +245,40 @@ st.markdown("""
         padding: 0 !important;
     }
     .stTextInput > div > div {
-        background-color: #121214 !important;
-        border: 1px solid #38383e !important;
-        border-radius: 20px !important;
-        height: 38px !important;
-        min-height: 38px !important;
+        background-color: #121212 !important;
+        border: 1px solid #303030 !important;
+        border-right: none !important;
+        border-radius: 40px 0 0 40px !important;
+        height: 40px !important;
+        min-height: 40px !important;
         padding: 0 !important;
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2) !important;
         transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
-        cursor: text !important;
     }
     .stTextInput > div > div:hover {
-        border-color: #555562 !important;
+        border-color: #444444 !important;
     }
     .stTextInput > div > div:focus-within {
-        border-color: #3ea6ff !important;
-        box-shadow: 0 0 0 1px #3ea6ff !important;
+        border-color: #1c62b9 !important;
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5) !important;
     }
     .stTextInput input {
         background-color: transparent !important;
         color: #f1f1f1 !important;
         border: none !important;
-        border-radius: 20px !important;
-        height: 36px !important;
-        padding: 0 16px !important;
-        font-size: 0.86rem !important;
+        border-radius: 40px 0 0 40px !important;
+        height: 38px !important;
+        padding: 0 18px !important;
+        font-size: 0.92rem !important;
         box-shadow: none !important;
-        transform: none !important;
         outline: none !important;
-        cursor: text !important;
-        pointer-events: auto !important;
     }
     
-    /* 검색 버튼 - 둥근 알약형 레드 버튼 (정확한 submit button 셀렉터 및 클릭 보장) */
+    /* 검색 제출 버튼 (좌측 직각 + 우측 둥근 알약 다크 그레이) */
     div[data-testid="stFormSubmitButton"] {
         margin: 0 !important;
         padding: 0 !important;
-        height: 38px !important;
+        height: 40px !important;
         display: flex !important;
         align-items: center !important;
         width: 100% !important;
@@ -216,59 +286,336 @@ st.markdown("""
         z-index: 101 !important;
     }
     div[data-testid="stFormSubmitButton"] button,
-    div[data-testid="stForm"] button,
-    .stButton button[kind="primary"] {
+    div[data-testid="stForm"] button {
         width: 100% !important;
-        height: 38px !important;
-        min-height: 38px !important;
-        background-color: #cc0000 !important;
-        border: 1px solid #cc0000 !important;
-        border-radius: 20px !important;
-        color: #ffffff !important;
-        font-weight: 700 !important;
-        font-size: 0.86rem !important;
-        padding: 0 16px !important;
+        height: 40px !important;
+        min-height: 40px !important;
+        background-color: #222222 !important;
+        border: 1px solid #303030 !important;
+        border-radius: 0 40px 40px 0 !important;
+        color: #f1f1f1 !important;
         box-shadow: none !important;
-        transform: none !important;
-        transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease !important;
+        transition: background-color 0.15s ease, border-color 0.15s ease !important;
         cursor: pointer !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        pointer-events: auto !important;
     }
     div[data-testid="stFormSubmitButton"] button:hover,
-    div[data-testid="stForm"] button:hover,
-    .stButton button[kind="primary"]:hover {
-        background-color: #ff0000 !important;
-        border-color: #ff0000 !important;
+    div[data-testid="stForm"] button:hover {
+        background-color: #272727 !important;
+        border-color: #383838 !important;
         color: #ffffff !important;
-        box-shadow: 0 2px 10px rgba(255, 0, 0, 0.4) !important;
-        transform: none !important;
     }
     div[data-testid="stFormSubmitButton"] button:active,
-    div[data-testid="stForm"] button:active,
-    .stButton button[kind="primary"]:active {
-        background-color: #b30000 !important;
-        border-color: #b30000 !important;
-        transform: none !important;
-    }
-    div[data-testid="stFormSubmitButton"] button:focus,
-    div[data-testid="stForm"] button:focus {
-        box-shadow: 0 0 0 2px rgba(255, 0, 0, 0.5) !important;
-        outline: none !important;
+    div[data-testid="stForm"] button:active {
+        background-color: #333333 !important;
     }
     div[data-testid="stFormSubmitButton"] button p,
     div[data-testid="stForm"] button p {
         margin: 0 !important;
         padding: 0 !important;
-        font-size: 0.86rem !important;
-        font-weight: 700 !important;
-        color: #ffffff !important;
+        font-size: 1.1rem !important;
+        color: #f1f1f1 !important;
         line-height: 1 !important;
+    }
+    
+    /* 음성 마이크 버튼 */
+    .yt-mic-btn {
+        width: 40px;
+        height: 40px;
+        min-width: 40px;
+        border-radius: 50%;
+        background: #222222;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: background-color 0.15s ease;
+        margin-left: 8px;
+    }
+    .yt-mic-btn:hover {
+        background: #2e2e2e;
+    }
+    
+    /* 반응형 사이드 드로어 (분석 보관함) */
+    .yt-drawer-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.72);
+        backdrop-filter: blur(4px);
+        z-index: 99998 !important;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.25s cubic-bezier(0.1, 0.9, 0.2, 1);
+    }
+    .yt-drawer-backdrop.open {
+        opacity: 1;
+        pointer-events: auto;
+    }
+    .yt-drawer-panel {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 370px;
+        max-width: 88vw;
+        height: 100vh;
+        background: #0f0f0f;
+        border-right: 1px solid #282828;
+        box-shadow: 6px 0 28px rgba(0, 0, 0, 0.85);
+        z-index: 99999 !important;
+        transform: translateX(-100%);
+        transition: transform 0.28s cubic-bezier(0.1, 0.9, 0.2, 1);
+        display: flex;
+        flex-direction: column;
+        box-sizing: border-box;
+    }
+    .yt-drawer-panel.open {
+        transform: translateX(0);
+    }
+    .d-panel-header {
+        display: flex;
+        align-items: center;
+        padding: 0 16px;
+        height: 56px;
+        min-height: 56px;
+        border-bottom: 1px solid #202020;
+    }
+    .d-panel-body {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        padding: 12px 14px;
+    }
+    .d-menu-btn {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 14px;
+        background: #181818;
+        border-radius: 10px;
+        color: #f1f1f1 !important;
+        font-weight: 600;
+        font-size: 0.92rem;
+        text-decoration: none !important;
+        transition: background 0.15s ease;
+        border: 1px solid #262626;
+        margin-bottom: 10px;
+    }
+    .d-menu-btn:hover {
+        background: #242424;
+        border-color: #383838;
+    }
+    .d-section-divider {
+        height: 1px;
+        background: #202020;
+        margin: 6px 0 12px 0;
+    }
+    .d-section-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        padding: 0 4px;
+    }
+    .d-count-pill {
+        background: #222222;
+        color: #3ea6ff;
+        border: 1px solid #303030;
+        border-radius: 12px;
+        padding: 2px 8px;
+        font-size: 0.72rem;
+        font-weight: 700;
+    }
+    .d-scroll-area {
+        flex: 1;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding-right: 4px;
+    }
+    .d-scroll-area::-webkit-scrollbar {
+        width: 5px;
+    }
+    .d-scroll-area::-webkit-scrollbar-thumb {
+        background: #2a2a2a;
+        border-radius: 3px;
+    }
+    .d-video-card {
+        display: flex;
+        align-items: center;
+        background: #161616;
+        border: 1px solid #262626;
+        border-radius: 10px;
+        padding: 8px 10px;
+        gap: 10px;
+        transition: all 0.18s ease;
+        position: relative;
+    }
+    .d-video-card:hover {
+        background: #202020;
+        border-color: #3ea6ff;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    }
+    .d-card-link {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none !important;
+        flex: 1;
+        min-width: 0;
+    }
+    .d-thumb-box {
+        position: relative;
+        width: 86px;
+        height: 52px;
+        min-width: 86px;
+        border-radius: 6px;
+        overflow: hidden;
+        background: #000;
+    }
+    .d-thumb-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .d-dur-tag {
+        position: absolute;
+        bottom: 3px;
+        right: 4px;
+        background: rgba(0, 0, 0, 0.85);
+        color: #fff;
+        font-size: 0.68rem;
+        font-weight: 700;
+        padding: 1px 4px;
+        border-radius: 4px;
+    }
+    .d-info-box {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+    }
+    .d-title {
+        color: #f1f1f1;
+        font-size: 0.82rem;
+        font-weight: 600;
+        line-height: 1.3;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .d-uploader {
+        color: #888888;
+        font-size: 0.72rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .d-footer-row {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 1px;
+    }
+    .d-token-tag {
+        background: #0e2a47;
+        color: #3ea6ff;
+        border: 1px solid #1c4a75;
+        border-radius: 8px;
+        padding: 1px 5px;
+        font-size: 0.65rem;
+        font-weight: 700;
+    }
+    .d-date-tag {
+        color: #666;
+        font-size: 0.68rem;
+    }
+    .d-del-btn {
+        width: 28px;
+        height: 28px;
+        min-width: 28px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none !important;
+        opacity: 0.5;
+        transition: all 0.15s ease;
+    }
+    .d-del-btn:hover {
+        opacity: 1;
+        background: rgba(255, 0, 0, 0.15);
+    }
+    .d-empty-box {
+        text-align: center;
+        padding: 40px 16px;
+        color: #777;
+    }
+    .d-panel-footer {
+        padding-top: 10px;
+        border-top: 1px solid #202020;
+        margin-top: 8px;
+    }
+    .d-clear-all-btn {
+        display: block;
+        text-align: center;
+        padding: 7px;
+        font-size: 0.76rem;
+        color: #999 !important;
+        text-decoration: none !important;
+        border-radius: 6px;
+        transition: all 0.15s ease;
+    }
+    .d-clear-all-btn:hover {
+        color: #ff5555 !important;
+        background: #1f1414;
     }
 </style>
 """, unsafe_allow_html=True)
+
+
+# --- [홈 복귀 및 캐시 로드/삭제 핸들러] ---
+q_params = st.query_params
+
+if q_params.get("home") == "true" or q_params.get("reset") == "true":
+    for key in list(st.session_state.keys()):
+        del st.session_state[key]
+    st.query_params.clear()
+    st.rerun()
+
+load_cache_id = q_params.get("load_cache")
+if load_cache_id:
+    c_data = load_from_cache(load_cache_id)
+    if c_data:
+        st.session_state.video_id = c_data["video_id"]
+        st.session_state.video_info = c_data["video_info"]
+        st.session_state.audio_path = c_data["audio_path"]
+        st.session_state.transcript_data = c_data["transcript_data"]
+        st.session_state.chapters_data = c_data.get("chapters_data", [])
+        st.session_state.current_url = c_data.get("url", f"https://www.youtube.com/watch?v={load_cache_id}")
+        st.session_state.chat_messages = []
+        st.session_state.from_cache = True
+        st.query_params.clear()
+        st.rerun()
+
+del_cache_id = q_params.get("delete_cache")
+if del_cache_id:
+    delete_from_cache(del_cache_id)
+    st.query_params.clear()
+    st.rerun()
+
+if q_params.get("clear_all_cache") == "true":
+    clear_all_cache()
+    st.query_params.clear()
+    st.rerun()
 
 
 # --- 세션 상태 초기화 ---
@@ -304,39 +651,178 @@ with st.sidebar:
         st.success("✅ Gemini API 연결 완료")
 
 
-# --- [핵심] 최상단 네비바 & 중앙 정렬 알약형 링크 검색창 ---
-col_head_left, col_head_center, col_head_right = st.columns([2.2, 5.6, 2.2], gap="medium")
+# --- [핵심] 유튜브 공식 상단 네비바 (Image 2 완벽 구현) ---
+col_head_left, col_head_center, col_head_right = st.columns([2.0, 5.8, 2.2], gap="small")
 
 with col_head_left:
     st.markdown("""
     <div class="yt-nav-header-left">
-        <div class="yt-logo-group">
+        <button class="yt-menu-icon" onclick="openDrawer()" title="카테고리 메뉴 열기 (분석 보관함)" style="background:none; border:none; padding:0; cursor:pointer;">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="#ffffff">
+                <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+            </svg>
+        </button>
+        <a href="?home=true" target="_self" class="yt-logo-link" title="YouTube 홈으로 돌아가기">
             <svg width="28" height="20" viewBox="0 0 32 23" fill="none">
                 <path d="M31.24 3.49C30.87 2.12 29.8 1.05 28.43 0.68C25.96 0 16 0 16 0C16 0 6.04 0 3.57 0.68C2.2 1.05 1.13 2.12 0.76 3.49C0 5.96 0 11.1 0 11.1C0 11.1 0 16.24 0.76 18.71C1.13 20.08 2.2 21.15 3.57 21.52C6.04 22.2 16 22.2 16 22.2C16 22.2 25.96 22.2 28.43 21.52C29.8 21.15 30.87 20.08 31.24 18.71C32 16.24 32 11.1 32 11.1C32 11.1 32 5.96 31.24 3.49Z" fill="#FF0000"/>
                 <polygon points="12.8,15.8 21.2,11.1 12.8,6.4" fill="#FFFFFF"/>
             </svg>
-            <span class="yt-logo-text">AI Studio</span>
-            <span class="badge-gemini">3.5 & 3.8</span>
-        </div>
+            <span class="yt-wordmark">YouTube</span>
+            <span class="yt-country-code">KR</span>
+        </a>
     </div>
     """, unsafe_allow_html=True)
 
 with col_head_center:
-    with st.form("yt_search_form", clear_on_submit=False, border=False):
-        c_search_in, c_search_btn = st.columns([82, 18], gap="small")
-        with c_search_in:
-            url_input = st.text_input(
-                "유튜브 링크 주소",
-                value=st.session_state.current_url,
-                placeholder="유튜브 영상 링크 입력 (예: https://www.youtube.com/watch?v=...)",
-                label_visibility="collapsed",
-                key="yt_url_input_box",
-            )
-        with c_search_btn:
-            search_submit = st.form_submit_button("🔍 검색", type="primary", use_container_width=True)
+    c_s_form, c_s_mic = st.columns([91, 9], gap="small")
+    with c_s_form:
+        with st.form("yt_search_form", clear_on_submit=False, border=False):
+            c_search_in, c_search_btn = st.columns([88, 12], gap="small")
+            with c_search_in:
+                url_input = st.text_input(
+                    "유튜브 링크 주소",
+                    value=st.session_state.current_url,
+                    placeholder="검색할 유튜브 영상 링크 입력 (예: https://www.youtube.com/watch?v=...)",
+                    label_visibility="collapsed",
+                    key="yt_url_input_box",
+                )
+            with c_search_btn:
+                search_submit = st.form_submit_button("🔍", type="primary", use_container_width=True)
+    with c_s_mic:
+        st.markdown("""
+        <div class="yt-mic-btn" title="음성으로 검색">
+            <svg viewBox="0 0 24 24" width="19" height="19" fill="#f1f1f1">
+                <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm-1-9c0-.55.45-1 1-1s1 .45 1 1v6c0 .55-.45 1-1 1s-1-.45-1-1V5zm6 6c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+            </svg>
+        </div>
+        """, unsafe_allow_html=True)
 
 with col_head_right:
-    st.write("")
+    st.markdown("""
+    <div class="yt-nav-header-right">
+        <div class="yt-create-btn" title="만들기">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="#ffffff">
+                <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+            </svg>
+            <span>만들기</span>
+        </div>
+        <div class="yt-icon-round-btn" title="알림">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="#ffffff">
+                <path d="M10 20h4c0 1.1-.9 2-2 2s-2-.9-2-2zm10-2v-1l-2-2v-6c0-3.07-1.63-5.64-4.5-6.32V2c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 3.36 6 5.92 6 9v6l-2 2v1h16zm-3-2H7v-7c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5v7z"/>
+            </svg>
+        </div>
+        <div class="yt-avatar-circle" title="계정">10</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+# --- [반응형 사이드 드로어 마크업 & JS 주입] ---
+cached_videos_list = get_all_cached_videos()
+cached_cards_html = ""
+
+if cached_videos_list:
+    for cv in cached_videos_list:
+        v_t_esc = cv['title'].replace('"', '&quot;').replace("'", "&#39;")
+        cached_cards_html += f"""
+        <div class="d-video-card">
+            <a href="?load_cache={cv['video_id']}" target="_self" class="d-card-link" title="{v_t_esc}">
+                <div class="d-thumb-box">
+                    <img src="{cv['thumbnail']}" alt="thumb" class="d-thumb-img" onerror="this.src='https://img.youtube.com/vi/{cv['video_id']}/hqdefault.jpg'"/>
+                    <span class="d-dur-tag">{cv['duration_str']}</span>
+                </div>
+                <div class="d-info-box">
+                    <div class="d-title">{v_t_esc}</div>
+                    <div class="d-uploader">📺 {cv['uploader']}</div>
+                    <div class="d-footer-row">
+                        <span class="d-token-tag">⚡ 0토큰 로드</span>
+                        <span class="d-date-tag">{cv['cached_at']}</span>
+                    </div>
+                </div>
+            </a>
+            <a href="?delete_cache={cv['video_id']}" target="_self" class="d-del-btn" title="보관함에서 삭제" onclick="return confirm('이 영상의 분석 캐시를 삭제하시겠습니까?');">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="#888">
+                    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                </svg>
+            </a>
+        </div>
+        """
+else:
+    cached_cards_html = """
+    <div class="d-empty-box">
+        <div style="font-size: 2.2rem; margin-bottom: 8px;">📂</div>
+        <div style="font-weight: 700; color: #ffffff; margin-bottom: 4px; font-size: 0.95rem;">아직 보관된 영상이 없습니다</div>
+        <div style="font-size: 0.8rem; color: #888888; line-height: 1.4;">상단에서 유튜브 링크를 분석하면<br>여기에 자동으로 보관되어 언제든 0토큰으로 다시 볼 수 있습니다.</div>
+    </div>
+    """
+
+clear_btn_html = f'<div class="d-panel-footer"><a href="?clear_all_cache=true" target="_self" class="d-clear-all-btn" onclick="return confirm(\'정말 모든 분석 캐시를 삭제하시겠습니까?\');">🗑️ 전체 캐시 비우기</a></div>' if cached_videos_list else ''
+
+drawer_markup = f"""
+<div id="yt-drawer-backdrop" class="yt-drawer-backdrop" onclick="closeDrawer()"></div>
+<div id="yt-drawer-panel" class="yt-drawer-panel">
+    <div class="d-panel-header">
+        <button class="yt-menu-icon" onclick="closeDrawer()" title="메뉴 닫기" style="background:none; border:none; padding:0; cursor:pointer;">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="#ffffff">
+                <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+            </svg>
+        </button>
+        <a href="?home=true" target="_self" class="yt-logo-link" style="margin-left: 12px;">
+            <svg width="28" height="20" viewBox="0 0 32 23" fill="none">
+                <path d="M31.24 3.49C30.87 2.12 29.8 1.05 28.43 0.68C25.96 0 16 0 16 0C16 0 6.04 0 3.57 0.68C2.2 1.05 1.13 2.12 0.76 3.49C0 5.96 0 11.1 0 11.1C0 11.1 0 16.24 0.76 18.71C1.13 20.08 2.2 21.15 3.57 21.52C6.04 22.2 16 22.2 16 22.2C16 22.2 25.96 22.2 28.43 21.52C29.8 21.15 30.87 20.08 31.24 18.71C32 16.24 32 11.1 32 11.1C32 11.1 32 5.96 31.24 3.49Z" fill="#FF0000"/>
+                <polygon points="12.8,15.8 21.2,11.1 12.8,6.4" fill="#FFFFFF"/>
+            </svg>
+            <span class="yt-wordmark">YouTube</span>
+            <span class="yt-country-code">KR</span>
+        </a>
+    </div>
+    
+    <div class="d-panel-body">
+        <a href="?home=true" target="_self" class="d-menu-btn" title="새로운 영상 분석 홈 화면">
+            <span style="font-size: 1.15rem;">🏠</span>
+            <span>홈 (새 영상 검색)</span>
+        </a>
+        
+        <div class="d-section-divider"></div>
+        
+        <div class="d-section-header">
+            <div style="display: flex; align-items: center; gap: 6px;">
+                <span style="font-size: 1.05rem;">📁</span>
+                <span style="font-weight: 700; font-size: 0.95rem; color: #ffffff;">분석 보관함</span>
+            </div>
+            <span class="d-count-pill">{len(cached_videos_list)}개 보관</span>
+        </div>
+        
+        <div class="d-scroll-area">
+            {cached_cards_html}
+        </div>
+        
+        {clear_btn_html}
+    </div>
+</div>
+
+<script>
+function openDrawer() {{
+    var bd = document.getElementById('yt-drawer-backdrop');
+    var pn = document.getElementById('yt-drawer-panel');
+    if (bd && pn) {{
+        bd.classList.add('open');
+        pn.classList.add('open');
+    }}
+}}
+function closeDrawer() {{
+    var bd = document.getElementById('yt-drawer-backdrop');
+    var pn = document.getElementById('yt-drawer-panel');
+    if (bd && pn) {{
+        bd.classList.remove('open');
+        pn.classList.remove('open');
+    }}
+}}
+document.addEventListener('keydown', function(e) {{
+    if (e.key === 'Escape') closeDrawer();
+}});
+</script>
+"""
+st.markdown(drawer_markup, unsafe_allow_html=True)
+
 
 
 # 다운로드 폴더
@@ -351,43 +837,69 @@ if search_submit or st.session_state.get("trigger_search", False):
     st.session_state.trigger_search = False
     if not target_url:
         st.error("유튜브 영상 링크를 입력해주세요.")
-    elif not api_key_input.strip():
-        st.error("사이드바에서 Gemini API 키를 입력해주세요.")
     else:
         v_id = extract_video_id(target_url)
         if not v_id:
             st.error("올바른 유튜브 링크 형식이 아닙니다. (예: https://www.youtube.com/watch?v=...)")
         else:
-            st.session_state.current_url = target_url
-            status_holder = st.empty()
-            with status_holder.status("🎬 유튜브 영상 분석 및 AI 데이터 생성 중...", expanded=True) as status:
-                try:
-                    status.write("📥 1/3: 영상 메타데이터 조회 및 오디오 추출...")
-                    audio_path, video_info = download_audio(target_url, output_dir=download_dir)
-                    st.session_state.video_id = v_id
-                    st.session_state.video_info = video_info
-                    st.session_state.audio_path = audio_path
+            # [핵심 1] 이전에 분석한 영상인지 로컬 캐시 우선 확인 (Gemini API 0 토큰 소모)
+            cached_data = load_from_cache(v_id)
+            if cached_data:
+                st.session_state.video_id = cached_data["video_id"]
+                st.session_state.video_info = cached_data["video_info"]
+                st.session_state.audio_path = cached_data["audio_path"]
+                st.session_state.transcript_data = cached_data["transcript_data"]
+                st.session_state.chapters_data = cached_data.get("chapters_data", [])
+                st.session_state.current_url = cached_data.get("url", target_url)
+                st.session_state.chat_messages = []
+                st.session_state.from_cache = True
+                st.toast("⚡ 이전에 분석된 영상입니다. Gemini 토큰 소모 없이 즉시 불러왔습니다!", icon="🚀")
+                st.rerun()
+            elif not api_key_input.strip():
+                st.error("신규 영상 분석을 위해 사이드바에서 Gemini API 키를 입력해주세요.")
+            else:
+                # [핵심 2] 신규 영상인 경우: 오디오 다운로드 및 Gemini 3.5 STT & 3.8 챕터 생성
+                st.session_state.current_url = target_url
+                status_holder = st.empty()
+                with status_holder.status("🎬 유튜브 영상 분석 및 AI 데이터 생성 중...", expanded=True) as status:
+                    try:
+                        status.write("📥 1/3: 영상 메타데이터 조회 및 오디오 추출...")
+                        audio_path, video_info = download_audio(target_url, output_dir=download_dir)
+                        st.session_state.video_id = v_id
+                        st.session_state.video_info = video_info
+                        st.session_state.audio_path = audio_path
 
-                    status.write("🎙️ 2/3: `gemini-3.5-transcribe` 모델로 실시간 타임스탬프 전사 추출...")
-                    transcript_res = transcribe_with_timestamps(audio_path, api_key=api_key_input.strip())
-                    st.session_state.transcript_data = transcript_res
+                        status.write("🎙️ 2/3: `gemini-3.5-transcribe` 모델로 실시간 타임스탬프 전사 추출...")
+                        transcript_res = transcribe_with_timestamps(audio_path, api_key=api_key_input.strip())
+                        st.session_state.transcript_data = transcript_res
 
-                    status.write("🏷️ 3/3: `gemini-3.8-flash` 모델로 주제별 챕터 및 핵심 요약 추출...")
-                    chapters = extract_video_chapters(
-                        segments=transcript_res.get("segments", []),
-                        full_text=transcript_res.get("full_text", ""),
-                        api_key=api_key_input.strip(),
-                    )
-                    st.session_state.chapters_data = chapters
-                    st.session_state.chat_messages = []
+                        status.write("🏷️ 3/3: `gemini-3.8-flash` 모델로 주제별 챕터 및 핵심 요약 추출...")
+                        chapters = extract_video_chapters(
+                            segments=transcript_res.get("segments", []),
+                            full_text=transcript_res.get("full_text", ""),
+                            api_key=api_key_input.strip(),
+                        )
+                        st.session_state.chapters_data = chapters
+                        st.session_state.chat_messages = []
+                        st.session_state.from_cache = False
 
-                    status.update(label="🎉 영상 분석 및 카테고리 생성 완료!", state="complete", expanded=False)
-                    status_holder.empty()
-                    st.rerun()
+                        # [핵심 3] 다음 재호출 시 0토큰으로 즉시 로드할 수 있도록 로컬 캐시에 자동 영구 저장
+                        save_to_cache(
+                            video_id=v_id,
+                            video_info=video_info,
+                            audio_path=audio_path,
+                            transcript_data=transcript_res,
+                            chapters_data=chapters,
+                            url=target_url,
+                        )
 
-                except Exception as e:
-                    status.update(label="❌ 오류 발생", state="error", expanded=True)
-                    st.error(f"오류 상세: {e}")
+                        status.update(label="🎉 영상 분석 및 카테고리 보관 완료!", state="complete", expanded=False)
+                        status_holder.empty()
+                        st.rerun()
+
+                    except Exception as e:
+                        status.update(label="❌ 오류 발생", state="error", expanded=True)
+                        st.error(f"오류 상세: {e}")
 
 
 # --- 메인 구글 유튜브 스타일 일체형 통합 웹 앱 ---
@@ -2022,15 +2534,25 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
     # 컴포넌트 높이 620px로 지정하여 상단 UI 잘림 없이 한 화면에 완전 렌더링
     components.html(integrated_html, height=620)
 
-    # 하단 비디오 상세 정보 바 (다운로드 버튼 완전 삭제 및 전체 폭 정렬)
+    # 하단 비디오 상세 정보 바 (토큰 0 캐시 로드 여부 표시)
     uploader_initial = v_uploader[0].upper() if v_uploader else "Y"
+    is_from_cache = st.session_state.get("from_cache", False)
+    cache_badge_html = """
+    <span style="margin-left: auto; color: #10b981; font-size: 0.76rem; font-weight: 700; background: #0c291e; border: 1px solid #165b40; padding: 2px 10px; border-radius: 12px; white-space: nowrap;">
+        ⚡ 로컬 캐시 (토큰 0 소모)
+    </span>
+    """ if is_from_cache else """
+    <span style="margin-left: auto; color: #3ea6ff; font-size: 0.76rem; font-weight: 700; background: #0f2338; border: 1px solid #1d466e; padding: 2px 10px; border-radius: 12px; white-space: nowrap;">
+        ✨ Gemini 3.5 신규 분석
+    </span>
+    """
 
     st.markdown(f"""
     <div style="background: #181818; border: 1px solid #282828; border-radius: 8px; padding: 4px 14px; height: 34px; display: flex; align-items: center; gap: 10px; overflow: hidden;" title="{v_title}">
         <div style="width: 22px; height: 22px; min-width: 22px; background: #333333; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 0.72rem; font-weight: 700;">
             {uploader_initial}
         </div>
-        <span style="font-weight: 700; font-size: 0.88rem; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 70%;">
+        <span style="font-weight: 700; font-size: 0.88rem; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 58%;">
             {v_title}
         </span>
         <span style="color: #555;">•</span>
@@ -2039,8 +2561,10 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
         <span style="color: #aaaaaa; font-size: 0.8rem; white-space: nowrap;">조회수 {v_views}회</span>
         <span style="color: #555;">•</span>
         <span style="color: #aaaaaa; font-size: 0.8rem; white-space: nowrap;">⏱️ {v_duration_str}</span>
+        {cache_badge_html}
     </div>
     """, unsafe_allow_html=True)
+
 
 else:
     # 초기 대기 화면 (중앙 정렬 배너 & 원클릭 샘플 추천 칩)

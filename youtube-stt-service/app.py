@@ -203,14 +203,21 @@ if "translated_text" not in st.session_state:
     st.session_state.translated_text = None
 
 
+# --- [홈 복귀 로직] 로고 클릭 시 첫 페이지로 복귀 ---
+if st.query_params.get("home") == "true" or st.query_params.get("reset") == "true":
+    for k in list(st.session_state.keys()):
+        del st.session_state[k]
+    st.query_params.clear()
+    st.rerun()
+
 # --- 상단 유튜브 스타일 헤더 바 ---
 st.markdown("""
 <div class="yt-navbar">
-    <div class="yt-logo">
+    <a href="?home=true" target="_self" class="yt-logo" style="text-decoration: none; cursor: pointer;">
         <span style="color: #ff0000; font-size: 1.6rem;">▶</span>
         <span>Studio Transcriber</span>
         <span class="yt-badge">AI Powered</span>
-    </div>
+    </a>
     <div style="color: #888; font-size: 0.85rem;">Google Gemini 3.5 & yt-dlp Engine</div>
 </div>
 """, unsafe_allow_html=True)
