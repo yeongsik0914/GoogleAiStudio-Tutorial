@@ -131,3 +131,75 @@ def answer_question_with_timestamps(
         "relevant_timestamp": "00:00",
         "relevant_seconds": 0.0,
     }
+
+
+def extract_video_chapters(
+    segments: List[Dict[str, Any]],
+    full_text: str,
+    api_key: str = None,
+) -> List[Dict[str, Any]]:
+    """
+    Gemini 3.8 Flash를 활용하여 전체 대본을 주제별 주요 카테고리/챕터(시작시간, 제목, 핵심요약)로 자동 분할합니다.
+    """
+    key = api_key or os.environ.get("GEMINI_API_KEY")
+    if not key:
+        return []
+
+    client = genai.Client(api_key=key)
+
+    timeline_script = "\n".join([
+        f"[{seg['time_str']}] {seg['text']}"
+        for seg in segments[:120]
+    ])
+
+    prompt = f"""당신은 영상 콘텐츠 분석가입니다.
+아래 제공된 시간대별 영상 대본을 읽고, 영상의 흐름을 3~6개의 주요 주제(카테고리/챕터)로 나누어 정리해주세요.
+
+[대본]
+{timeline_script}
+
+[응답 규칙]
+- 반드시 아래 JSON 배열 형식으로만 응답하세요. 다른 설명은 붙이지 마세요.
+- start_seconds: 해당 챕터의 시작 시간 (초 단위 숫자)
+- time_str: "MM:SS" 형식
+- title: 해당 챕터의 핵심 주제명 (15자 이내)
+- summary: 해당 챕터의 1~2줄 핵심 내용 요약
+
+```json
+[
+  {{
+    "start_seconds": 0.0,
+    "time_str": "00:00",
+    "title": "오프닝 및 주제 소개",
+    "summary": "영상의 주제와 오늘 다룰 주요 내용을 소개합니다."
+  }}
+]
+```"""
+
+    try:
+        response = client.models.generate_content(
+            model="gemini-3.8-flash",
+            contents=prompt,
+        )
+        raw = response.text or ""
+        json_match = re.search(r"```json\s*(\[.*?\])\s*```", raw, re.DOTALL)
+        if json_match:
+            return json.loads(json_match.group(1))
+        bracket_match = re.search(r"(\[.*\])", raw, re.DOTALL)
+        if bracket_match:
+            return json.loads(bracket_match.group(1))
+    except Exception as e:
+        print(f"챕터 생성 실패: {e}")
+
+    # 실패 시 기본 세그먼트 기반 fallback
+    if segments:
+        return [
+            {
+                "start_seconds": segments[0]["start"],
+                "time_str": segments[0]["time_str"],
+                "title": "전체 영상",
+                "summary": segments[0]["text"][:60] + "...",
+            }
+        ]
+    return []
+

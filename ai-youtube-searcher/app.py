@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 # 로컬 엔진 모듈 임포트
 from downloader import extract_video_id, get_video_info, download_audio
 from transcribe_engine import transcribe_with_timestamps, format_seconds
-from qa_engine import answer_question_with_timestamps
+from qa_engine import answer_question_with_timestamps, extract_video_chapters
 
 # Windows 환경 한글 출력 인코딩 대응
 if sys.platform == "win32":
@@ -22,90 +22,121 @@ load_dotenv()
 # --- 페이지 설정 (와이드 모드, 사이드바 닫힘) ---
 st.set_page_config(
     page_title="AI 유튜브 검색기",
-    page_icon="🎬",
+    page_icon="▶️",
     layout="wide",
     initial_sidebar_state="collapsed",
 )
 
-# --- 한 화면에 딱 맞추는 모던 다크 UI CSS ---
+# --- 구글 유튜브 공식 다크 테마 UI CSS ---
 st.markdown("""
 <style>
     @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+    
     * {
-        font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+        font-family: 'Pretendard', 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
     }
     
-    /* Streamlit 기본 헤더 투명화 및 안전 여백 확보 */
+    /* 전체 배경을 유튜브 공식 다크 테마(#0f0f0f)로 지정 */
+    .stApp {
+        background-color: #0f0f0f !important;
+        color: #f1f1f1 !important;
+    }
+    
+    /* Streamlit 기본 헤더 투명화 */
     header[data-testid="stHeader"] {
         background: transparent !important;
         height: 2.5rem !important;
     }
     
-    /* 기본 여백 설정 (상단 헤더와 겹치지 않도록 padding-top 3.5rem 지정) */
+    /* 여백 최적화 */
     .block-container {
-        padding-top: 3.5rem !important;
-        padding-bottom: 0.8rem !important;
-        padding-left: 2rem !important;
-        padding-right: 2rem !important;
+        padding-top: 3.2rem !important;
+        padding-bottom: 1rem !important;
+        padding-left: 1.8rem !important;
+        padding-right: 1.8rem !important;
         max-width: 100% !important;
     }
     
-    /* 상단 슬림 네비바 */
-    .nav-header {
+    /* 유튜브 스타일 상단 네비게이션 헤더 */
+    .yt-nav-header {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        background: #111111;
-        border: 1px solid #282828;
-        border-radius: 12px;
-        padding: 10px 18px;
-        margin-bottom: 14px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        background: #0f0f0f;
+        border-bottom: 1px solid #272727;
+        padding: 8px 12px 14px 12px;
+        margin-bottom: 16px;
     }
-    .brand-title {
+    .yt-logo-group {
         display: flex;
         align-items: center;
-        gap: 10px;
-        font-size: 1.25rem;
+        gap: 8px;
+        cursor: pointer;
+    }
+    .yt-logo-text {
+        font-size: 1.35rem;
         font-weight: 800;
+        letter-spacing: -0.5px;
         color: #ffffff;
+        display: flex;
+        align-items: center;
+        gap: 6px;
     }
     .badge-gemini {
-        background: linear-gradient(135deg, #ff4b4b, #ff7675);
+        background: linear-gradient(135deg, #ff0000 0%, #ff4b4b 100%);
         color: white;
-        padding: 3px 10px;
-        border-radius: 6px;
-        font-size: 0.75rem;
+        padding: 3px 8px;
+        border-radius: 12px;
+        font-size: 0.72rem;
         font-weight: 700;
         letter-spacing: 0.3px;
     }
+    .yt-sub-desc {
+        color: #aaaaaa;
+        font-size: 0.85rem;
+    }
 
-    /* 챗봇 컨테이너 스타일 */
-    .chat-card {
-        background: #141414;
-        border: 1px solid #242424;
-        border-radius: 12px;
-        padding: 12px;
-        height: 100%;
+    /* 다운로드 버튼 칩 스타일 */
+    .stDownloadButton button {
+        background: #272727 !important;
+        color: #f1f1f1 !important;
+        border: 1px solid #3f3f3f !important;
+        border-radius: 18px !important;
+        font-weight: 600 !important;
+        font-size: 0.82rem !important;
+        padding: 5px 16px !important;
+        transition: all 0.2s ease !important;
     }
-    .chat-bubble-user {
-        background: #253342;
-        color: #ffffff;
-        padding: 8px 12px;
-        border-radius: 10px 10px 2px 10px;
-        margin-bottom: 8px;
-        font-size: 0.88rem;
-        line-height: 1.35;
+    .stDownloadButton button:hover {
+        background: #3f3f3f !important;
+        border-color: #555555 !important;
+        color: #ffffff !important;
     }
-    .chat-bubble-ai {
-        background: #1c1c1c;
-        color: #ececec;
-        padding: 10px 14px;
-        border-radius: 10px 10px 10px 2px;
-        margin-bottom: 10px;
-        font-size: 0.88rem;
-        border-left: 3px solid #ff4b4b;
-        line-height: 1.45;
+    
+    /* 기본 버튼 스타일 */
+    .stButton button[kind="primary"] {
+        background-color: #cc0000 !important;
+        border: none !important;
+        border-radius: 20px !important;
+        color: #ffffff !important;
+        font-weight: 700 !important;
+        transition: background-color 0.2s ease !important;
+    }
+    .stButton button[kind="primary"]:hover {
+        background-color: #ff0000 !important;
+    }
+    
+    /* 인풋창 스타일 */
+    .stTextInput input {
+        background-color: #121212 !important;
+        color: #f1f1f1 !important;
+        border: 1px solid #303030 !important;
+        border-radius: 20px !important;
+    }
+    .stTextInput input:focus {
+        border-color: #3ea6ff !important;
+        box-shadow: 0 0 0 1px #3ea6ff !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -120,29 +151,31 @@ if "audio_path" not in st.session_state:
     st.session_state.audio_path = None
 if "transcript_data" not in st.session_state:
     st.session_state.transcript_data = None
+if "chapters_data" not in st.session_state:
+    st.session_state.chapters_data = []
 if "chat_messages" not in st.session_state:
     st.session_state.chat_messages = []
 
 
-# --- 상단 슬림 네비바 ---
+# --- 유튜브 스타일 상단 네비바 ---
 st.markdown("""
-<div class="nav-header">
-    <div class="brand-title">
-        <svg width="26" height="18" viewBox="0 0 28 20" fill="none">
-            <rect width="28" height="20" rx="5" fill="#FF0000"/>
-            <polygon points="11,6 19,10 11,14" fill="#FFFFFF"/>
+<div class="yt-nav-header">
+    <div class="yt-logo-group">
+        <svg width="32" height="23" viewBox="0 0 32 23" fill="none">
+            <path d="M31.24 3.49C30.87 2.12 29.8 1.05 28.43 0.68C25.96 0 16 0 16 0C16 0 6.04 0 3.57 0.68C2.2 1.05 1.13 2.12 0.76 3.49C0 5.96 0 11.1 0 11.1C0 11.1 0 16.24 0.76 18.71C1.13 20.08 2.2 21.15 3.57 21.52C6.04 22.2 16 22.2 16 22.2C16 22.2 25.96 22.2 28.43 21.52C29.8 21.15 30.87 20.08 31.24 18.71C32 16.24 32 11.1 32 11.1C32 11.1 32 5.96 31.24 3.49Z" fill="#FF0000"/>
+            <polygon points="12.8,15.8 21.2,11.1 12.8,6.4" fill="#FFFFFF"/>
         </svg>
-        <span>AI 유튜브 검색기</span>
+        <span class="yt-logo-text">YouTube AI Studio</span>
         <span class="badge-gemini">Gemini 3.5 & 3.8</span>
     </div>
-    <div style="color: #888; font-size: 0.84rem;">실시간 대본 싱크 • 무중단 음향 제어 • 영상 질의응답</div>
+    <div class="yt-sub-desc">실시간 대본 싱크 • AI 영상 질의응답 • 카테고리별 챕터 요약</div>
 </div>
 """, unsafe_allow_html=True)
 
 
 # --- 사이드바 설정 ---
 with st.sidebar:
-    st.header("⚙️ 환경 설정")
+    st.header("⚙️ Gemini API 설정")
     env_api_key = os.environ.get("GEMINI_API_KEY", "")
     api_key_input = st.text_input(
         "Gemini API Key",
@@ -151,12 +184,12 @@ with st.sidebar:
         help=".env 파일 또는 직접 입력 가능",
     )
     if not api_key_input:
-        st.warning("⚠️ API 키를 입력해주세요.")
+        st.warning("⚠️ Gemini API 키를 입력해주세요.")
     else:
-        st.success("✅ API 키 인증 완료")
+        st.success("✅ Gemini API 연결 완료")
 
 
-# --- 상단 검색창 (유튜브 검색창 스타일, 한 줄 배치) ---
+# --- 상단 검색창 (유튜브 알약 형태 검색창) ---
 col_search, col_btn = st.columns([84, 16], gap="small")
 with col_search:
     url_input = st.text_input(
@@ -184,580 +217,1151 @@ if search_submit:
         if not v_id:
             st.error("올바른 유튜브 링크 형식이 아닙니다.")
         else:
-            with st.status("🎬 영상 로드 및 타임스탬프 분석 중...", expanded=True) as status:
+            with st.status("🎬 유튜브 영상 분석 및 AI 데이터 생성 중...", expanded=True) as status:
                 try:
-                    status.write("📥 1/3: 영상 정보 조회 및 오디오 추출...")
+                    status.write("📥 1/3: 영상 메타데이터 조회 및 오디오 추출...")
                     audio_path, video_info = download_audio(url_input.strip(), output_dir=download_dir)
                     st.session_state.video_id = v_id
                     st.session_state.video_info = video_info
                     st.session_state.audio_path = audio_path
 
-                    status.write("🎙️ 2/3: `gemini-3.5-transcribe` 모델로 실시간 타임스탬프 추출 중...")
+                    status.write("🎙️ 2/3: `gemini-3.5-transcribe` 모델로 실시간 타임스탬프 전사 추출...")
                     transcript_res = transcribe_with_timestamps(audio_path, api_key=api_key_input.strip())
                     st.session_state.transcript_data = transcript_res
 
+                    status.write("🏷️ 3/3: `gemini-3.8-flash` 모델로 주제별 챕터 및 핵심 요약 추출...")
+                    chapters = extract_video_chapters(
+                        segments=transcript_res.get("segments", []),
+                        full_text=transcript_res.get("full_text", ""),
+                        api_key=api_key_input.strip(),
+                    )
+                    st.session_state.chapters_data = chapters
                     st.session_state.chat_messages = []
-                    status.write("✨ 3/3: 분석 완료!")
-                    status.update(label="🎉 영상 분석 완료!", state="complete", expanded=False)
+
+                    status.update(label="🎉 영상 분석 및 카테고리 생성 완료!", state="complete", expanded=False)
 
                 except Exception as e:
                     status.update(label="❌ 오류 발생", state="error", expanded=True)
                     st.error(f"오류 상세: {e}")
 
 
-# --- 메인 2열 레이아웃: 한 화면에 맞춘 컴팩트 뷰 ---
+# --- 메인 구글 유튜브 스타일 일체형 통합 웹 앱 ---
 if st.session_state.video_id and st.session_state.video_info and st.session_state.transcript_data:
     v_id = st.session_state.video_id
     v_info = st.session_state.video_info
     t_data = st.session_state.transcript_data
+    chapters = st.session_state.chapters_data or []
+    
     segments_json = json.dumps(t_data.get("segments", []), ensure_ascii=False)
+    chapters_json = json.dumps(chapters, ensure_ascii=False)
+    chat_json = json.dumps(st.session_state.chat_messages, ensure_ascii=False)
+    v_title = v_info.get("title", "유튜브 영상")
+    v_uploader = v_info.get("uploader", "채널명")
+    v_duration_str = f"{v_info.get('duration', 0)//60}분 {v_info.get('duration', 0)%60}초"
+    v_views = f"{v_info.get('view_count', 0):,}"
+    api_key_clean = api_key_input.strip()
 
-    col_media, col_chat = st.columns([62, 38], gap="medium")
-
-    # ==============================================================
-    # 📺 [좌측]: 영상 전체 표시 + 컨트롤 + 라이브 대사 + 3개 대본
-    # ==============================================================
-    with col_media:
-        # 플레이어 + 무중단 볼륨 + 라이브 대사 + 딱 3개씩 보이는 대본 리스트 통합 컴포넌트
-        player_html = f"""
-        <!DOCTYPE html>
-        <html lang="ko">
-        <head>
-            <meta charset="UTF-8">
-            <style>
-                @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
-                * {{
-                    box-sizing: border-box;
-                    font-family: 'Pretendard', sans-serif;
-                    margin: 0;
-                    padding: 0;
-                }}
-                body {{
-                    background: transparent;
-                    color: #fff;
-                    overflow: hidden;
-                }}
-                
-                /* [해결] 영상이 잘리지 않도록 16:9 비율 고정 및 반응형 뷰포트 맞춤 */
-                .player-box {{
-                    position: relative;
-                    width: 100%;
-                    aspect-ratio: 16 / 9;
-                    max-height: 330px;
-                    background: #000;
-                    border-radius: 10px;
-                    overflow: hidden;
-                    box-shadow: 0 4px 16px rgba(0,0,0,0.6);
-                    margin: 0 auto;
-                }}
-                .player-box iframe {{
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    border: 0;
-                }}
-                
-                /* 슬림 무중단 컨트롤 바 */
-                .ctrl-bar {{
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                    background: #161616;
-                    border: 1px solid #262626;
-                    border-radius: 8px;
-                    padding: 6px 12px;
-                    margin-top: 8px;
-                    gap: 12px;
-                }}
-                .vol-group {{
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                    flex: 1;
-                }}
-                .vol-slider {{
-                    -webkit-appearance: none;
-                    width: 100%;
-                    height: 5px;
-                    border-radius: 3px;
-                    background: #333;
-                    outline: none;
-                    cursor: pointer;
-                }}
-                .vol-slider::-webkit-slider-thumb {{
-                    -webkit-appearance: none;
-                    width: 14px;
-                    height: 14px;
-                    border-radius: 50%;
-                    background: #ff4b4b;
-                    cursor: pointer;
-                    box-shadow: 0 0 4px rgba(255, 75, 75, 0.7);
-                }}
-                .vol-badge {{
-                    font-size: 0.78rem;
-                    font-weight: 700;
-                    color: #ff4b4b;
-                    min-width: 36px;
-                }}
-                .time-badge {{
-                    font-size: 0.78rem;
-                    color: #888;
-                    font-variant-numeric: tabular-nums;
-                    white-space: nowrap;
-                }}
-                
-                /* 실시간 라이브 대사 박스 */
-                .live-box {{
-                    background: linear-gradient(90deg, #132338 0%, #0d1624 100%);
-                    border: 1px solid #0284c7;
-                    border-radius: 8px;
-                    padding: 8px 12px;
-                    margin-top: 8px;
-                    box-shadow: 0 2px 8px rgba(2, 132, 199, 0.2);
-                }}
-                .live-head {{
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                    margin-bottom: 3px;
-                }}
-                .live-tag {{
-                    display: inline-flex;
-                    align-items: center;
-                    gap: 5px;
-                    background: #ef4444;
-                    color: #fff;
-                    padding: 1px 6px;
-                    border-radius: 4px;
-                    font-size: 0.68rem;
-                    font-weight: 800;
-                }}
-                .live-dot {{
-                    width: 5px;
-                    height: 5px;
-                    background: #fff;
-                    border-radius: 50%;
-                    animation: pulse 1s infinite alternate;
-                }}
-                @keyframes pulse {{
-                    from {{ opacity: 0.3; }}
-                    to {{ opacity: 1; }}
-                }}
-                .live-time {{
-                    color: #38bdf8;
-                    font-size: 0.75rem;
-                    font-weight: 700;
-                }}
-                .live-text {{
-                    color: #ffffff;
-                    font-size: 0.95rem;
-                    font-weight: 700;
-                    line-height: 1.35;
-                    white-space: nowrap;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                }}
-
-                /* [핵심] 대본에 표시되는 텍스트 수를 3개씩만 나오도록 높이 고정 (약 130px) */
-                .transcript-section {{
-                    margin-top: 8px;
-                    background: #131313;
-                    border: 1px solid #222;
-                    border-radius: 8px;
-                    padding: 6px 10px;
-                }}
-                .transcript-head-row {{
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                    margin-bottom: 6px;
-                }}
-                .transcript-title {{
-                    font-size: 0.82rem;
-                    font-weight: 700;
-                    color: #aaa;
-                    display: flex;
-                    align-items: center;
-                    gap: 5px;
-                }}
-                .search-input {{
-                    background: #1f1f1f;
-                    border: 1px solid #333;
-                    border-radius: 5px;
-                    padding: 3px 8px;
-                    color: #fff;
-                    font-size: 0.75rem;
-                    width: 140px;
-                    outline: none;
-                }}
-                .search-input:focus {{
-                    border-color: #38bdf8;
-                }}
-                
-                /* 딱 3개 카드가 화면에 피트되는 높이 (128px) */
-                .transcript-scroll-view {{
-                    height: 128px;
-                    overflow-y: auto;
-                    display: flex;
-                    flex-direction: column;
-                    gap: 5px;
-                    padding-right: 4px;
-                }}
-                .transcript-scroll-view::-webkit-scrollbar {{
-                    width: 4px;
-                }}
-                .transcript-scroll-view::-webkit-scrollbar-thumb {{
-                    background: #333;
-                    border-radius: 2px;
-                }}
-                
-                .card-item {{
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                    padding: 6px 10px;
-                    background: #1a1a1a;
-                    border: 1px solid transparent;
-                    border-radius: 6px;
-                    cursor: pointer;
-                    transition: all 0.15s ease;
-                    min-height: 36px;
-                    max-height: 38px;
-                }}
-                .card-item:hover {{
-                    background: #242424;
-                    border-color: #38bdf8;
-                }}
-                .card-item.active {{
-                    background: #15324b !important;
-                    border-color: #38bdf8 !important;
-                    box-shadow: 0 0 8px rgba(56, 189, 248, 0.4);
-                }}
-                .time-chip {{
-                    background: #262626;
-                    color: #38bdf8;
-                    font-size: 0.75rem;
-                    font-weight: 700;
-                    padding: 2px 6px;
-                    border-radius: 4px;
-                    white-space: nowrap;
-                    font-variant-numeric: tabular-nums;
-                }}
-                .card-item.active .time-chip {{
-                    background: #38bdf8;
-                    color: #0b1120;
-                }}
-                .text-content {{
-                    color: #bbb;
-                    font-size: 0.82rem;
-                    line-height: 1.25;
-                    white-space: nowrap;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                    flex: 1;
-                }}
-                .card-item.active .text-content {{
-                    color: #fff;
-                    font-weight: 600;
-                }}
-            </style>
-        </head>
-        <body>
-            <!-- 1. 비디오 뷰포트 (16:9 완전 표시, 잘림 없음) -->
-            <div class="player-box">
-                <div id="yt-player"></div>
-            </div>
-
-            <!-- 2. 무중단 실시간 음향 조절 바 -->
-            <div class="ctrl-bar">
-                <div class="vol-group">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="#ff4b4b">
-                        <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
-                    </svg>
-                    <input type="range" class="vol-slider" id="vol-slider" min="0" max="100" value="100" oninput="changeVol(this.value)">
-                    <span class="vol-badge" id="vol-badge">100%</span>
+    # 전체 화면을 하나로 통합한 일체형 컴포넌트 HTML (좌측 플레이어/타임라인 + 우측 대본 5개 뷰/챗봇/챕터)
+    integrated_html = f"""
+    <!DOCTYPE html>
+    <html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <style>
+            @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+            @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+            
+            * {{
+                box-sizing: border-box;
+                font-family: 'Pretendard', 'Roboto', sans-serif;
+                margin: 0;
+                padding: 0;
+            }}
+            body {{
+                background: #0f0f0f;
+                color: #f1f1f1;
+                overflow: hidden;
+            }}
+            
+            /* 2열 메인 컨테이너 */
+            .app-container {{
+                display: grid;
+                grid-template-columns: 60fr 40fr;
+                gap: 16px;
+                width: 100%;
+                height: 575px;
+            }}
+            
+            /* ========================================= */
+            /* 📺 좌측: 비디오 플레이어 & 타임라인 & 자막 */
+            /* ========================================= */
+            .left-column {{
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+            }}
+            
+            .player-wrapper {{
+                position: relative;
+                width: 100%;
+                aspect-ratio: 16 / 9;
+                max-height: 330px;
+                background: #000;
+                border-radius: 12px;
+                overflow: hidden;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.8);
+            }}
+            .player-wrapper iframe {{
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                border: 0;
+            }}
+            
+            /* [핵심] 유튜브 정통 인터랙티브 타임라인 (시크바) */
+            .yt-timeline-container {{
+                position: relative;
+                width: 100%;
+                height: 18px;
+                display: flex;
+                align-items: center;
+                cursor: pointer;
+                user-select: none;
+                margin-top: -2px;
+            }}
+            .yt-timeline-track {{
+                position: relative;
+                width: 100%;
+                height: 4px;
+                background: rgba(255, 255, 255, 0.2);
+                border-radius: 2px;
+                transition: height 0.15s ease;
+            }}
+            .yt-timeline-container:hover .yt-timeline-track {{
+                height: 7px;
+            }}
+            .yt-buffer-bar {{
+                position: absolute;
+                top: 0;
+                left: 0;
+                height: 100%;
+                width: 0%;
+                background: rgba(255, 255, 255, 0.35);
+                border-radius: 2px;
+                pointer-events: none;
+            }}
+            .yt-hover-bar {{
+                position: absolute;
+                top: 0;
+                left: 0;
+                height: 100%;
+                width: 0%;
+                background: rgba(255, 255, 255, 0.25);
+                border-radius: 2px;
+                pointer-events: none;
+            }}
+            .yt-play-bar {{
+                position: absolute;
+                top: 0;
+                left: 0;
+                height: 100%;
+                width: 0%;
+                background: #ff0000;
+                border-radius: 2px;
+                pointer-events: none;
+            }}
+            .yt-scrubber-handle {{
+                position: absolute;
+                top: 50%;
+                transform: translate(-50%, -50%) scale(0);
+                width: 13px;
+                height: 13px;
+                border-radius: 50%;
+                background: #ff0000;
+                transition: transform 0.15s ease;
+                pointer-events: none;
+                box-shadow: 0 0 4px rgba(255,0,0,0.8);
+            }}
+            .yt-timeline-container:hover .yt-scrubber-handle {{
+                transform: translate(-50%, -50%) scale(1);
+            }}
+            
+            /* [핵심] 마우스 호버 시 뜨는 썸네일 + 분초 툴팁 */
+            .yt-hover-tooltip {{
+                position: absolute;
+                bottom: 24px;
+                transform: translateX(-50%);
+                background: #181818;
+                border: 1px solid #383838;
+                border-radius: 8px;
+                padding: 4px;
+                box-shadow: 0 6px 16px rgba(0,0,0,0.9);
+                display: none;
+                pointer-events: none;
+                z-index: 1000;
+                text-align: center;
+            }}
+            .yt-tooltip-thumb {{
+                width: 132px;
+                height: 74px;
+                border-radius: 5px;
+                object-fit: cover;
+                display: block;
+                margin-bottom: 3px;
+            }}
+            .yt-tooltip-time {{
+                color: #ffffff;
+                font-size: 0.78rem;
+                font-weight: 700;
+                font-variant-numeric: tabular-nums;
+                letter-spacing: 0.5px;
+            }}
+            
+            /* 컨트롤 바: 볼륨 & 시간 표시 */
+            .yt-control-row {{
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                background: #181818;
+                border: 1px solid #272727;
+                border-radius: 8px;
+                padding: 6px 12px;
+                gap: 12px;
+            }}
+            .yt-vol-group {{
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                flex: 1;
+            }}
+            .yt-vol-slider {{
+                -webkit-appearance: none;
+                width: 100%;
+                height: 4px;
+                border-radius: 2px;
+                background: #333333;
+                outline: none;
+                cursor: pointer;
+            }}
+            .yt-vol-slider::-webkit-slider-thumb {{
+                -webkit-appearance: none;
+                width: 12px;
+                height: 12px;
+                border-radius: 50%;
+                background: #ff0000;
+                cursor: pointer;
+            }}
+            .yt-vol-badge {{
+                font-size: 0.78rem;
+                font-weight: 700;
+                color: #ff4b4b;
+                min-width: 36px;
+            }}
+            .yt-time-badge {{
+                font-size: 0.78rem;
+                color: #aaaaaa;
+                font-variant-numeric: tabular-nums;
+                white-space: nowrap;
+            }}
+            
+            /* 실시간 라이브 자막 바 */
+            .yt-live-caption-box {{
+                background: #181818;
+                border: 1px solid #272727;
+                border-left: 4px solid #ff0000;
+                border-radius: 8px;
+                padding: 7px 12px;
+            }}
+            .yt-live-head {{
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                margin-bottom: 2px;
+            }}
+            .yt-live-tag {{
+                display: inline-flex;
+                align-items: center;
+                gap: 5px;
+                background: #ff0000;
+                color: #fff;
+                padding: 1px 6px;
+                border-radius: 4px;
+                font-size: 0.65rem;
+                font-weight: 800;
+            }}
+            .yt-live-dot {{
+                width: 4px;
+                height: 4px;
+                background: #fff;
+                border-radius: 50%;
+                animation: pulse 1s infinite alternate;
+            }}
+            @keyframes pulse {{
+                from {{ opacity: 0.2; }}
+                to {{ opacity: 1; }}
+            }}
+            .yt-live-time {{
+                color: #3ea6ff;
+                font-size: 0.75rem;
+                font-weight: 700;
+            }}
+            .yt-live-text {{
+                color: #ffffff;
+                font-size: 0.92rem;
+                font-weight: 700;
+                line-height: 1.35;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }}
+            
+            /* ========================================= */
+            /* 📑💬 우측: 카테고리 탭 통합 사이드 패널    */
+            /* ========================================= */
+            .right-column {{
+                background: #181818;
+                border: 1px solid #272727;
+                border-radius: 12px;
+                padding: 10px;
+                display: flex;
+                flex-direction: column;
+                height: 100%;
+                overflow: hidden;
+            }}
+            
+            /* 유튜브 알약 필터 탭 바 */
+            .tab-nav-bar {{
+                display: flex;
+                gap: 6px;
+                margin-bottom: 10px;
+                border-bottom: 1px solid #282828;
+                padding-bottom: 8px;
+            }}
+            .tab-chip {{
+                background: #272727;
+                color: #f1f1f1;
+                border: 1px solid #383838;
+                border-radius: 16px;
+                padding: 5px 12px;
+                font-size: 0.78rem;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.15s ease;
+                display: flex;
+                align-items: center;
+                gap: 5px;
+                white-space: nowrap;
+            }}
+            .tab-chip:hover {{
+                background: #383838;
+            }}
+            .tab-chip.active {{
+                background: #f1f1f1 !important;
+                color: #0f0f0f !important;
+                border-color: #ffffff !important;
+                font-weight: 700 !important;
+            }}
+            
+            .tab-panel {{
+                display: none;
+                flex: 1;
+                flex-direction: column;
+                overflow: hidden;
+            }}
+            .tab-panel.active {{
+                display: flex;
+            }}
+            
+            /* ------------------------------------- */
+            /* 📑 카테고리 1: 대본 (정확히 5개 축소 뷰포트) */
+            /* ------------------------------------- */
+            .search-box-wrap {{
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                background: #121212;
+                border: 1px solid #303030;
+                border-radius: 8px;
+                padding: 5px 10px;
+                margin-bottom: 8px;
+            }}
+            .search-box-wrap input {{
+                background: transparent;
+                border: none;
+                color: #fff;
+                font-size: 0.82rem;
+                width: 100%;
+                outline: none;
+            }}
+            
+            /* [핵심] 화면에서 약 5개 정도로 축소된 높이 (약 235px) 및 스크롤/드래그 지원 */
+            .transcript-scroll-view {{
+                height: 235px;
+                min-height: 235px;
+                max-height: 235px;
+                overflow-y: auto;
+                display: flex;
+                flex-direction: column;
+                gap: 6px;
+                padding-right: 4px;
+            }}
+            .transcript-scroll-view::-webkit-scrollbar {{
+                width: 5px;
+            }}
+            .transcript-scroll-view::-webkit-scrollbar-thumb {{
+                background: #333333;
+                border-radius: 3px;
+            }}
+            .transcript-scroll-view::-webkit-scrollbar-thumb:hover {{
+                background: #555555;
+            }}
+            
+            .t-row {{
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                padding: 8px 10px;
+                background: #1f1f1f;
+                border: 1px solid transparent;
+                border-radius: 8px;
+                cursor: pointer;
+                transition: all 0.15s ease;
+                min-height: 40px;
+                max-height: 42px;
+            }}
+            .t-row:hover {{
+                background: #272727;
+                border-color: #3ea6ff;
+            }}
+            /* 실시간 하이라이트 */
+            .t-row.active {{
+                background: #0f2b4c !important;
+                border-color: #3ea6ff !important;
+                box-shadow: 0 0 10px rgba(62, 166, 255, 0.35);
+            }}
+            .t-time-btn {{
+                background: #282828;
+                color: #3ea6ff;
+                font-size: 0.74rem;
+                font-weight: 700;
+                padding: 3px 6px;
+                border-radius: 4px;
+                white-space: nowrap;
+                font-variant-numeric: tabular-nums;
+            }}
+            .t-row.active .t-time-btn {{
+                background: #3ea6ff;
+                color: #0b1120;
+            }}
+            .t-content {{
+                font-size: 0.82rem;
+                color: #cccccc;
+                line-height: 1.25;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                flex: 1;
+            }}
+            .t-row.active .t-content {{
+                color: #ffffff;
+                font-weight: 600;
+            }}
+            
+            /* ------------------------------------- */
+            /* 💬 카테고리 2: Gemini AI 챗봇           */
+            /* ------------------------------------- */
+            .preset-chips-row {{
+                display: flex;
+                gap: 5px;
+                margin-bottom: 8px;
+                flex-wrap: wrap;
+            }}
+            .preset-chip {{
+                background: #242424;
+                color: #3ea6ff;
+                border: 1px solid #333333;
+                border-radius: 12px;
+                padding: 3px 8px;
+                font-size: 0.72rem;
+                font-weight: 600;
+                cursor: pointer;
+            }}
+            .preset-chip:hover {{
+                background: #333333;
+                color: #ffffff;
+            }}
+            .chat-messages-container {{
+                flex: 1;
+                overflow-y: auto;
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+                padding-right: 4px;
+                margin-bottom: 8px;
+            }}
+            .chat-messages-container::-webkit-scrollbar {{
+                width: 5px;
+            }}
+            .chat-messages-container::-webkit-scrollbar-thumb {{
+                background: #333;
+                border-radius: 3px;
+            }}
+            .chat-bubble-u {{
+                background: #252e3e;
+                color: #fff;
+                padding: 7px 10px;
+                border-radius: 10px 10px 2px 10px;
+                align-self: flex-end;
+                font-size: 0.8rem;
+                max-width: 90%;
+                line-height: 1.3;
+            }}
+            .chat-bubble-a {{
+                background: #1f1f1f;
+                border: 1px solid #2e2e2e;
+                border-left: 3px solid #ff0000;
+                color: #ececec;
+                padding: 8px 12px;
+                border-radius: 10px 10px 10px 2px;
+                align-self: flex-start;
+                font-size: 0.8rem;
+                max-width: 96%;
+                line-height: 1.4;
+            }}
+            .chat-input-row {{
+                display: flex;
+                gap: 6px;
+            }}
+            .chat-input {{
+                flex: 1;
+                background: #121212;
+                border: 1px solid #333;
+                border-radius: 16px;
+                padding: 6px 12px;
+                color: #fff;
+                font-size: 0.8rem;
+                outline: none;
+            }}
+            .chat-send-btn {{
+                background: #cc0000;
+                border: none;
+                border-radius: 16px;
+                color: #fff;
+                padding: 6px 14px;
+                font-size: 0.8rem;
+                font-weight: 700;
+                cursor: pointer;
+            }}
+            .chat-send-btn:hover {{
+                background: #ff0000;
+            }}
+            
+            /* ------------------------------------- */
+            /* 🏷️ 카테고리 3: 주제별 챕터 요약        */
+            /* ------------------------------------- */
+            .chapters-scroll-view {{
+                flex: 1;
+                overflow-y: auto;
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+                padding-right: 4px;
+            }}
+            .chapters-scroll-view::-webkit-scrollbar {{
+                width: 5px;
+            }}
+            .chapters-scroll-view::-webkit-scrollbar-thumb {{
+                background: #333;
+                border-radius: 3px;
+            }}
+            .ch-card {{
+                background: #1f1f1f;
+                border: 1px solid #2c2c2c;
+                border-radius: 8px;
+                padding: 8px 10px;
+                cursor: pointer;
+                transition: all 0.15s ease;
+            }}
+            .ch-card:hover {{
+                background: #272727;
+                border-color: #ff0000;
+            }}
+            .ch-header {{
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                margin-bottom: 4px;
+            }}
+            .ch-time {{
+                background: #ff0000;
+                color: #fff;
+                font-size: 0.72rem;
+                font-weight: 700;
+                padding: 1px 6px;
+                border-radius: 4px;
+                font-variant-numeric: tabular-nums;
+            }}
+            .ch-title {{
+                color: #fff;
+                font-size: 0.85rem;
+                font-weight: 700;
+            }}
+            .ch-desc {{
+                color: #aaa;
+                font-size: 0.78rem;
+                line-height: 1.35;
+            }}
+        </style>
+    </head>
+    <body>
+        <div class="app-container">
+            <!-- ============================================== -->
+            <!-- 📺 [좌측]: 비디오 + 타임라인 + 컨트롤 + 라이브자막 -->
+            <!-- ============================================== -->
+            <div class="left-column">
+                <div class="player-wrapper">
+                    <div id="yt-player"></div>
                 </div>
-                <div class="time-badge">
-                    ⏱️ <span id="time-current">00:00</span> / <span id="time-total">00:00</span>
-                </div>
-            </div>
 
-            <!-- 3. 실시간 라이브 대사 (한 줄 컴팩트) -->
-            <div class="live-box">
-                <div class="live-head">
-                    <div class="live-tag">
-                        <span class="live-dot"></span>
-                        <span>실시간 대사</span>
+                <!-- [핵심] 유튜브 정통 타임라인 바 (마우스 호버 시 썸네일 & 분초 툴팁) -->
+                <div class="yt-timeline-container" id="timeline-container">
+                    <!-- 마우스 호버 툴팁 -->
+                    <div class="yt-hover-tooltip" id="hover-tooltip">
+                        <img class="yt-tooltip-thumb" id="tooltip-thumb" src="https://img.youtube.com/vi/{v_id}/mqdefault.jpg" alt="thumbnail">
+                        <div class="yt-tooltip-time" id="tooltip-time">00:00</div>
                     </div>
-                    <div class="live-time" id="live-time-display">00:00</div>
-                </div>
-                <div class="live-text" id="live-text-display">영상을 재생하면 실시간 대사가 여기에 나타납니다.</div>
-            </div>
-
-            <!-- 4. 전체 대본 (딱 3개씩 보이는 컴팩트 스크롤 뷰) -->
-            <div class="transcript-section">
-                <div class="transcript-head-row">
-                    <div class="transcript-title">
-                        <span>📑 시간대별 대본</span>
-                        <span style="font-size: 0.7rem; color: #666;">(클릭 시 즉시 이동)</span>
+                    <!-- 트랙 바 -->
+                    <div class="yt-timeline-track" id="timeline-track">
+                        <div class="yt-buffer-bar" id="buffer-bar"></div>
+                        <div class="yt-hover-bar" id="hover-bar"></div>
+                        <div class="yt-play-bar" id="play-bar"></div>
+                        <div class="yt-scrubber-handle" id="scrubber-handle"></div>
                     </div>
-                    <input type="text" class="search-input" placeholder="🔍 대본 검색..." oninput="onSearchFilter(this.value)">
                 </div>
-                <div class="transcript-scroll-view" id="transcript-list">
-                    <!-- JS 카드가 들어갑니다 -->
+
+                <!-- 볼륨 및 시간 제어 -->
+                <div class="yt-control-row">
+                    <div class="yt-vol-group">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="#ff0000">
+                            <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+                        </svg>
+                        <input type="range" class="yt-vol-slider" min="0" max="100" value="100" oninput="changeVol(this.value)">
+                        <span class="yt-vol-badge" id="vol-badge">100%</span>
+                    </div>
+                    <div class="yt-time-badge">
+                        ⏱️ <span id="time-current">00:00</span> / <span id="time-total">00:00</span>
+                    </div>
+                </div>
+
+                <!-- 실시간 라이브 자막 -->
+                <div class="yt-live-caption-box">
+                    <div class="yt-live-head">
+                        <div class="yt-live-tag">
+                            <span class="yt-live-dot"></span>
+                            <span>실시간 대사</span>
+                        </div>
+                        <div class="yt-live-time" id="live-time-display">00:00</div>
+                    </div>
+                    <div class="yt-live-text" id="live-text-display">영상을 재생하면 실시간 음성에 맞추어 대사가 출력됩니다.</div>
                 </div>
             </div>
 
-            <script>
-                var segments = {segments_json};
-                var player;
-                var currentActiveIdx = -1;
+            <!-- ============================================== -->
+            <!-- 📑💬 [우측]: 카테고리 탭 통합 사이드 패널       -->
+            <!-- ============================================== -->
+            <div class="right-column">
+                <!-- 탭 버튼들 -->
+                <div class="tab-nav-bar">
+                    <button class="tab-chip active" id="tab-btn-transcript" onclick="switchTab('transcript')">📑 시간대별 대본 (5개 뷰)</button>
+                    <button class="tab-chip" id="tab-btn-chat" onclick="switchTab('chat')">💬 Gemini AI 챗봇</button>
+                    <button class="tab-chip" id="tab-btn-chapters" onclick="switchTab('chapters')">🏷️ 주제별 요약/챕터</button>
+                </div>
 
-                var tag = document.createElement('script');
-                tag.src = "https://www.youtube.com/iframe_api";
-                var firstScriptTag = document.getElementsByTagName('script')[0];
-                firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+                <!-- 1. 시간대별 대본 탭 (화면에서 5개 정도로 축소 & 스크롤/드래그 지원) -->
+                <div class="tab-panel active" id="panel-transcript">
+                    <div class="search-box-wrap">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="#888">
+                            <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                        </svg>
+                        <input type="text" placeholder="대본 내용 검색..." oninput="onFilterTranscript(this.value)">
+                        <span style="font-size: 0.72rem; color: #888;" id="t-count-badge"></span>
+                    </div>
 
-                function onYouTubeIframeAPIReady() {{
-                    player = new YT.Player('yt-player', {{
-                        videoId: '{v_id}',
-                        playerVars: {{
-                            'autoplay': 1,
-                            'playsinline': 1,
-                            'rel': 0,
-                            'modestbranding': 1
-                        }},
-                        events: {{
-                            'onReady': onPlayerReady,
-                            'onStateChange': onPlayerStateChange
-                        }}
-                    }});
-                }}
+                    <!-- 5개 아이템 축소 뷰포트 (드래그 & 부드러운 스크롤) -->
+                    <div class="transcript-scroll-view" id="transcript-container"></div>
+                </div>
 
-                function fmtSec(sec) {{
-                    var total = Math.floor(sec);
-                    var m = Math.floor(total / 60);
-                    var s = total % 60;
-                    return (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
-                }}
+                <!-- 2. Gemini AI 챗봇 탭 -->
+                <div class="tab-panel" id="panel-chat">
+                    <div class="preset-chips-row">
+                        <span class="preset-chip" onclick="askPreset('이 영상의 가장 중요한 핵심 내용을 3줄로 요약해줘.')">📌 3줄 핵심 요약</span>
+                        <span class="preset-chip" onclick="askPreset('영상의 최종 결론과 화자의 핵심 메시지는 뭐야?')">🎯 최종 결론</span>
+                        <span class="preset-chip" onclick="askPreset('영상에서 다루는 주요 이슈와 원인은 무엇인가요?')">🔍 주요 원인 분석</span>
+                    </div>
 
-                function onPlayerReady(event) {{
-                    event.target.setVolume(100);
-                    event.target.playVideo();
-                    renderList(segments);
+                    <div class="chat-messages-container" id="chat-box">
+                        <div class="chat-bubble-a">
+                            🤖 <b>Gemini 3.8 Flash 어시스턴트:</b><br>
+                            영상 내용에 대해 궁금한 점을 질문해보세요. 답변과 관련된 정확한 영상 위치도 함께 안내해 드립니다.
+                        </div>
+                    </div>
 
-                    var dur = event.target.getDuration();
-                    if (dur > 0) {{
-                        document.getElementById('time-total').innerText = fmtSec(dur);
+                    <div class="chat-input-row">
+                        <input type="text" class="chat-input" id="chat-input-field" placeholder="영상에 대해 질문하세요..." onkeydown="if(event.key==='Enter') sendChatQuestion()">
+                        <button class="chat-send-btn" onclick="sendChatQuestion()">전송</button>
+                    </div>
+                </div>
+
+                <!-- 3. 주제별 챕터 요약 탭 -->
+                <div class="tab-panel" id="panel-chapters">
+                    <div class="chapters-scroll-view" id="chapters-container"></div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            var segments = {segments_json};
+            var chapters = {chapters_json};
+            var player;
+            var currentActiveIdx = -1;
+            var isUserScrolling = false;
+            var scrollTimeout;
+            var apiKey = "{api_key_clean}";
+
+            // YouTube IFrame API 로드
+            var tag = document.createElement('script');
+            tag.src = "https://www.youtube.com/iframe_api";
+            var firstScriptTag = document.getElementsByTagName('script')[0];
+            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+            function onYouTubeIframeAPIReady() {{
+                player = new YT.Player('yt-player', {{
+                    videoId: '{v_id}',
+                    playerVars: {{
+                        'autoplay': 1,
+                        'playsinline': 1,
+                        'rel': 0,
+                        'modestbranding': 1
+                    }},
+                    events: {{
+                        'onReady': onPlayerReady
                     }}
+                }});
+            }}
 
-                    // 200ms 주기로 실시간 싱크 체크
-                    setInterval(syncTranscript, 200);
+            function fmtSec(sec) {{
+                var total = Math.floor(Math.max(0, sec));
+                var h = Math.floor(total / 3600);
+                var m = Math.floor((total % 3600) / 60);
+                var s = total % 60;
+                if (h > 0) {{
+                    return (h < 10 ? "0" + h : h) + ":" + (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
+                }}
+                return (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
+            }}
+
+            function onPlayerReady(event) {{
+                event.target.setVolume(100);
+                event.target.playVideo();
+                renderTranscriptList(segments);
+                renderChapters(chapters);
+
+                var dur = event.target.getDuration();
+                if (dur > 0) {{
+                    document.getElementById('time-total').innerText = fmtSec(dur);
                 }}
 
-                function onPlayerStateChange(event) {{
-                    var dur = player.getDuration();
-                    if (dur > 0) {{
-                        document.getElementById('time-total').innerText = fmtSec(dur);
+                // 150ms 고속 정밀 싱크 타이머
+                setInterval(syncPlaybackAndTranscript, 150);
+            }}
+
+            function changeVol(v) {{
+                if (player && player.setVolume) {{
+                    player.setVolume(v);
+                    document.getElementById('vol-badge').innerText = v + "%";
+                }}
+            }}
+
+            function jumpTo(sec) {{
+                if (player && player.seekTo) {{
+                    player.seekTo(sec, true);
+                    player.playVideo();
+                }}
+            }}
+
+            // ----------------------------------------------------
+            // [핵심 1] 유튜브 마우스 호버 타임라인 & 썸네일/시간대 툴팁
+            // ----------------------------------------------------
+            var timelineContainer = document.getElementById('timeline-container');
+            var hoverTooltip = document.getElementById('hover-tooltip');
+            var tooltipTime = document.getElementById('tooltip-time');
+            var hoverBar = document.getElementById('hover-bar');
+            var playBar = document.getElementById('play-bar');
+            var scrubberHandle = document.getElementById('scrubber-handle');
+
+            timelineContainer.addEventListener('mousemove', function(e) {{
+                if (!player || !player.getDuration) return;
+                var dur = player.getDuration();
+                if (!dur || dur <= 0) return;
+
+                var rect = timelineContainer.getBoundingClientRect();
+                var clickX = e.clientX - rect.left;
+                var ratio = Math.max(0, Math.min(1, clickX / rect.width));
+                var hoverSeconds = ratio * dur;
+
+                // 호버 회색 바 업데이트
+                hoverBar.style.width = (ratio * 100) + "%";
+
+                // 툴팁 위치 및 시간 업데이트
+                hoverTooltip.style.display = 'block';
+                // 툴팁이 좌우 영역을 벗어나지 않도록 clamp (가로 140px 기준)
+                var clampedX = Math.max(70, Math.min(rect.width - 70, clickX));
+                hoverTooltip.style.left = clampedX + "px";
+                tooltipTime.innerText = fmtSec(hoverSeconds);
+            }});
+
+            timelineContainer.addEventListener('mouseleave', function() {{
+                hoverTooltip.style.display = 'none';
+                hoverBar.style.width = "0%";
+            }});
+
+            timelineContainer.addEventListener('click', function(e) {{
+                if (!player || !player.getDuration) return;
+                var dur = player.getDuration();
+                if (!dur || dur <= 0) return;
+
+                var rect = timelineContainer.getBoundingClientRect();
+                var ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+                jumpTo(ratio * dur);
+            }});
+
+            // ----------------------------------------------------
+            // [핵심 2] 실시간 음성-대본 싱크 & 5개 뷰포트 자동 스크롤
+            // ----------------------------------------------------
+            var tContainer = document.getElementById('transcript-container');
+            tContainer.addEventListener('scroll', function() {{
+                isUserScrolling = true;
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(function() {{
+                    isUserScrolling = false;
+                }}, 2500);
+            }});
+
+            function syncPlaybackAndTranscript() {{
+                if (!player || !player.getCurrentTime) return;
+                var cur = player.getCurrentTime();
+                var dur = player.getDuration() || 1;
+
+                // 1. 타임라인 진행률 바 업데이트
+                var pct = Math.max(0, Math.min(100, (cur / dur) * 100));
+                playBar.style.width = pct + "%";
+                scrubberHandle.style.left = pct + "%";
+                document.getElementById('time-current').innerText = fmtSec(cur);
+
+                if (dur > 1) {{
+                    document.getElementById('time-total').innerText = fmtSec(dur);
+                }}
+
+                // 2. 현재 발화 세그먼트 탐색
+                var targetIdx = -1;
+                for (var i = 0; i < segments.length; i++) {{
+                    if (cur >= segments[i].start && cur <= (segments[i].end + 0.35)) {{
+                        targetIdx = i;
+                        break;
                     }}
                 }}
-
-                // 무중단 볼륨 조절 (페이지 새로고침 없음)
-                function changeVol(v) {{
-                    if (player && player.setVolume) {{
-                        player.setVolume(v);
-                        document.getElementById('vol-badge').innerText = v + "%";
-                    }}
-                }}
-
-                // 특정 시간대로 점프
-                function jumpTo(sec) {{
-                    if (player && player.seekTo) {{
-                        player.seekTo(sec, true);
-                        player.playVideo();
-                    }}
-                }}
-
-                function renderList(list) {{
-                    var box = document.getElementById('transcript-list');
-                    box.innerHTML = "";
-                    if (!list || list.length === 0) {{
-                        box.innerHTML = "<div style='color: #666; font-size: 0.8rem; text-align: center; padding: 10px;'>검색 결과가 없습니다.</div>";
-                        return;
-                    }}
-                    list.forEach(function(s, idx) {{
-                        var item = document.createElement('div');
-                        item.className = 'card-item';
-                        item.id = 'card-' + idx;
-                        item.onclick = function() {{ jumpTo(s.start); }};
-                        item.innerHTML = '<span class="time-chip">' + s.time_str + '</span><span class="text-content">' + s.text + '</span>';
-                        box.appendChild(item);
-                    }});
-                }}
-
-                function onSearchFilter(val) {{
-                    var q = val.trim().toLowerCase();
-                    if (!q) {{
-                        renderList(segments);
-                        return;
-                    }}
-                    var filtered = segments.filter(function(s) {{
-                        return s.text.toLowerCase().indexOf(q) !== -1;
-                    }});
-                    renderList(filtered);
-                }}
-
-                // 실시간 대사 싱크 및 카드 활성화/자동 스크롤
-                function syncTranscript() {{
-                    if (!player || !player.getCurrentTime) return;
-                    var cur = player.getCurrentTime();
-                    document.getElementById('time-current').innerText = fmtSec(cur);
-
-                    var targetIdx = -1;
-                    for (var i = 0; i < segments.length; i++) {{
-                        if (cur >= segments[i].start && cur <= (segments[i].end + 0.3)) {{
-                            targetIdx = i;
+                if (targetIdx === -1) {{
+                    for (var j = segments.length - 1; j >= 0; j--) {{
+                        if (cur >= segments[j].start) {{
+                            targetIdx = j;
                             break;
                         }}
                     }}
-                    if (targetIdx === -1) {{
-                        for (var j = segments.length - 1; j >= 0; j--) {{
-                            if (cur >= segments[j].start) {{
-                                targetIdx = j;
-                                break;
+                }}
+
+                // 3. 자막 및 5개 대본 목록 실시간 동기화
+                if (targetIdx !== -1) {{
+                    var curSeg = segments[targetIdx];
+                    document.getElementById('live-time-display').innerText = curSeg.time_str;
+                    document.getElementById('live-text-display').innerText = curSeg.text;
+
+                    if (targetIdx !== currentActiveIdx) {{
+                        currentActiveIdx = targetIdx;
+
+                        // 이전 활성 카드 해제
+                        var prev = document.querySelector('.t-row.active');
+                        if (prev) prev.classList.remove('active');
+
+                        // 신규 카드 활성화
+                        var activeEl = document.getElementById('t-card-' + targetIdx);
+                        if (activeEl) {{
+                            activeEl.classList.add('active');
+
+                            // 사용자가 직접 스크롤 중이 아닐 때만 5개 뷰포트 내로 부드럽게 자동 스크롤
+                            if (!isUserScrolling) {{
+                                activeEl.scrollIntoView({{ behavior: 'smooth', block: 'nearest' }});
                             }}
                         }}
                     }}
-
-                    if (targetIdx !== -1 && targetIdx !== currentActiveIdx) {{
-                        currentActiveIdx = targetIdx;
-                        var curSeg = segments[targetIdx];
-
-                        // 라이브 배너 대사 업데이트
-                        document.getElementById('live-time-display').innerText = curSeg.time_str;
-                        document.getElementById('live-text-display').innerText = curSeg.text;
-
-                        // 이전 활성 카드 해제
-                        var prev = document.querySelector('.card-item.active');
-                        if (prev) prev.classList.remove('active');
-
-                        // 현재 카드 활성화 및 자동 스크롤
-                        var activeEl = document.getElementById('card-' + targetIdx);
-                        if (activeEl) {{
-                            activeEl.classList.add('active');
-                            activeEl.scrollIntoView({{ behavior: 'smooth', block: 'nearest' }});
-                        }}
-                    }}
                 }}
-            </script>
-        </body>
-        </html>
-        """
-        # 한 화면에 꼭 맞는 높이로 최적화
-        components.html(player_html, height=545)
+            }}
 
-        # 미니멀 정보 & 다운로드 바 (한 줄 배치)
-        sub_c1, sub_c2, sub_c3 = st.columns([3, 1.2, 1.2], gap="small")
-        with sub_c1:
-            st.caption(f"📺 **{v_info['uploader']}** | ⏱️ {v_info['duration']//60}분 {v_info['duration']%60}초 | 👀 {v_info['view_count']:,}회")
-        with sub_c2:
-            safe_title = "".join(c for c in v_info["title"] if c.isalnum() or c in (" ", "_", "-")).rstrip()
-            st.download_button(
-                "📥 대본.txt",
-                data=t_data.get("full_text", "").encode("utf-8"),
-                file_name=f"{safe_title}_transcript.txt",
-                mime="text/plain",
-                use_container_width=True,
-            )
-        with sub_c3:
-            if st.session_state.audio_path and os.path.exists(st.session_state.audio_path):
-                with open(st.session_state.audio_path, "rb") as f:
-                    st.download_button(
-                        "🎵 오디오.m4a",
-                        data=f.read(),
-                        file_name=os.path.basename(st.session_state.audio_path),
-                        mime="audio/m4a",
-                        use_container_width=True,
-                    )
+            // 대본 렌더링
+            function renderTranscriptList(list) {{
+                tContainer.innerHTML = "";
+                document.getElementById('t-count-badge').innerText = (list ? list.length : 0) + "개";
 
-    # ==============================================================
-    # 💬 [우측]: 영상 우측에 딱 붙어 한 화면에 피트되는 챗봇
-    # ==============================================================
-    with col_chat:
-        st.markdown("""
-        <div style="background: #141414; padding: 8px 12px; border-radius: 8px; border: 1px solid #242424; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between;">
-            <div style="font-weight: 700; font-size: 0.95rem; color: #fff; display: flex; align-items: center; gap: 6px;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="#38bdf8">
-                    <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/>
-                </svg>
-                <span>Gemini 3.8 Flash 영상 챗봇</span>
-            </div>
-            <span style="font-size: 0.72rem; color: #38bdf8; background: #0c2d48; padding: 2px 6px; border-radius: 4px;">대본 실시간 연동</span>
+                if (!list || list.length === 0) {{
+                    tContainer.innerHTML = "<div style='color: #888; font-size: 0.8rem; text-align: center; padding: 30px;'>검색 결과가 없습니다.</div>";
+                    return;
+                }}
+
+                list.forEach(function(s, idx) {{
+                    var row = document.createElement('div');
+                    row.className = 't-row';
+                    row.id = 't-card-' + (s.orig_index !== undefined ? s.orig_index : idx);
+                    row.onclick = function() {{ jumpTo(s.start); }};
+                    row.innerHTML = '<span class="t-time-btn">' + s.time_str + '</span><span class="t-content">' + s.text + '</span>';
+                    tContainer.appendChild(row);
+                }});
+            }}
+
+            // 대본 검색 필터
+            var indexedSegments = segments.map(function(s, idx) {{
+                return {{ orig_index: idx, start: s.start, end: s.end, time_str: s.time_str, text: s.text }};
+            }});
+
+            function onFilterTranscript(q) {{
+                var val = q.trim().toLowerCase();
+                if (!val) {{
+                    renderTranscriptList(indexedSegments);
+                    return;
+                }}
+                var filtered = indexedSegments.filter(function(s) {{
+                    return s.text.toLowerCase().indexOf(val) !== -1;
+                }});
+                renderTranscriptList(filtered);
+            }}
+
+            // ----------------------------------------------------
+            // 탭 전환
+            // ----------------------------------------------------
+            function switchTab(name) {{
+                document.querySelectorAll('.tab-chip').forEach(function(el) {{ el.classList.remove('active'); }});
+                document.querySelectorAll('.tab-panel').forEach(function(el) {{ el.classList.remove('active'); }});
+
+                document.getElementById('tab-btn-' + name).classList.add('active');
+                document.getElementById('panel-' + name).classList.add('active');
+            }}
+
+            // ----------------------------------------------------
+            // 챗봇 비동기 질의응답 (무중단 실시간 답변)
+            // ----------------------------------------------------
+            function askPreset(q) {{
+                document.getElementById('chat-input-field').value = q;
+                sendChatQuestion();
+            }}
+
+            async function sendChatQuestion() {{
+                var inputEl = document.getElementById('chat-input-field');
+                var question = inputEl.value.trim();
+                if (!question) return;
+
+                var chatBox = document.getElementById('chat-box');
+
+                // 사용자 메시지 추가
+                var uMsg = document.createElement('div');
+                uMsg.className = 'chat-bubble-u';
+                uMsg.innerHTML = '🙋 <b>질문:</b> ' + question;
+                chatBox.appendChild(uMsg);
+                inputEl.value = "";
+
+                // 로딩 메시지
+                var loadMsg = document.createElement('div');
+                loadMsg.className = 'chat-bubble-a';
+                loadMsg.id = 'chat-loading-item';
+                loadMsg.innerHTML = '🤖 <b>Gemini 3.8 Flash:</b> 답변을 생성하고 있습니다... ⏳';
+                chatBox.appendChild(loadMsg);
+                chatBox.scrollTop = chatBox.scrollHeight;
+
+                try {{
+                    // 세그먼트 스크립트 제작
+                    var nl = String.fromCharCode(10);
+                    var timelineScript = segments.slice(0, 100).map(function(s) {{
+                        return "[" + s.time_str + "] " + s.text;
+                    }}).join(nl);
+
+                    var promptText = [
+                        "당신은 유튜브 영상 분석 전문가 AI입니다.",
+                        "제공된 시간대별 영상 트랜스크립트를 확인하고 질문에 명쾌하게 답변하세요.",
+                        "답변과 가장 관련된 시작 시간(예: 01:23 및 초 단위)을 찾아 JSON으로 응답하세요.",
+                        "",
+                        "[대본]",
+                        timelineScript,
+                        "",
+                        "[질문]",
+                        question,
+                        "",
+                        "[응답 형식]",
+                        "```json",
+                        "{{",
+                        '  "answer": "답변 내용...",',
+                        '  "relevant_timestamp": "00:02",',
+                        '  "relevant_seconds": 2.0',
+                        "}}",
+                        "```"
+                    ].join(nl);
+
+                    var resp = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=" + apiKey, {{
+                        method: "POST",
+                        headers: {{ "Content-Type": "application/json" }},
+                        body: JSON.stringify({{
+                            contents: [{{ parts: [{{ text: promptText }}] }}]
+                        }})
+                    }});
+
+                    var data = await resp.json();
+                    var rawText = data.candidates[0].content.parts[0].text;
+                    
+                    var answerText = rawText;
+                    var relTs = "00:00";
+                    var relSec = 0;
+
+                    var firstBrace = rawText.indexOf("{{");
+                    var lastBrace = rawText.lastIndexOf("}}");
+                    if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {{
+                        try {{
+                            var jsonStr = rawText.substring(firstBrace, lastBrace + 1);
+                            var parsed = JSON.parse(jsonStr);
+                            answerText = parsed.answer || rawText;
+                            relTs = parsed.relevant_timestamp || "00:00";
+                            relSec = parseFloat(parsed.relevant_seconds) || 0;
+                        }} catch(e) {{}}
+                    }}
+
+                    // 로딩 제거 후 답변 삽입
+                    loadMsg.remove();
+                    var aMsg = document.createElement('div');
+                    aMsg.className = 'chat-bubble-a';
+
+                    var tsButton = "";
+                    if (relSec > 0 || relTs !== "00:00") {{
+                        tsButton = '<div style="margin-top: 5px;">' +
+                            '<button onclick="jumpTo(' + relSec + ')" style="background: #0f2b4c; border: 1px solid #3ea6ff; color: #3ea6ff; font-size: 0.72rem; font-weight: 700; padding: 2px 7px; border-radius: 4px; cursor: pointer;">' +
+                            '⏱️ 구간 바로가기: [' + relTs + '] (' + Math.floor(relSec) + '초)</button></div>';
+                    }}
+
+                    aMsg.innerHTML = '🤖 <b>Gemini 3.8 Flash:</b><br>' + answerText.split(nl).join('<br>') + tsButton;
+                    chatBox.appendChild(aMsg);
+                    chatBox.scrollTop = chatBox.scrollHeight;
+
+                }} catch(err) {{
+                    loadMsg.remove();
+                    var errMsg = document.createElement('div');
+                    errMsg.className = 'chat-bubble-a';
+                    errMsg.style.borderColor = '#ff4b4b';
+                    errMsg.innerHTML = '⚠️ 답변 생성 중 오류가 발생했습니다: ' + err.message;
+                    chatBox.appendChild(errMsg);
+                    chatBox.scrollTop = chatBox.scrollHeight;
+                }}
+            }}
+
+            // ----------------------------------------------------
+            // 챕터 렌더링
+            // ----------------------------------------------------
+            function renderChapters(list) {{
+                var container = document.getElementById('chapters-container');
+                container.innerHTML = "";
+                if (!list || list.length === 0) {{
+                    container.innerHTML = "<div style='color: #888; font-size: 0.8rem; text-align: center; padding: 30px;'>추출된 주제 챕터가 없습니다.</div>";
+                    return;
+                }}
+                list.forEach(function(ch) {{
+                    var card = document.createElement('div');
+                    card.className = 'ch-card';
+                    card.onclick = function() {{ jumpTo(ch.start_seconds); }};
+                    card.innerHTML = 
+                        '<div class="ch-header">' +
+                            '<span class="ch-time">' + ch.time_str + '</span>' +
+                            '<span class="ch-title">' + ch.title + '</span>' +
+                        '</div>' +
+                        '<div class="ch-desc">' + ch.summary + '</div>';
+                    container.appendChild(card);
+                }});
+            }}
+        </script>
+    </body>
+    </html>
+    """
+
+    # 컴포넌트 높이 590px로 넉넉하게 지정하여 스크롤 잘림 없이 한 화면에 완전 렌더링
+    components.html(integrated_html, height=590)
+
+    # 하단 비디오 상세 정보 및 다운로드 바 (Streamlit 네이티브 UI)
+    st.markdown(f"""
+    <div style="background: #181818; border: 1px solid #272727; border-radius: 10px; padding: 10px 16px; margin-top: 2px;">
+        <div style="font-weight: 700; font-size: 1.05rem; color: #ffffff; line-height: 1.35; margin-bottom: 6px;">
+            {v_title}
         </div>
-        """, unsafe_allow_html=True)
+        <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.83rem; color: #aaaaaa; flex-wrap: wrap; gap: 8px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <div style="width: 26px; height: 26px; background: #333333; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 0.75rem; font-weight: 700;">
+                    {v_uploader[0].upper() if v_uploader else "Y"}
+                </div>
+                <span style="color: #ffffff; font-weight: 600;">{v_uploader}</span>
+                <span>•</span>
+                <span>조회수 {v_views}회</span>
+                <span>•</span>
+                <span>⏱️ {v_duration_str}</span>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
-        # 챗봇 대화 스크롤 영역 (좌측 컴포넌트와 높이 정확히 일치)
-        chat_box = st.container(height=450)
-        with chat_box:
-            if not st.session_state.chat_messages:
-                st.info("💡 **영상에 대해 질문해보세요:**\n- 이 영상에서 가장 중요한 핵심 내용이 뭐야?\n- 특정 인물이나 사건이 어떻게 언급됐어?\n- 결론이 어떻게 끝났어?")
-            
-            for msg in st.session_state.chat_messages:
-                st.markdown(f'<div class="chat-bubble-user">🙋 <b>질문:</b> {msg["q"]}</div>', unsafe_allow_html=True)
-                st.markdown(f'<div class="chat-bubble-ai">🤖 <b>Gemini 3.8 Flash:</b><br>{msg["a"]}</div>', unsafe_allow_html=True)
-                if msg.get("sec", 0) > 0:
-                    st.caption(f"📍 관련 구간: **[{msg.get('ts', '00:00')}]** ({int(msg['sec'])}초)")
-
-        # 컴팩트 질문 입력창
-        q_col, send_col = st.columns([82, 18], gap="small")
-        with q_col:
-            user_q = st.text_input(
-                "질문",
-                placeholder="영상에 대해 궁금한 점을 입력하세요...",
-                key="chat_in",
-                label_visibility="collapsed",
-            )
-        with send_col:
-            send_btn = st.button("전송", type="primary", use_container_width=True)
-
-        if send_btn and user_q.strip():
-            with st.spinner("Gemini 3.8 Flash 답변 생성 중..."):
-                try:
-                    segments = t_data.get("segments", [])
-                    full_text = t_data.get("full_text", "")
-                    qa_res = answer_question_with_timestamps(
-                        question=user_q.strip(),
-                        segments=segments,
-                        full_text=full_text,
-                        api_key=api_key_input.strip(),
-                    )
-                    st.session_state.chat_messages.append({
-                        "q": user_q.strip(),
-                        "a": qa_res["answer"],
-                        "ts": qa_res.get("relevant_timestamp", "00:00"),
-                        "sec": qa_res.get("relevant_seconds", 0.0),
-                    })
-                    st.rerun()
-                except Exception as e:
-                    st.error(f"답변 생성 실패: {e}")
+    # 다운로드 버튼
+    dl_c1, dl_c2 = st.columns([1, 1], gap="small")
+    with dl_c1:
+        safe_title = "".join(c for c in v_title if c.isalnum() or c in (" ", "_", "-")).rstrip()
+        st.download_button(
+            "📥 전체 대본 다운로드 (.txt)",
+            data=t_data.get("full_text", "").encode("utf-8"),
+            file_name=f"{safe_title}_transcript.txt",
+            mime="text/plain",
+            use_container_width=True,
+        )
+    with dl_c2:
+        if st.session_state.audio_path and os.path.exists(st.session_state.audio_path):
+            with open(st.session_state.audio_path, "rb") as f:
+                st.download_button(
+                    "🎵 고음질 오디오 다운로드 (.m4a)",
+                    data=f.read(),
+                    file_name=os.path.basename(st.session_state.audio_path),
+                    mime="audio/m4a",
+                    use_container_width=True,
+                )
 
 else:
     # 초기 대기 화면
     st.markdown("""
-    <div style="background: #131313; border-radius: 12px; padding: 2.5rem 1.5rem; text-align: center; border: 1px dashed #2a2a2a; margin-top: 1rem;">
-        <div style="font-size: 2.8rem; margin-bottom: 0.6rem;">🎬</div>
-        <h3 style="color: #ffffff; margin-bottom: 0.4rem;">AI 유튜브 검색기</h3>
-        <p style="color: #888; max-width: 580px; margin: 0 auto 1.2rem auto; font-size: 0.9rem; line-height: 1.5;">
-            상단 검색창에 유튜브 영상 링크를 입력하세요.<br>
-            <b>Gemini 3.5 Transcribe</b> 실시간 대본 싱크와 <b>Gemini 3.8 Flash</b> 영상 질의응답이 한 화면에서 동작합니다.
+    <div style="background: #181818; border-radius: 16px; padding: 3rem 2rem; text-align: center; border: 1px dashed #333333; margin-top: 1.5rem;">
+        <div style="margin-bottom: 0.8rem;">
+            <svg width="60" height="42" viewBox="0 0 32 23" fill="none">
+                <path d="M31.24 3.49C30.87 2.12 29.8 1.05 28.43 0.68C25.96 0 16 0 16 0C16 0 6.04 0 3.57 0.68C2.2 1.05 1.13 2.12 0.76 3.49C0 5.96 0 11.1 0 11.1C0 11.1 0 16.24 0.76 18.71C1.13 20.08 2.2 21.15 3.57 21.52C6.04 22.2 16 22.2 16 22.2C16 22.2 25.96 22.2 28.43 21.52C29.8 21.15 30.87 20.08 31.24 18.71C32 16.24 32 11.1 32 11.1C32 11.1 32 5.96 31.24 3.49Z" fill="#FF0000"/>
+                <polygon points="12.8,15.8 21.2,11.1 12.8,6.4" fill="#FFFFFF"/>
+            </svg>
+        </div>
+        <h2 style="color: #ffffff; margin-bottom: 0.5rem; font-weight: 800; font-size: 1.5rem;">Google YouTube AI Searcher</h2>
+        <p style="color: #aaaaaa; max-width: 620px; margin: 0 auto 1.5rem auto; font-size: 0.92rem; line-height: 1.6;">
+            유튜브 영상 링크를 상단에 입력하세요.<br>
+            <b>실시간 음성 대본 싱크 (5개 컴팩트 뷰)</b>와 <b>유튜브 호버 타임라인 및 썸네일 미리보기</b>, <b>Gemini 3.8 AI 챗봇</b>이 한눈에 펼쳐집니다.
         </p>
-        <div style="display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;">
-            <span style="background: #202020; color: #38bdf8; padding: 4px 10px; border-radius: 16px; font-size: 0.8rem;">✨ 16:9 완전 영상 뷰</span>
-            <span style="background: #202020; color: #ff4b4b; padding: 4px 10px; border-radius: 16px; font-size: 0.8rem;">🔊 끊김없는 볼륨 조절</span>
-            <span style="background: #202020; color: #10b981; padding: 4px 10px; border-radius: 16px; font-size: 0.8rem;">📑 대본 3개 컴팩트 뷰</span>
-            <span style="background: #202020; color: #f59e0b; padding: 4px 10px; border-radius: 16px; font-size: 0.8rem;">💬 우측 Gemini 3.8 챗봇</span>
+        <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+            <span style="background: #272727; color: #ff4b4b; padding: 6px 14px; border-radius: 18px; font-size: 0.82rem; font-weight: 600;">🎞️ 유튜브 호버 타임라인 & 썸네일</span>
+            <span style="background: #272727; color: #3ea6ff; padding: 6px 14px; border-radius: 18px; font-size: 0.82rem; font-weight: 600;">⚡ 실시간 음성-대본 0ms 싱크</span>
+            <span style="background: #272727; color: #10b981; padding: 6px 14px; border-radius: 18px; font-size: 0.82rem; font-weight: 600;">📑 5개 축소 뷰 & 자유 드래그 스크롤</span>
+            <span style="background: #272727; color: #f59e0b; padding: 6px 14px; border-radius: 18px; font-size: 0.82rem; font-weight: 600;">💬 무중단 Gemini 3.8 챗봇</span>
         </div>
     </div>
     """, unsafe_allow_html=True)
