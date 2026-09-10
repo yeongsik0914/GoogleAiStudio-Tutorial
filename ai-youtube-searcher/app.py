@@ -46,21 +46,56 @@ st.markdown("""
         font-family: 'Pretendard', 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
     }
     
-    /* 전체 배경을 유튜브 공식 다크 테마(#0f0f0f)로 지정 및 안전한 뷰포트 스크롤 */
-    html, body, [data-testid="stAppViewContainer"], .stApp {
+    /* [이중 스크롤바 완전 제거] html, body, .stApp의 스크롤바를 숨기고 stAppViewContainer 단 하나에서만 스크롤 처리 */
+    html, body {
+        background-color: #0f0f0f !important;
+        color: #f1f1f1 !important;
+        overflow: hidden !important;
+        height: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        scrollbar-width: none !important;
+        -ms-overflow-style: none !important;
+    }
+    html::-webkit-scrollbar, body::-webkit-scrollbar {
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
+    }
+    .stApp {
+        background-color: #0f0f0f !important;
+        color: #f1f1f1 !important;
+        overflow: hidden !important;
+        height: 100% !important;
+    }
+    [data-testid="stAppViewContainer"] {
         background-color: #0f0f0f !important;
         color: #f1f1f1 !important;
         overflow-x: hidden !important;
         overflow-y: auto !important;
+        height: 100% !important;
+        scroll-behavior: smooth !important;
     }
     
-    /* 앱 전체 부드럽고 얇은 스크롤바 */
+    /* 앱 전체 부드럽고 얇은 단일 유튜브 다크 스크롤바 */
     [data-testid="stAppViewContainer"]::-webkit-scrollbar {
-        width: 6px;
+        width: 8px;
+    }
+    [data-testid="stAppViewContainer"]::-webkit-scrollbar-track {
+        background: #0f0f0f;
     }
     [data-testid="stAppViewContainer"]::-webkit-scrollbar-thumb {
-        background: #24242c;
-        border-radius: 3px;
+        background: #27272c;
+        border-radius: 4px;
+    }
+    [data-testid="stAppViewContainer"]::-webkit-scrollbar-thumb:hover {
+        background: #3ea6ff;
+    }
+
+    /* iframe 요소의 불필요한 스크롤바 및 테두리 차단 */
+    iframe {
+        border: none !important;
+        outline: none !important;
     }
     
     /* Streamlit 기본 헤더 비활성화 - 상단 검색창 클릭 및 호버 방해 완전 차단 */
@@ -1328,8 +1363,14 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
                 audio_b64 = ""
 
     segments_count_val = len(segments_list)
+    uploader_initial = v_uploader[0].upper() if v_uploader else "Y"
+    is_from_cache = st.session_state.get("from_cache", False)
+    if is_from_cache:
+        cache_badge_html = '<span style="margin-left: auto; color: #10b981; font-size: 0.72rem; font-weight: 700; background: #0c291e; border: 1px solid #165b40; padding: 2px 9px; border-radius: 12px; white-space: nowrap;">⚡ 로컬 캐시 (토큰 0 소모)</span>'
+    else:
+        cache_badge_html = '<span style="margin-left: auto; color: #3ea6ff; font-size: 0.72rem; font-weight: 700; background: #0f2338; border: 1px solid #1d466e; padding: 2px 9px; border-radius: 12px; white-space: nowrap;">✨ Gemini 3.5 신규 분석</span>'
 
-    # 전체 화면을 하나로 통합한 일체형 컴포넌트 HTML (좌측 플레이어/타임라인 + 우측 4대 탭)
+    # 전체 화면을 하나로 통합한 일체형 컴포넌트 HTML (좌측 플레이어/타임라인/상세정보 + 우측 4대 탭)
     integrated_html = f"""
     <!DOCTYPE html>
     <html lang="ko">
@@ -1360,6 +1401,48 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
                 height: 635px;
                 max-height: 100vh;
                 box-sizing: border-box;
+                transition: all 0.25s ease;
+            }}
+            
+            /* 🎬 유튜브 공식 영화관 모드 (Theater Mode) 전폭 레이아웃 */
+            .app-container.theater-mode {{
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 14px !important;
+                width: 100% !important;
+                height: auto !important;
+                max-height: none !important;
+            }}
+            .app-container.theater-mode .left-column {{
+                width: 100% !important;
+                height: auto !important;
+                max-height: none !important;
+                overflow: visible !important;
+            }}
+            .app-container.theater-mode .player-wrapper {{
+                width: 100% !important;
+                max-width: 100% !important;
+                height: auto !important;
+                max-height: min(72vh, 760px) !important;
+                aspect-ratio: 16 / 9 !important;
+                border-radius: 12px !important;
+                background: #000 !important;
+                box-shadow: 0 8px 32px rgba(0,0,0,0.9) !important;
+            }}
+            .app-container.theater-mode .yt-timeline-container {{
+                margin-top: 3px !important;
+            }}
+            .app-container.theater-mode .yt-control-row {{
+                margin-bottom: 3px !important;
+            }}
+            .app-container.theater-mode .yt-live-caption-box {{
+                width: 100% !important;
+            }}
+            .app-container.theater-mode .right-column {{
+                width: 100% !important;
+                height: 580px !important;
+                min-height: 520px !important;
+                margin-top: 6px !important;
             }}
             
             /* ==================================================== */
@@ -1375,12 +1458,12 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
                 justify-content: flex-start;
             }}
             
-            /* [핵심] 대형/와이드 화면에서도 하단 컨트롤과 실시간 대사가 잘리지 않도록 높이 자동 제한 */
+            /* [핵심] 대형/와이드 화면에서도 하단 컨트롤과 실시간 대사, 비디오 정보바가 잘리지 않도록 높이 자동 제한 */
             .player-wrapper {{
                 position: relative;
                 width: 100%;
                 max-width: 100%;
-                max-height: calc(100% - 120px);
+                max-height: calc(100% - 156px);
                 aspect-ratio: 16 / 9;
                 margin: 0 auto;
                 background: #000;
@@ -1588,12 +1671,37 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
             .yt-ctrl-right {{
                 display: flex;
                 align-items: center;
+                gap: 7px;
             }}
             .yt-time-badge {{
                 font-size: 0.76rem;
                 color: #aaaaaa;
                 font-variant-numeric: tabular-nums;
                 white-space: nowrap;
+            }}
+            .yt-theater-btn, .yt-fs-btn {{
+                background: transparent;
+                border: none;
+                cursor: pointer;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                padding: 3px 5px;
+                border-radius: 4px;
+                transition: all 0.15s ease;
+                outline: none;
+            }}
+            .yt-theater-btn:hover, .yt-fs-btn:hover {{
+                background: #2b2b32;
+            }}
+            .yt-theater-btn:hover svg, .yt-fs-btn:hover svg {{
+                fill: #3ea6ff;
+            }}
+            .yt-theater-btn.active {{
+                background: rgba(62, 166, 255, 0.18);
+            }}
+            .yt-theater-btn.active svg {{
+                fill: #3ea6ff;
             }}
             
             /* 실시간 라이브 자막 바 */
@@ -1607,8 +1715,8 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
                 display: flex;
                 flex-direction: column;
                 justify-content: center;
-                min-height: 58px;
-                max-height: 62px;
+                min-height: 52px;
+                max-height: 56px;
                 flex-shrink: 0;
                 width: 100%;
             }}
@@ -1676,6 +1784,90 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
                 -webkit-box-orient: vertical;
                 overflow: hidden;
                 text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+            }}
+
+            /* 📺 영상 상세 정보 바 (100% 반응형 일체형 배너) */
+            .video-info-banner {{
+                background: #161616;
+                border: 1px solid #282828;
+                border-radius: 8px;
+                padding: 6px 12px;
+                min-height: 36px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 10px;
+                flex-shrink: 0;
+                width: 100%;
+                box-sizing: border-box;
+                transition: all 0.2s ease;
+            }}
+            .v-info-left {{
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                min-width: 0;
+                flex: 1 1 auto;
+            }}
+            .v-uploader-avatar {{
+                width: 24px;
+                height: 24px;
+                min-width: 24px;
+                background: #7c4dff;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #fff;
+                font-size: 0.72rem;
+                font-weight: 700;
+                flex-shrink: 0;
+            }}
+            .v-info-title {{
+                font-weight: 700;
+                font-size: 0.86rem;
+                color: #ffffff;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                line-height: 1.3;
+            }}
+            .v-info-meta {{
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                flex-shrink: 0;
+                flex-wrap: wrap;
+                margin-left: auto;
+            }}
+            .v-meta-item {{
+                color: #aaaaaa;
+                font-size: 0.75rem;
+                white-space: nowrap;
+            }}
+            .v-meta-dot {{
+                color: #555555;
+            }}
+            
+            @media (max-width: 680px) {{
+                .video-info-banner {{
+                    flex-direction: column !important;
+                    align-items: flex-start !important;
+                    gap: 6px !important;
+                    padding: 8px 10px !important;
+                }}
+                .v-info-left {{
+                    width: 100% !important;
+                }}
+                .v-info-title {{
+                    white-space: normal !important;
+                    word-break: break-word !important;
+                }}
+                .v-info-meta {{
+                    width: 100% !important;
+                    margin-left: 0 !important;
+                    gap: 6px !important;
+                }}
             }}
             
             /* ========================================= */
@@ -2185,55 +2377,62 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
             /* 화면 크기에 따른 반응형 미디어 쿼리 */
             @media (max-width: 900px) {{
                 body {{
-                    overflow-y: auto !important;
+                    overflow: hidden !important;
                 }}
                 .app-container {{
                     display: flex !important;
                     flex-direction: column !important;
                     height: auto !important;
                     min-height: 100% !important;
+                    gap: 12px !important;
                 }}
                 .left-column {{
+                    width: 100% !important;
                     height: auto !important;
                     flex-shrink: 0 !important;
                 }}
                 .player-wrapper {{
-                    max-height: none !important;
                     width: 100% !important;
+                    max-height: none !important;
+                    aspect-ratio: 16 / 9 !important;
                 }}
                 .right-column {{
-                    height: 520px !important;
-                    min-height: 520px !important;
+                    width: 100% !important;
+                    height: 540px !important;
+                    min-height: 480px !important;
                     flex-shrink: 0 !important;
-                    margin-top: 10px !important;
+                    margin-top: 6px !important;
                 }}
             }}
 
-            @media (max-width: 480px) {{
+            @media (max-width: 520px) {{
                 .yt-control-row {{
                     padding: 3px 6px !important;
                     gap: 4px !important;
                 }}
                 .yt-vol-slider {{
-                    max-width: 45px !important;
+                    max-width: 50px !important;
                 }}
                 .yt-vol-badge {{
                     display: none !important;
                 }}
                 .skip-btn {{
-                    padding: 2px 5px !important;
-                    font-size: 0.68rem !important;
-                }}
-                .speed-select {{
                     padding: 2px 4px !important;
                     font-size: 0.68rem !important;
                 }}
+                .speed-select {{
+                    padding: 2px 3px !important;
+                    font-size: 0.68rem !important;
+                }}
                 .yt-time-badge {{
-                    font-size: 0.7rem !important;
+                    font-size: 0.68rem !important;
+                }}
+                .yt-theater-btn, .yt-fs-btn {{
+                    padding: 2px 3px !important;
                 }}
                 .right-column {{
                     height: 480px !important;
-                    min-height: 480px !important;
+                    min-height: 440px !important;
                 }}
             }}
         </style>
@@ -2266,7 +2465,7 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
                 <!-- 볼륨 및 배속, 탐색 제어 바 -->
                 <div class="yt-control-row">
                     <div class="yt-ctrl-left">
-                        <button class="ctrl-icon-btn" onclick="toggleMute()" id="mute-btn" title="음소거 토글">
+                        <button class="ctrl-icon-btn" onclick="toggleMute()" id="mute-btn" title="음소거 토글 (m)">
                             <svg id="speaker-icon" width="16" height="16" viewBox="0 0 24 24" fill="#ff0000">
                                 <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
                             </svg>
@@ -2275,8 +2474,8 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
                         <span class="yt-vol-badge" id="vol-badge">100%</span>
                     </div>
                     <div class="yt-ctrl-center">
-                        <button class="skip-btn" onclick="skipRelative(-5)" title="5초 뒤로">⏪ -5s</button>
-                        <button class="skip-btn" onclick="skipRelative(5)" title="5초 앞으로">+5s ⏩</button>
+                        <button class="skip-btn" onclick="skipRelative(-5)" title="5초 뒤로 (J)">⏪ -5s</button>
+                        <button class="skip-btn" onclick="skipRelative(5)" title="5초 앞으로 (L)">+5s ⏩</button>
                         <select class="speed-select" onchange="changeSpeed(this.value)" id="speed-selector" title="재생 속도 조절">
                             <option value="0.75">0.75x</option>
                             <option value="1.0" selected>1.0x (보통)</option>
@@ -2289,6 +2488,21 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
                         <div class="yt-time-badge">
                             ⏱️ <span id="time-current">00:00</span> / <span id="time-total">00:00</span>
                         </div>
+                        <!-- 🎬 유튜브 공식 영화관 모드 (Theater Mode) 버튼 -->
+                        <button class="ctrl-icon-btn yt-theater-btn" id="theater-toggle-btn" onclick="toggleTheaterMode()" title="영화관 모드 (t)">
+                            <svg id="theater-icon-enter" viewBox="0 0 24 24" width="18" height="18" fill="#f1f1f1">
+                                <path d="M19 6H5c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 10H5V8h14v8z"/>
+                            </svg>
+                            <svg id="theater-icon-exit" viewBox="0 0 24 24" width="18" height="18" fill="#3ea6ff" style="display: none;">
+                                <path d="M19 7H5c-1.1 0-2 .9-2 2v6c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zm0 8H5V9h14v6z"/>
+                            </svg>
+                        </button>
+                        <!-- ⛶ 전체화면 버튼 -->
+                        <button class="ctrl-icon-btn yt-fs-btn" id="fs-toggle-btn" onclick="toggleFullscreen()" title="전체화면 (f)">
+                            <svg viewBox="0 0 24 24" width="17" height="17" fill="#f1f1f1">
+                                <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
+                            </svg>
+                        </button>
                     </div>
                 </div>
 
@@ -2305,6 +2519,22 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
                         </div>
                     </div>
                     <div class="yt-live-text" id="live-text-display">영상을 재생하면 실시간 음성에 맞추어 대사가 출력됩니다.</div>
+                </div>
+
+                <!-- 📺 영상 상세 정보 배너 (일체형 반응형 배너) -->
+                <div class="video-info-banner" title="{v_title}">
+                    <div class="v-info-left">
+                        <div class="v-uploader-avatar">{uploader_initial}</div>
+                        <span class="v-info-title">{v_title}</span>
+                    </div>
+                    <div class="v-info-meta">
+                        <span class="v-meta-item">📺 {v_uploader}</span>
+                        <span class="v-meta-dot">•</span>
+                        <span class="v-meta-item">조회수 {v_views}회</span>
+                        <span class="v-meta-dot">•</span>
+                        <span class="v-meta-item">⏱️ {v_duration_str}</span>
+                        {cache_badge_html}
+                    </div>
                 </div>
             </div>
 
@@ -2414,6 +2644,7 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
             var scrollTimeout;
             var apiKey = "{api_key_clean}";
             var isExpandedView = false;
+            var isTheaterMode = false;
             var isMuted = false;
             var lastVolume = 100;
             var videoTitleSafe = "{safe_title}";
@@ -2988,61 +3219,145 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
                 }});
             }}
 
-            // 브라우저 리사이즈 시 Streamlit iframe 높이 자동 동기화
+            // 🎬 유튜브 공식 영화관 모드 (Theater Mode) 토글 함수
+            function toggleTheaterMode() {{
+                isTheaterMode = !isTheaterMode;
+                var container = document.querySelector('.app-container');
+                var enterIcon = document.getElementById('theater-icon-enter');
+                var exitIcon = document.getElementById('theater-icon-exit');
+                var btn = document.getElementById('theater-toggle-btn');
+                
+                if (isTheaterMode) {{
+                    if (container) container.classList.add('theater-mode');
+                    document.body.classList.add('theater-active');
+                    if (enterIcon) enterIcon.style.display = 'none';
+                    if (exitIcon) exitIcon.style.display = 'block';
+                    if (btn) {{
+                        btn.title = "기본 보기 (t)";
+                        btn.classList.add('active');
+                    }}
+                    try {{ localStorage.setItem('yt_ai_theater_mode', 'true'); }} catch(e) {{}}
+                }} else {{
+                    if (container) {{
+                        container.classList.remove('theater-mode');
+                    }}
+                    document.body.classList.remove('theater-active');
+                    if (enterIcon) enterIcon.style.display = 'block';
+                    if (exitIcon) exitIcon.style.display = 'none';
+                    if (btn) {{
+                        btn.title = "영화관 모드 (t)";
+                        btn.classList.remove('active');
+                    }}
+                    try {{ localStorage.setItem('yt_ai_theater_mode', 'false'); }} catch(e) {{}}
+                }}
+                
+                syncParentFrameHeight();
+                setTimeout(syncParentFrameHeight, 150);
+                setTimeout(syncParentFrameHeight, 350);
+            }}
+
+            // ⛶ 전체화면 토글 함수
+            function toggleFullscreen() {{
+                var elem = document.querySelector('.player-wrapper') || document.documentElement;
+                if (!document.fullscreenElement) {{
+                    if (elem.requestFullscreen) {{
+                        elem.requestFullscreen();
+                    }} else if (elem.webkitRequestFullscreen) {{
+                        elem.webkitRequestFullscreen();
+                    }} else if (elem.msRequestFullscreen) {{
+                        elem.msRequestFullscreen();
+                    }}
+                }} else {{
+                    if (document.exitFullscreen) {{
+                        document.exitFullscreen();
+                    }}
+                }}
+            }}
+
+            // ⌨️ 키보드 단축키 (t: 영화관 모드, f: 전체화면, m: 음소거)
+            document.addEventListener('keydown', function(e) {{
+                var target = e.target;
+                if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) {{
+                    return;
+                }}
+                if (e.key === 't' || e.key === 'T') {{
+                    e.preventDefault();
+                    toggleTheaterMode();
+                }} else if (e.key === 'f' || e.key === 'F') {{
+                    e.preventDefault();
+                    toggleFullscreen();
+                }} else if (e.key === 'm' || e.key === 'M') {{
+                    e.preventDefault();
+                    toggleMute();
+                }}
+            }});
+
+            // 📐 뷰 모드 및 반응형 화면 너비에 따른 최적 iframe 높이 정밀 계산 (중간 빈 공간/늘어짐 현상 원천 차단)
+            function calculateOptimalHeight() {{
+                if (isTheaterMode) {{
+                    var leftCol = document.querySelector('.left-column');
+                    var rightCol = document.querySelector('.right-column');
+                    var hLeft = leftCol ? leftCol.getBoundingClientRect().height : 0;
+                    var hRight = rightCol ? rightCol.getBoundingClientRect().height : 580;
+                    return Math.max(Math.round(hLeft + hRight + 32), 1160);
+                }}
+                
+                if (window.innerWidth <= 900) {{
+                    var leftCol = document.querySelector('.left-column');
+                    var rightCol = document.querySelector('.right-column');
+                    var hLeft = leftCol ? leftCol.getBoundingClientRect().height : 0;
+                    var hRight = rightCol ? rightCol.getBoundingClientRect().height : 540;
+                    return Math.max(Math.round(hLeft + hRight + 24), 980);
+                }}
+                
+                // 데스크톱 기본 2열 모드: 645px 고정 (화면을 줄였다가 되돌아왔을 때 공백 없이 즉시 완벽 밀착)
+                return 645;
+            }}
+
+            // 브라우저 리사이즈 및 영화관 모드 전환 시 Streamlit iframe 높이 자동 동기화
             function syncParentFrameHeight() {{
                 try {{
-                    var scrollH = Math.max(645, document.documentElement.scrollHeight, document.body.scrollHeight);
-                    window.parent.postMessage({{ type: "streamlit:setFrameHeight", height: scrollH }}, "*");
+                    var targetH = calculateOptimalHeight();
+                    window.parent.postMessage({{ type: "streamlit:setFrameHeight", height: targetH }}, "*");
                     if (window.frameElement) {{
-                        window.frameElement.style.height = scrollH + "px";
+                        window.frameElement.style.height = targetH + "px";
+                        if (window.frameElement.parentElement) {{
+                            window.frameElement.parentElement.style.height = targetH + "px";
+                        }}
+                    }}
+                    if (window.parent && window.parent.document) {{
+                        var iframes = window.parent.document.querySelectorAll('iframe');
+                        iframes.forEach(function(f) {{
+                            try {{
+                                if (f.contentWindow === window || f === window.frameElement) {{
+                                    f.style.height = targetH + "px";
+                                    if (f.parentElement) {{
+                                        f.parentElement.style.height = targetH + "px";
+                                    }}
+                                }}
+                            }} catch(err) {{}}
+                        }});
                     }}
                 }} catch (e) {{}}
             }}
-            window.addEventListener('resize', syncParentFrameHeight);
+            window.addEventListener('resize', function() {{
+                syncParentFrameHeight();
+            }});
             window.addEventListener('load', function() {{
-                setTimeout(syncParentFrameHeight, 300);
+                try {{
+                    if (localStorage.getItem('yt_ai_theater_mode') === 'true') {{
+                        toggleTheaterMode();
+                    }}
+                }} catch(e) {{}}
+                setTimeout(syncParentFrameHeight, 200);
             }});
         </script>
     </body>
     </html>
     """
 
-    # 컴포넌트 높이 645px로 지정하여 와이드/대형 화면에서도 하단 자막 잘림 없이 완전 렌더링
+    # 컴포넌트 높이 645px로 지정 (영화관 모드 시 JS syncParentFrameHeight로 동적 확장 및 원상 복구)
     components.html(integrated_html, height=645)
-
-    # 하단 비디오 상세 정보 바 (토큰 0 캐시 로드 여부 표시)
-    uploader_initial = v_uploader[0].upper() if v_uploader else "Y"
-    is_from_cache = st.session_state.get("from_cache", False)
-    cache_badge_html = """
-    <span style="margin-left: auto; color: #10b981; font-size: 0.76rem; font-weight: 700; background: #0c291e; border: 1px solid #165b40; padding: 2px 10px; border-radius: 12px; white-space: nowrap;">
-        ⚡ 로컬 캐시 (토큰 0 소모)
-    </span>
-    """ if is_from_cache else """
-    <span style="margin-left: auto; color: #3ea6ff; font-size: 0.76rem; font-weight: 700; background: #0f2338; border: 1px solid #1d466e; padding: 2px 10px; border-radius: 12px; white-space: nowrap;">
-        ✨ Gemini 3.5 신규 분석
-    </span>
-    """
-
-    st.markdown(f"""
-    <div class="video-info-banner" title="{v_title}">
-        <div class="v-info-left">
-            <div class="v-uploader-avatar">
-                {uploader_initial}
-            </div>
-            <span class="v-info-title">
-                {v_title}
-            </span>
-        </div>
-        <div class="v-info-meta">
-            <span class="v-meta-item">📺 {v_uploader}</span>
-            <span class="v-meta-dot">•</span>
-            <span class="v-meta-item">조회수 {v_views}회</span>
-            <span class="v-meta-dot">•</span>
-            <span class="v-meta-item">⏱️ {v_duration_str}</span>
-            {cache_badge_html}
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
 
 
 else:
