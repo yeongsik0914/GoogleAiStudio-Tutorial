@@ -37,24 +37,25 @@ st.markdown("""
         font-family: 'Pretendard', 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
     }
     
-    /* 전체 배경을 유튜브 공식 다크 테마(#0f0f0f)로 지정 */
-    .stApp {
+    /* 전체 배경을 유튜브 공식 다크 테마(#0f0f0f)로 지정 및 스크롤바 방지 */
+    html, body, [data-testid="stAppViewContainer"], .stApp {
         background-color: #0f0f0f !important;
         color: #f1f1f1 !important;
+        overflow-y: hidden !important;
     }
     
-    /* Streamlit 기본 헤더 투명화 */
+    /* Streamlit 기본 헤더 투명화 및 높이 최소화 */
     header[data-testid="stHeader"] {
         background: transparent !important;
-        height: 2.5rem !important;
+        height: 1.5rem !important;
     }
     
-    /* 여백 최적화 */
+    /* 한 화면(단일 뷰포트) 여백 최적화 */
     .block-container {
-        padding-top: 3.2rem !important;
-        padding-bottom: 1rem !important;
-        padding-left: 1.8rem !important;
-        padding-right: 1.8rem !important;
+        padding-top: 0.6rem !important;
+        padding-bottom: 0.4rem !important;
+        padding-left: 1.2rem !important;
+        padding-right: 1.2rem !important;
         max-width: 100% !important;
     }
     
@@ -65,8 +66,8 @@ st.markdown("""
         justify-content: space-between;
         background: #0f0f0f;
         border-bottom: 1px solid #272727;
-        padding: 8px 12px 14px 12px;
-        margin-bottom: 16px;
+        padding: 4px 8px 8px 8px;
+        margin-bottom: 8px;
     }
     .yt-logo-group {
         display: flex;
@@ -75,7 +76,7 @@ st.markdown("""
         cursor: pointer;
     }
     .yt-logo-text {
-        font-size: 1.35rem;
+        font-size: 1.25rem;
         font-weight: 800;
         letter-spacing: -0.5px;
         color: #ffffff;
@@ -86,30 +87,33 @@ st.markdown("""
     .badge-gemini {
         background: linear-gradient(135deg, #ff0000 0%, #ff4b4b 100%);
         color: white;
-        padding: 3px 8px;
-        border-radius: 12px;
-        font-size: 0.72rem;
+        padding: 2px 7px;
+        border-radius: 10px;
+        font-size: 0.7rem;
         font-weight: 700;
         letter-spacing: 0.3px;
     }
     .yt-sub-desc {
-        color: #aaaaaa;
-        font-size: 0.85rem;
+        color: #888888;
+        font-size: 0.8rem;
     }
 
     /* 다운로드 버튼 칩 스타일 */
     .stDownloadButton button {
-        background: #272727 !important;
+        background: #222222 !important;
         color: #f1f1f1 !important;
-        border: 1px solid #3f3f3f !important;
-        border-radius: 18px !important;
+        border: 1px solid #383838 !important;
+        border-radius: 10px !important;
         font-weight: 600 !important;
         font-size: 0.82rem !important;
-        padding: 5px 16px !important;
+        padding: 4px 12px !important;
+        height: 38px !important;
+        line-height: 1.2 !important;
         transition: all 0.2s ease !important;
+        white-space: nowrap !important;
     }
     .stDownloadButton button:hover {
-        background: #3f3f3f !important;
+        background: #333333 !important;
         border-color: #555555 !important;
         color: #ffffff !important;
     }
@@ -118,9 +122,10 @@ st.markdown("""
     .stButton button[kind="primary"] {
         background-color: #cc0000 !important;
         border: none !important;
-        border-radius: 20px !important;
+        border-radius: 12px !important;
         color: #ffffff !important;
         font-weight: 700 !important;
+        height: 38px !important;
         transition: background-color 0.2s ease !important;
     }
     .stButton button[kind="primary"]:hover {
@@ -132,7 +137,8 @@ st.markdown("""
         background-color: #121212 !important;
         color: #f1f1f1 !important;
         border: 1px solid #303030 !important;
-        border-radius: 20px !important;
+        border-radius: 12px !important;
+        height: 38px !important;
     }
     .stTextInput input:focus {
         border-color: #3ea6ff !important;
@@ -286,10 +292,11 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
             /* 2열 메인 컨테이너 */
             .app-container {{
                 display: grid;
-                grid-template-columns: 60fr 40fr;
-                gap: 16px;
+                grid-template-columns: 58fr 42fr;
+                gap: 14px;
                 width: 100%;
-                height: 575px;
+                height: 570px;
+                box-sizing: border-box;
             }}
             
             /* ========================================= */
@@ -298,18 +305,20 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
             .left-column {{
                 display: flex;
                 flex-direction: column;
-                gap: 8px;
+                gap: 7px;
+                height: 100%;
+                min-height: 0;
             }}
             
             .player-wrapper {{
                 position: relative;
                 width: 100%;
                 aspect-ratio: 16 / 9;
-                max-height: 330px;
                 background: #000;
-                border-radius: 12px;
+                border-radius: 10px;
                 overflow: hidden;
                 box-shadow: 0 4px 20px rgba(0,0,0,0.8);
+                flex-shrink: 0;
             }}
             .player-wrapper iframe {{
                 position: absolute;
@@ -468,32 +477,38 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
             
             /* 실시간 라이브 자막 바 */
             .yt-live-caption-box {{
-                background: #181818;
-                border: 1px solid #272727;
-                border-left: 4px solid #ff0000;
-                border-radius: 8px;
-                padding: 7px 12px;
+                background: linear-gradient(180deg, #1f1f22 0%, #161618 100%);
+                border: 1px solid #2d2d32;
+                border-left: 5px solid #ff0000;
+                border-radius: 10px;
+                padding: 9px 14px;
+                box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                min-height: 72px;
             }}
             .yt-live-head {{
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
-                margin-bottom: 2px;
+                margin-bottom: 4px;
             }}
             .yt-live-tag {{
                 display: inline-flex;
                 align-items: center;
-                gap: 5px;
+                gap: 6px;
                 background: #ff0000;
-                color: #fff;
-                padding: 1px 6px;
+                color: #ffffff;
+                padding: 2px 8px;
                 border-radius: 4px;
-                font-size: 0.65rem;
+                font-size: 0.75rem;
                 font-weight: 800;
+                letter-spacing: 0.3px;
             }}
             .yt-live-dot {{
-                width: 4px;
-                height: 4px;
+                width: 5px;
+                height: 5px;
                 background: #fff;
                 border-radius: 50%;
                 animation: pulse 1s infinite alternate;
@@ -504,17 +519,23 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
             }}
             .yt-live-time {{
                 color: #3ea6ff;
-                font-size: 0.75rem;
+                font-size: 0.85rem;
                 font-weight: 700;
+                font-variant-numeric: tabular-nums;
             }}
             .yt-live-text {{
                 color: #ffffff;
-                font-size: 0.92rem;
+                font-size: 1.25rem;
                 font-weight: 700;
-                line-height: 1.35;
-                white-space: nowrap;
+                line-height: 1.4;
+                letter-spacing: -0.2px;
+                word-break: keep-all;
+                overflow-wrap: break-word;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
                 overflow: hidden;
-                text-overflow: ellipsis;
+                text-shadow: 0 1px 3px rgba(0,0,0,0.8);
             }}
             
             /* ========================================= */
@@ -528,6 +549,7 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
                 display: flex;
                 flex-direction: column;
                 height: 100%;
+                min-height: 0;
                 overflow: hidden;
             }}
             
@@ -535,7 +557,7 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
             .tab-nav-bar {{
                 display: flex;
                 gap: 6px;
-                margin-bottom: 10px;
+                margin-bottom: 8px;
                 border-bottom: 1px solid #282828;
                 padding-bottom: 8px;
             }}
@@ -544,7 +566,7 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
                 color: #f1f1f1;
                 border: 1px solid #383838;
                 border-radius: 16px;
-                padding: 5px 12px;
+                padding: 4px 10px;
                 font-size: 0.78rem;
                 font-weight: 600;
                 cursor: pointer;
@@ -567,6 +589,7 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
             .tab-panel {{
                 display: none;
                 flex: 1;
+                min-height: 0;
                 flex-direction: column;
                 overflow: hidden;
             }}
@@ -575,7 +598,7 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
             }}
             
             /* ------------------------------------- */
-            /* 📑 카테고리 1: 대본 (정확히 5개 축소 뷰포트) */
+            /* 📑 카테고리 1: 대본 (전체 높이 확장)     */
             /* ------------------------------------- */
             .search-box-wrap {{
                 display: flex;
@@ -596,11 +619,10 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
                 outline: none;
             }}
             
-            /* [핵심] 화면에서 약 5개 정도로 축소된 높이 (약 235px) 및 스크롤/드래그 지원 */
+            /* [핵심] 패널 높이를 100% 채워 빈 공간 제거 & 부드러운 스크롤 */
             .transcript-scroll-view {{
-                height: 235px;
-                min-height: 235px;
-                max-height: 235px;
+                flex: 1;
+                min-height: 0;
                 overflow-y: auto;
                 display: flex;
                 flex-direction: column;
@@ -624,12 +646,11 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
                 gap: 8px;
                 padding: 8px 10px;
                 background: #1f1f1f;
-                border: 1px solid transparent;
+                border: 1px solid #2a2a2a;
                 border-radius: 8px;
                 cursor: pointer;
                 transition: all 0.15s ease;
-                min-height: 40px;
-                max-height: 42px;
+                min-height: 42px;
             }}
             .t-row:hover {{
                 background: #272727;
@@ -644,7 +665,7 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
             .t-time-btn {{
                 background: #282828;
                 color: #3ea6ff;
-                font-size: 0.74rem;
+                font-size: 0.8rem;
                 font-weight: 700;
                 padding: 3px 6px;
                 border-radius: 4px;
@@ -656,9 +677,9 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
                 color: #0b1120;
             }}
             .t-content {{
-                font-size: 0.82rem;
-                color: #cccccc;
-                line-height: 1.25;
+                font-size: 0.96rem;
+                color: #dddddd;
+                line-height: 1.35;
                 white-space: nowrap;
                 overflow: hidden;
                 text-overflow: ellipsis;
@@ -666,7 +687,7 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
             }}
             .t-row.active .t-content {{
                 color: #ffffff;
-                font-weight: 600;
+                font-weight: 700;
             }}
             
             /* ------------------------------------- */
@@ -874,7 +895,7 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
             <div class="right-column">
                 <!-- 탭 버튼들 -->
                 <div class="tab-nav-bar">
-                    <button class="tab-chip active" id="tab-btn-transcript" onclick="switchTab('transcript')">📑 시간대별 대본 (5개 뷰)</button>
+                    <button class="tab-chip active" id="tab-btn-transcript" onclick="switchTab('transcript')">📑 시간대별 대본</button>
                     <button class="tab-chip" id="tab-btn-chat" onclick="switchTab('chat')">💬 Gemini AI 챗봇</button>
                     <button class="tab-chip" id="tab-btn-chapters" onclick="switchTab('chapters')">🏷️ 주제별 요약/챕터</button>
                 </div>
@@ -1296,34 +1317,32 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
     </html>
     """
 
-    # 컴포넌트 높이 590px로 넉넉하게 지정하여 스크롤 잘림 없이 한 화면에 완전 렌더링
-    components.html(integrated_html, height=590)
+    # 컴포넌트 높이 575px로 지정하여 스크롤 잘림 없이 한 화면에 완전 렌더링
+    components.html(integrated_html, height=575)
 
-    # 하단 비디오 상세 정보 및 다운로드 바 (Streamlit 네이티브 UI)
-    st.markdown(f"""
-    <div style="background: #181818; border: 1px solid #272727; border-radius: 10px; padding: 10px 16px; margin-top: 2px;">
-        <div style="font-weight: 700; font-size: 1.05rem; color: #ffffff; line-height: 1.35; margin-bottom: 6px;">
-            {v_title}
-        </div>
-        <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.83rem; color: #aaaaaa; flex-wrap: wrap; gap: 8px;">
-            <div style="display: flex; align-items: center; gap: 8px;">
-                <div style="width: 26px; height: 26px; background: #333333; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 0.75rem; font-weight: 700;">
-                    {v_uploader[0].upper() if v_uploader else "Y"}
-                </div>
-                <span style="color: #ffffff; font-weight: 600;">{v_uploader}</span>
-                <span>•</span>
-                <span>조회수 {v_views}회</span>
-                <span>•</span>
-                <span>⏱️ {v_duration_str}</span>
+    # 하단 비디오 상세 정보 및 다운로드 바를 단일 행(Row)으로 통합하여 한 화면에 깔끔하게 배치
+    safe_title = "".join(c for c in v_title if c.isalnum() or c in (" ", "_", "-")).rstrip()
+    uploader_initial = v_uploader[0].upper() if v_uploader else "Y"
+
+    info_col, dl_col1, dl_col2 = st.columns([54, 23, 23], gap="small")
+    with info_col:
+        st.markdown(f"""
+        <div style="background: #181818; border: 1px solid #282828; border-radius: 10px; padding: 4px 12px; height: 38px; display: flex; align-items: center; gap: 8px; overflow: hidden;" title="{v_title}">
+            <div style="width: 22px; height: 22px; min-width: 22px; background: #333333; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 0.72rem; font-weight: 700;">
+                {uploader_initial}
             </div>
+            <span style="font-weight: 700; font-size: 0.9rem; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 45%;">
+                {v_title}
+            </span>
+            <span style="color: #555;">•</span>
+            <span style="color: #aaaaaa; font-size: 0.8rem; white-space: nowrap;">{v_uploader}</span>
+            <span style="color: #555;">•</span>
+            <span style="color: #aaaaaa; font-size: 0.8rem; white-space: nowrap;">조회수 {v_views}회</span>
+            <span style="color: #555;">•</span>
+            <span style="color: #aaaaaa; font-size: 0.8rem; white-space: nowrap;">⏱️ {v_duration_str}</span>
         </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-    # 다운로드 버튼
-    dl_c1, dl_c2 = st.columns([1, 1], gap="small")
-    with dl_c1:
-        safe_title = "".join(c for c in v_title if c.isalnum() or c in (" ", "_", "-")).rstrip()
+        """, unsafe_allow_html=True)
+    with dl_col1:
         st.download_button(
             "📥 전체 대본 다운로드 (.txt)",
             data=t_data.get("full_text", "").encode("utf-8"),
@@ -1331,11 +1350,11 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
             mime="text/plain",
             use_container_width=True,
         )
-    with dl_c2:
+    with dl_col2:
         if st.session_state.audio_path and os.path.exists(st.session_state.audio_path):
             with open(st.session_state.audio_path, "rb") as f:
                 st.download_button(
-                    "🎵 고음질 오디오 다운로드 (.m4a)",
+                    "🎵 고음질 오디오 (.m4a)",
                     data=f.read(),
                     file_name=os.path.basename(st.session_state.audio_path),
                     mime="audio/m4a",
