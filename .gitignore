@@ -219,4 +219,5 @@ __marimo__/
 
 .env
 *.pyc
-
+*.html
+*.pdf
