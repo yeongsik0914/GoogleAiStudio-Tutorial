@@ -43,40 +43,50 @@ def save_to_cache(
 
 
 def load_from_cache(video_id: str) -> Optional[Dict[str, Any]]:
-    """캐시된 영상 데이터를 로드합니다. 오디오 파일이 존재하는지 검증합니다."""
+    """
+    캐시된 영상 데이터를 로드합니다.
+    오디오 파일이 임시 삭제되었더라도 JSON 캐시에 저장된 대본과 챕터 데이터를
+    온전히 복원하여 추가 토큰 소모(Gemini API 재호출)를 100% 방지합니다.
+    """
     cache_path = _get_cache_path(video_id)
     if not os.path.exists(cache_path):
         return None
     try:
         with open(cache_path, "r", encoding="utf-8") as f:
             data = json.load(f)
+
+        # 필수 대본 데이터 검증
+        if not data.get("transcript_data"):
+            return None
         
-        # 오디오 파일 절대 경로 복원 및 존재 여부 검증
+        # 오디오 파일 절대 경로 복원 및 존재 여부 확인
         stored_audio = data.get("audio_path", "")
-        if not os.path.isabs(stored_audio):
-            abs_audio = os.path.join(os.path.dirname(__file__), stored_audio)
-        else:
-            abs_audio = stored_audio
-            
-        if not os.path.exists(abs_audio):
-            # 오디오 파일이 downloads 폴더에 있는지 다시 한 번 확인
-            downloads_dir = os.path.join(os.path.dirname(__file__), "downloads")
-            fallback_audio = None
-            if os.path.exists(downloads_dir):
-                for f in os.listdir(downloads_dir):
-                    if f.startswith(video_id):
-                        fallback_audio = os.path.join(downloads_dir, f)
-                        break
-            if fallback_audio and os.path.exists(fallback_audio):
-                abs_audio = fallback_audio
+        abs_audio = ""
+        if stored_audio:
+            if not os.path.isabs(stored_audio):
+                candidate = os.path.join(os.path.dirname(__file__), stored_audio)
             else:
-                return None  # 오디오 파일 유실 시 재분석 유도
-                
+                candidate = stored_audio
+
+            if os.path.exists(candidate):
+                abs_audio = candidate
+            else:
+                # downloads 폴더에서 동일 video_id 파일 탐색
+                downloads_dir = os.path.join(os.path.dirname(__file__), "downloads")
+                if os.path.exists(downloads_dir):
+                    for f in os.listdir(downloads_dir):
+                        if f.startswith(video_id):
+                            matched = os.path.join(downloads_dir, f)
+                            if os.path.exists(matched):
+                                abs_audio = matched
+                                break
+                                
         data["audio_path"] = abs_audio
         return data
     except Exception as e:
         print(f"[Cache Error] Failed to load cache for {video_id}: {e}")
         return None
+
 
 
 def has_cache(video_id: str) -> bool:

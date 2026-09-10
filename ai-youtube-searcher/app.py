@@ -338,7 +338,7 @@ st.markdown("""
         background: #2e2e2e;
     }
     
-    /* 반응형 사이드 드로어 (분석 보관함) */
+    /* 반응형 사이드 드로어 (분석 보관함 및 카테고리 메뉴) */
     .yt-drawer-backdrop {
         position: fixed;
         top: 0;
@@ -351,21 +351,22 @@ st.markdown("""
         opacity: 0;
         pointer-events: none;
         transition: opacity 0.25s cubic-bezier(0.1, 0.9, 0.2, 1);
+        cursor: pointer;
     }
     .yt-drawer-backdrop.open {
-        opacity: 1;
-        pointer-events: auto;
+        opacity: 1 !important;
+        pointer-events: auto !important;
     }
     .yt-drawer-panel {
         position: fixed;
         top: 0;
         left: 0;
-        width: 370px;
+        width: 390px;
         max-width: 88vw;
         height: 100vh;
         background: #0f0f0f;
         border-right: 1px solid #282828;
-        box-shadow: 6px 0 28px rgba(0, 0, 0, 0.85);
+        box-shadow: 8px 0 32px rgba(0, 0, 0, 0.9);
         z-index: 99999 !important;
         transform: translateX(-100%);
         transition: transform 0.28s cubic-bezier(0.1, 0.9, 0.2, 1);
@@ -373,8 +374,63 @@ st.markdown("""
         flex-direction: column;
         box-sizing: border-box;
     }
-    .yt-drawer-panel.open {
-        transform: translateX(0);
+    .yt-drawer-panel.open,
+    body:has(#yt-drawer-toggle:checked) .yt-drawer-panel {
+        transform: translateX(0) !important;
+    }
+    .d-category-section {
+        margin-bottom: 12px;
+    }
+    .d-category-title {
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: #aaaaaa;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+        padding-left: 2px;
+    }
+    .d-category-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+    .d-cat-chip {
+        background: #1e1e1e;
+        color: #f1f1f1;
+        border: 1px solid #2d2d2d;
+        border-radius: 16px;
+        padding: 4px 10px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.15s ease;
+        user-select: none;
+    }
+    .d-cat-chip:hover, .d-cat-chip.active {
+        background: #ffffff;
+        color: #0f0f0f;
+        border-color: #ffffff;
+        font-weight: 700;
+    }
+    .d-search-box {
+        margin-bottom: 10px;
+    }
+    .d-search-input {
+        width: 100%;
+        box-sizing: border-box;
+        background: #141414;
+        border: 1px solid #2a2a2a;
+        border-radius: 8px;
+        color: #f1f1f1;
+        padding: 7px 10px;
+        font-size: 0.78rem;
+        outline: none;
+        transition: border-color 0.2s;
+    }
+    .d-search-input:focus {
+        border-color: #3ea6ff;
+        background: #181818;
     }
     .d-panel-header {
         display: flex;
@@ -578,6 +634,223 @@ st.markdown("""
         color: #ff5555 !important;
         background: #1f1414;
     }
+    
+    /* 홈 화면 분석 보관함 그리드 카드 */
+    .home-cache-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 16px;
+        margin-top: 14px;
+    }
+    .home-cache-card {
+        background: #181818;
+        border: 1px solid #282828;
+        border-radius: 12px;
+        overflow: hidden;
+        text-decoration: none !important;
+        transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+        display: flex;
+        flex-direction: column;
+    }
+    .home-cache-card:hover {
+        transform: translateY(-2px);
+        border-color: #3ea6ff;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.6);
+    }
+    .home-card-thumb {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 16/9;
+        background: #000;
+    }
+    .home-card-thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .home-card-dur {
+        position: absolute;
+        bottom: 6px;
+        right: 6px;
+        background: rgba(0,0,0,0.85);
+        color: #fff;
+        font-size: 0.7rem;
+        font-weight: 700;
+        padding: 2px 5px;
+        border-radius: 4px;
+    }
+    .home-card-body {
+        padding: 10px 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        flex: 1;
+    }
+    .home-card-title {
+        color: #f1f1f1;
+        font-size: 0.88rem;
+        font-weight: 700;
+        line-height: 1.35;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    .home-card-uploader {
+        color: #aaaaaa;
+        font-size: 0.76rem;
+    }
+    .home-card-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 6px;
+        padding-top: 6px;
+        border-top: 1px solid #242424;
+    }
+
+    /* 모바일 및 좁은 화면에서도 상단 헤더 3대 칼럼을 1줄(가로 flex)로 완벽 유지 */
+    [data-testid="stHorizontalBlock"]:has(.yt-nav-header-left) {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        align-items: center !important;
+        gap: 6px !important;
+    }
+    [data-testid="stHorizontalBlock"]:has(.yt-nav-header-left) > [data-testid="column"]:nth-child(1) {
+        width: auto !important;
+        min-width: fit-content !important;
+        flex: 0 0 auto !important;
+    }
+    [data-testid="stHorizontalBlock"]:has(.yt-nav-header-left) > [data-testid="column"]:nth-child(2) {
+        flex: 1 1 auto !important;
+        min-width: 0 !important;
+    }
+    [data-testid="stHorizontalBlock"]:has(.yt-nav-header-left) > [data-testid="column"]:nth-child(3) {
+        width: auto !important;
+        min-width: fit-content !important;
+        flex: 0 0 auto !important;
+    }
+
+    /* 초기 대기 화면 반응형 히어로 배너 */
+    .home-hero-banner {
+        background: #181818;
+        border-radius: 16px;
+        padding: clamp(1.4rem, 3.5vw, 2.6rem) clamp(1rem, 3vw, 2rem);
+        text-align: center;
+        border: 1px dashed #333333;
+        margin-top: 1.2rem;
+    }
+    .home-hero-title {
+        color: #ffffff;
+        margin-bottom: 0.5rem;
+        font-weight: 800;
+        font-size: clamp(1.2rem, 3.8vw, 1.5rem);
+    }
+    .home-hero-desc {
+        color: #aaaaaa;
+        max-width: 640px;
+        margin: 0 auto 1.5rem auto;
+        font-size: 0.9rem;
+        line-height: 1.6;
+    }
+
+    /* 영상 상세 정보 바 반응형 */
+    .video-info-banner {
+        background: #181818;
+        border: 1px solid #282828;
+        border-radius: 8px;
+        padding: 6px 14px;
+        min-height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 4px;
+    }
+    .v-info-left {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+        flex: 1 1 auto;
+    }
+    .v-uploader-avatar {
+        width: 22px;
+        height: 22px;
+        min-width: 22px;
+        background: #333333;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 0.72rem;
+        font-weight: 700;
+    }
+    .v-info-title {
+        font-weight: 700;
+        font-size: 0.88rem;
+        color: #ffffff;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 600px;
+    }
+    .v-info-meta {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+    .v-meta-item {
+        color: #aaaaaa;
+        font-size: 0.8rem;
+        white-space: nowrap;
+    }
+    .v-meta-dot {
+        color: #555555;
+    }
+
+    /* 반응형 모바일 및 태블릿 미디어 쿼리 */
+    @media (max-width: 768px) {
+        .block-container {
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
+            padding-top: 0.4rem !important;
+        }
+        .yt-create-btn {
+            display: none !important;
+        }
+        .yt-icon-round-btn {
+            display: none !important;
+        }
+        .yt-mic-btn {
+            display: none !important;
+        }
+        .yt-wordmark, .yt-country-code {
+            display: none !important;
+        }
+        .yt-nav-header-left {
+            gap: 8px !important;
+        }
+        .video-info-banner {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 6px;
+            padding: 8px 12px;
+        }
+        .v-info-title {
+            white-space: normal;
+            word-break: break-word;
+            max-width: 100%;
+        }
+        .home-cache-grid {
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -586,8 +859,9 @@ st.markdown("""
 q_params = st.query_params
 
 if q_params.get("home") == "true" or q_params.get("reset") == "true":
-    for key in list(st.session_state.keys()):
-        del st.session_state[key]
+    for key in ["video_id", "video_info", "audio_path", "transcript_data", "chapters_data", "chat_messages", "current_url", "from_cache", "trigger_search"]:
+        if key in st.session_state:
+            del st.session_state[key]
     st.query_params.clear()
     st.rerun()
 
@@ -597,13 +871,14 @@ if load_cache_id:
     if c_data:
         st.session_state.video_id = c_data["video_id"]
         st.session_state.video_info = c_data["video_info"]
-        st.session_state.audio_path = c_data["audio_path"]
+        st.session_state.audio_path = c_data.get("audio_path", "")
         st.session_state.transcript_data = c_data["transcript_data"]
         st.session_state.chapters_data = c_data.get("chapters_data", [])
         st.session_state.current_url = c_data.get("url", f"https://www.youtube.com/watch?v={load_cache_id}")
         st.session_state.chat_messages = []
         st.session_state.from_cache = True
         st.query_params.clear()
+        st.toast("⚡ 분석 보관함에서 0토큰으로 대본을 불러왔습니다!", icon="🚀")
         st.rerun()
 
 del_cache_id = q_params.get("delete_cache")
@@ -651,14 +926,14 @@ with st.sidebar:
         st.success("✅ Gemini API 연결 완료")
 
 
-# --- [핵심] 유튜브 공식 상단 네비바 (Image 2 완벽 구현) ---
+# --- [핵심] 유튜브 공식 상단 네비바 ---
 col_head_left, col_head_center, col_head_right = st.columns([2.0, 5.8, 2.2], gap="small")
 
 with col_head_left:
     st.markdown("""
     <div class="yt-nav-header-left">
-        <button class="yt-menu-icon" onclick="openDrawer()" title="카테고리 메뉴 열기 (분석 보관함)" style="background:none; border:none; padding:0; cursor:pointer;">
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="#ffffff">
+        <button type="button" id="yt-hamburger-btn" class="yt-menu-icon" title="카테고리 메뉴 및 보관함 열기" style="background:none; border:none; padding:0; cursor:pointer; display:flex; align-items:center; justify-content:center;">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="#ffffff">
                 <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
             </svg>
         </button>
@@ -715,113 +990,227 @@ with col_head_right:
     </div>
     """, unsafe_allow_html=True)
 
-# --- [반응형 사이드 드로어 마크업 & JS 주입] ---
+# --- [반응형 사이드 드로어 마크업 & 카테고리 목록 & 캐시 보관함] ---
 cached_videos_list = get_all_cached_videos()
 cached_cards_html = ""
 
 if cached_videos_list:
     for cv in cached_videos_list:
         v_t_esc = cv['title'].replace('"', '&quot;').replace("'", "&#39;")
-        cached_cards_html += f"""
-        <div class="d-video-card">
-            <a href="?load_cache={cv['video_id']}" target="_self" class="d-card-link" title="{v_t_esc}">
-                <div class="d-thumb-box">
-                    <img src="{cv['thumbnail']}" alt="thumb" class="d-thumb-img" onerror="this.src='https://img.youtube.com/vi/{cv['video_id']}/hqdefault.jpg'"/>
-                    <span class="d-dur-tag">{cv['duration_str']}</span>
-                </div>
-                <div class="d-info-box">
-                    <div class="d-title">{v_t_esc}</div>
-                    <div class="d-uploader">📺 {cv['uploader']}</div>
-                    <div class="d-footer-row">
-                        <span class="d-token-tag">⚡ 0토큰 로드</span>
-                        <span class="d-date-tag">{cv['cached_at']}</span>
-                    </div>
-                </div>
-            </a>
-            <a href="?delete_cache={cv['video_id']}" target="_self" class="d-del-btn" title="보관함에서 삭제" onclick="return confirm('이 영상의 분석 캐시를 삭제하시겠습니까?');">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="#888">
-                    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
-                </svg>
-            </a>
-        </div>
-        """
-else:
-    cached_cards_html = """
-    <div class="d-empty-box">
-        <div style="font-size: 2.2rem; margin-bottom: 8px;">📂</div>
-        <div style="font-weight: 700; color: #ffffff; margin-bottom: 4px; font-size: 0.95rem;">아직 보관된 영상이 없습니다</div>
-        <div style="font-size: 0.8rem; color: #888888; line-height: 1.4;">상단에서 유튜브 링크를 분석하면<br>여기에 자동으로 보관되어 언제든 0토큰으로 다시 볼 수 있습니다.</div>
-    </div>
-    """
-
-clear_btn_html = f'<div class="d-panel-footer"><a href="?clear_all_cache=true" target="_self" class="d-clear-all-btn" onclick="return confirm(\'정말 모든 분석 캐시를 삭제하시겠습니까?\');">🗑️ 전체 캐시 비우기</a></div>' if cached_videos_list else ''
-
-drawer_markup = f"""
-<div id="yt-drawer-backdrop" class="yt-drawer-backdrop" onclick="closeDrawer()"></div>
-<div id="yt-drawer-panel" class="yt-drawer-panel">
-    <div class="d-panel-header">
-        <button class="yt-menu-icon" onclick="closeDrawer()" title="메뉴 닫기" style="background:none; border:none; padding:0; cursor:pointer;">
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="#ffffff">
-                <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
-            </svg>
-        </button>
-        <a href="?home=true" target="_self" class="yt-logo-link" style="margin-left: 12px;">
-            <svg width="28" height="20" viewBox="0 0 32 23" fill="none">
-                <path d="M31.24 3.49C30.87 2.12 29.8 1.05 28.43 0.68C25.96 0 16 0 16 0C16 0 6.04 0 3.57 0.68C2.2 1.05 1.13 2.12 0.76 3.49C0 5.96 0 11.1 0 11.1C0 11.1 0 16.24 0.76 18.71C1.13 20.08 2.2 21.15 3.57 21.52C6.04 22.2 16 22.2 16 22.2C16 22.2 25.96 22.2 28.43 21.52C29.8 21.15 30.87 20.08 31.24 18.71C32 16.24 32 11.1 32 11.1C32 11.1 32 5.96 31.24 3.49Z" fill="#FF0000"/>
-                <polygon points="12.8,15.8 21.2,11.1 12.8,6.4" fill="#FFFFFF"/>
-            </svg>
-            <span class="yt-wordmark">YouTube</span>
-            <span class="yt-country-code">KR</span>
-        </a>
-    </div>
-    
-    <div class="d-panel-body">
-        <a href="?home=true" target="_self" class="d-menu-btn" title="새로운 영상 분석 홈 화면">
-            <span style="font-size: 1.15rem;">🏠</span>
-            <span>홈 (새 영상 검색)</span>
-        </a>
-        
-        <div class="d-section-divider"></div>
-        
-        <div class="d-section-header">
-            <div style="display: flex; align-items: center; gap: 6px;">
-                <span style="font-size: 1.05rem;">📁</span>
-                <span style="font-weight: 700; font-size: 0.95rem; color: #ffffff;">분석 보관함</span>
-            </div>
-            <span class="d-count-pill">{len(cached_videos_list)}개 보관</span>
-        </div>
-        
-        <div class="d-scroll-area">
-            {cached_cards_html}
-        </div>
-        
-        {clear_btn_html}
-    </div>
+        v_u_esc = cv['uploader'].replace('"', '&quot;').replace("'", "&#39;")
+        cached_cards_html += f"""<div class="d-video-card" data-title="{v_t_esc.lower()}" data-uploader="{v_u_esc.lower()}">
+<a href="?load_cache={cv['video_id']}" target="_self" class="d-card-link" title="{v_t_esc}">
+<div class="d-thumb-box">
+<img src="{cv['thumbnail']}" alt="thumb" class="d-thumb-img" onerror="this.src='https://img.youtube.com/vi/{cv['video_id']}/hqdefault.jpg'"/>
+<span class="d-dur-tag">{cv['duration_str']}</span>
 </div>
+<div class="d-info-box">
+<div class="d-title">{v_t_esc}</div>
+<div class="d-uploader">📺 {v_u_esc}</div>
+<div class="d-footer-row">
+<span class="d-token-tag">⚡ 0토큰 로드</span>
+<span class="d-date-tag">{cv.get('segment_count', 0)}개 구간</span>
+</div>
+</div>
+</a>
+<a href="?delete_cache={cv['video_id']}" target="_self" class="d-del-btn" title="보관함에서 삭제" onclick="return confirm('이 영상의 분석 캐시를 삭제하시겠습니까?');">
+<svg viewBox="0 0 24 24" width="16" height="16" fill="#888">
+<path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+</svg>
+</a>
+</div>"""
+else:
+    cached_cards_html = """<div class="d-empty-box">
+<div style="font-size: 2.2rem; margin-bottom: 8px;">📂</div>
+<div style="font-weight: 700; color: #ffffff; margin-bottom: 4px; font-size: 0.95rem;">보관된 영상이 없습니다</div>
+<div style="font-size: 0.8rem; color: #888888; line-height: 1.4;">상단에서 유튜브 링크를 분석하면<br>여기에 자동으로 영구 보관되어<br>언제든 0토큰으로 대본을 다시 볼 수 있습니다.</div>
+</div>"""
 
-<script>
-function openDrawer() {{
-    var bd = document.getElementById('yt-drawer-backdrop');
-    var pn = document.getElementById('yt-drawer-panel');
-    if (bd && pn) {{
-        bd.classList.add('open');
-        pn.classList.add('open');
-    }}
-}}
-function closeDrawer() {{
-    var bd = document.getElementById('yt-drawer-backdrop');
-    var pn = document.getElementById('yt-drawer-panel');
-    if (bd && pn) {{
-        bd.classList.remove('open');
-        pn.classList.remove('open');
-    }}
-}}
-document.addEventListener('keydown', function(e) {{
-    if (e.key === 'Escape') closeDrawer();
-}});
-</script>
+clear_btn_html = f'<div class="d-panel-footer"><a href="?clear_all_cache=true" target="_self" class="d-clear-all-btn" onclick="return confirm(\'정말 모든 분석 캐시를 삭제하시겠습니까?\');">🗑️ 전체 보관함 비우기</a></div>' if cached_videos_list else ''
+
+raw_drawer_html = f"""
+<div id="yt-drawer-backdrop" class="yt-drawer-backdrop" title="메뉴 닫기"></div>
+<div id="yt-drawer-panel" class="yt-drawer-panel">
+<div class="d-panel-header">
+<button type="button" id="d-close-drawer-btn" class="d-close-drawer-btn yt-menu-icon" title="메뉴 닫기" style="background:none; border:none; padding:0; cursor:pointer; display:flex; align-items:center; justify-content:center;">
+<svg viewBox="0 0 24 24" width="22" height="22" fill="#ffffff">
+<path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+</svg>
+</button>
+<a href="?home=true" target="_self" class="yt-logo-link" style="margin-left: 12px;" title="YouTube 홈">
+<svg width="28" height="20" viewBox="0 0 32 23" fill="none">
+<path d="M31.24 3.49C30.87 2.12 29.8 1.05 28.43 0.68C25.96 0 16 0 16 0C16 0 6.04 0 3.57 0.68C2.2 1.05 1.13 2.12 0.76 3.49C0 5.96 0 11.1 0 11.1C0 11.1 0 16.24 0.76 18.71C1.13 20.08 2.2 21.15 3.57 21.52C6.04 22.2 16 22.2 16 22.2C16 22.2 25.96 22.2 28.43 21.52C29.8 21.15 30.87 20.08 31.24 18.71C32 16.24 32 11.1 32 11.1C32 11.1 32 5.96 31.24 3.49Z" fill="#FF0000"/>
+<polygon points="12.8,15.8 21.2,11.1 12.8,6.4" fill="#FFFFFF"/>
+</svg>
+<span class="yt-wordmark">YouTube</span>
+<span class="yt-country-code">KR</span>
+</a>
+</div>
+<div class="d-panel-body">
+<a href="?home=true" target="_self" class="d-menu-btn" title="새로운 영상 분석 홈 화면">
+<span style="font-size: 1.15rem;">🏠</span>
+<span>홈 (새 영상 검색)</span>
+</a>
+<div class="d-category-section">
+<div class="d-category-title">🏷️ 카테고리 목록</div>
+<div class="d-category-chips">
+<button type="button" class="d-cat-chip active" onclick="if(window.parent.filterDrawerCategory)window.parent.filterDrawerCategory('all', this);">전체</button>
+<button type="button" class="d-cat-chip" onclick="if(window.parent.filterDrawerCategory)window.parent.filterDrawerCategory('지식', this);">🎓 지식/강의</button>
+<button type="button" class="d-cat-chip" onclick="if(window.parent.filterDrawerCategory)window.parent.filterDrawerCategory('IT', this);">💻 IT/테크</button>
+<button type="button" class="d-cat-chip" onclick="if(window.parent.filterDrawerCategory)window.parent.filterDrawerCategory('뉴스', this);">📰 뉴스/시사</button>
+<button type="button" class="d-cat-chip" onclick="if(window.parent.filterDrawerCategory)window.parent.filterDrawerCategory('음악', this);">🎵 음악/오디오</button>
+<button type="button" class="d-cat-chip" onclick="if(window.parent.filterDrawerCategory)window.parent.filterDrawerCategory('게임', this);">🎮 게임/엔터</button>
+</div>
+</div>
+<div class="d-section-divider"></div>
+<div class="d-section-header">
+<div style="display: flex; align-items: center; gap: 6px;">
+<span style="font-size: 1.05rem;">📁</span>
+<span style="font-weight: 700; font-size: 0.95rem; color: #ffffff;">분석 완료 영상 목록</span>
+</div>
+<span class="d-count-pill">{len(cached_videos_list)}개 저장</span>
+</div>
+<div class="d-search-box">
+<input type="text" id="d-drawer-search-input" placeholder="🔍 보관된 영상 검색..." oninput="if(window.parent.filterDrawerVideos)window.parent.filterDrawerVideos(this.value)" class="d-search-input" />
+</div>
+<div class="d-scroll-area" id="d-video-list-scroll">
+{cached_cards_html}
+<div id="d-filter-empty" style="display:none; text-align:center; padding:30px 10px; color:#777; font-size:0.8rem;">
+검색된 영상이 없습니다.
+</div>
+</div>
+{clear_btn_html}
+</div>
+</div>
 """
-st.markdown(drawer_markup, unsafe_allow_html=True)
+clean_drawer_html = "\n".join(l.strip() for l in raw_drawer_html.splitlines() if l.strip())
+st.markdown(clean_drawer_html, unsafe_allow_html=True)
+
+# 브라우저 DOM 이벤트 및 햄버거 메뉴 토글 / 바깥 영역 클릭 닫기 제어 스크립트 iframe 주입
+components.html("""
+<script>
+(function() {
+    try {
+        const pDoc = window.parent.document;
+        if (!pDoc) return;
+        
+        window.parent.openDrawer = function() {
+            const bd = pDoc.getElementById('yt-drawer-backdrop');
+            const pn = pDoc.getElementById('yt-drawer-panel');
+            if (bd) bd.classList.add('open');
+            if (pn) pn.classList.add('open');
+        };
+        window.parent.closeDrawer = function() {
+            const bd = pDoc.getElementById('yt-drawer-backdrop');
+            const pn = pDoc.getElementById('yt-drawer-panel');
+            if (bd) bd.classList.remove('open');
+            if (pn) pn.classList.remove('open');
+        };
+        window.parent.toggleDrawer = function() {
+            const pn = pDoc.getElementById('yt-drawer-panel');
+            if (pn && pn.classList.contains('open')) {
+                window.parent.closeDrawer();
+            } else {
+                window.parent.openDrawer();
+            }
+        };
+
+        window.parent.filterDrawerVideos = function(query) {
+            const q = (query || '').toLowerCase().trim();
+            const cards = pDoc.querySelectorAll('.d-video-card');
+            let matchCount = 0;
+            cards.forEach(function(card) {
+                const title = (card.getAttribute('data-title') || '').toLowerCase();
+                const uploader = (card.getAttribute('data-uploader') || '').toLowerCase();
+                if (!q || title.includes(q) || uploader.includes(q)) {
+                    card.style.display = 'flex';
+                    matchCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            const emptyNotice = pDoc.getElementById('d-filter-empty');
+            if (emptyNotice) {
+                emptyNotice.style.display = (matchCount === 0 && cards.length > 0) ? 'block' : 'none';
+            }
+        };
+
+        window.parent.filterDrawerCategory = function(cat, btnElem) {
+            if (btnElem) {
+                const chips = pDoc.querySelectorAll('.d-cat-chip');
+                chips.forEach(c => c.classList.remove('active'));
+                btnElem.classList.add('active');
+            }
+            const input = pDoc.getElementById('d-drawer-search-input');
+            if (cat === 'all') {
+                if (input) input.value = '';
+                window.parent.filterDrawerVideos('');
+            } else {
+                if (input) input.value = cat;
+                window.parent.filterDrawerVideos(cat);
+            }
+        };
+
+        // 기존 이벤트 리스너 중복 방지 정리
+        if (pDoc.__yt_drawer_click_handler) {
+            pDoc.removeEventListener('click', pDoc.__yt_drawer_click_handler, true);
+        }
+        if (pDoc.__yt_drawer_key_handler) {
+            pDoc.removeEventListener('keydown', pDoc.__yt_drawer_key_handler);
+        }
+
+        pDoc.__yt_drawer_click_handler = function(e) {
+            // 1. 햄버거 메뉴바 버튼 클릭 시: 토글 동작 (열려있으면 닫고, 닫혀있으면 엶)
+            const hamBtn = e.target.closest('#yt-hamburger-btn');
+            if (hamBtn) {
+                e.preventDefault();
+                e.stopPropagation();
+                window.parent.toggleDrawer();
+                return;
+            }
+
+            // 2. 드로어 상단 닫기 버튼 클릭 시: 닫기
+            const closeBtn = e.target.closest('#d-close-drawer-btn, .d-close-drawer-btn');
+            if (closeBtn) {
+                e.preventDefault();
+                e.stopPropagation();
+                window.parent.closeDrawer();
+                return;
+            }
+
+            // 3. 드로어 바깥 배경(Backdrop) 클릭 시: 닫기
+            if (e.target.id === 'yt-drawer-backdrop' || e.target.classList.contains('yt-drawer-backdrop')) {
+                e.preventDefault();
+                e.stopPropagation();
+                window.parent.closeDrawer();
+                return;
+            }
+
+            // 4. 드로어가 열려있는 상태에서 카테고리/드로어 패널 영역 밖을 클릭한 경우: 닫기
+            const pn = pDoc.getElementById('yt-drawer-panel');
+            if (pn && pn.classList.contains('open')) {
+                if (!pn.contains(e.target)) {
+                    window.parent.closeDrawer();
+                }
+            }
+        };
+
+        pDoc.__yt_drawer_key_handler = function(e) {
+            if (e.key === 'Escape') {
+                window.parent.closeDrawer();
+            }
+        };
+
+        // 캡처 단계에서 등록하여 어디서든 안정적으로 동작 보장
+        pDoc.addEventListener('click', pDoc.__yt_drawer_click_handler, true);
+        pDoc.addEventListener('keydown', pDoc.__yt_drawer_key_handler);
+
+    } catch(err) {
+        console.warn("[Drawer Script Warning]", err);
+    }
+})();
+</script>
+""", height=0)
 
 
 
@@ -847,13 +1236,13 @@ if search_submit or st.session_state.get("trigger_search", False):
             if cached_data:
                 st.session_state.video_id = cached_data["video_id"]
                 st.session_state.video_info = cached_data["video_info"]
-                st.session_state.audio_path = cached_data["audio_path"]
+                st.session_state.audio_path = cached_data.get("audio_path", "")
                 st.session_state.transcript_data = cached_data["transcript_data"]
                 st.session_state.chapters_data = cached_data.get("chapters_data", [])
                 st.session_state.current_url = cached_data.get("url", target_url)
                 st.session_state.chat_messages = []
                 st.session_state.from_cache = True
-                st.toast("⚡ 이전에 분석된 영상입니다. Gemini 토큰 소모 없이 즉시 불러왔습니다!", icon="🚀")
+                st.toast("⚡ 이전에 분석된 영상입니다! Gemini API 토큰 소모 없이 이전 데이터를 활용하여 즉시 대본 페이지를 불러왔습니다.", icon="🚀")
                 st.rerun()
             elif not api_key_input.strip():
                 st.error("신규 영상 분석을 위해 사이드바에서 Gemini API 키를 입력해주세요.")
@@ -962,37 +1351,44 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
                 overflow: hidden;
             }}
             
-            /* 2열 메인 컨테이너 (615px 높이로 100vh 일체화 및 상단 잘림 방지) */
+            /* 2열 메인 컨테이너 (와이드 화면 및 축소 화면 모두 지원하는 반응형 컨테이너) */
             .app-container {{
                 display: grid;
                 grid-template-columns: 58fr 42fr;
                 gap: 12px;
                 width: 100%;
-                height: 615px;
+                height: 635px;
+                max-height: 100vh;
                 box-sizing: border-box;
             }}
             
             /* ==================================================== */
-            /* 📺 좌측: 비디오 플레이어(좌우 공백 없이 100% 꽉 채움) + 타임라인 + 자막 */
+            /* 📺 좌측: 비디오 플레이어 + 타임라인 + 컨트롤 + 자막   */
             /* ==================================================== */
             .left-column {{
                 display: flex;
                 flex-direction: column;
-                gap: 6px;
+                gap: 5px;
                 height: 100%;
                 min-height: 0;
+                overflow: hidden;
+                justify-content: flex-start;
             }}
             
-            /* [핵심] 좌우 공백 없이 칼럼 전체 너비를 100% 꽉 채우는 16:9 플레이어 */
+            /* [핵심] 대형/와이드 화면에서도 하단 컨트롤과 실시간 대사가 잘리지 않도록 높이 자동 제한 */
             .player-wrapper {{
                 position: relative;
                 width: 100%;
+                max-width: 100%;
+                max-height: calc(100% - 120px);
                 aspect-ratio: 16 / 9;
+                margin: 0 auto;
                 background: #000;
                 border-radius: 10px;
                 overflow: hidden;
                 box-shadow: 0 4px 20px rgba(0,0,0,0.8);
-                flex-shrink: 0;
+                flex: 0 1 auto;
+                min-height: 0;
             }}
             .player-wrapper iframe {{
                 position: absolute;
@@ -1206,14 +1602,15 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
                 border: 1px solid #2d2d32;
                 border-left: 5px solid #ff0000;
                 border-radius: 9px;
-                padding: 7px 12px;
+                padding: 5px 12px;
                 box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
                 display: flex;
                 flex-direction: column;
                 justify-content: center;
-                min-height: 64px;
-                max-height: 64px;
+                min-height: 58px;
+                max-height: 62px;
                 flex-shrink: 0;
+                width: 100%;
             }}
             .yt-live-head {{
                 display: flex;
@@ -1296,36 +1693,45 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
                 overflow: hidden;
             }}
             
-            /* 유튜브 알약 필터 탭 바 (4개 탭 수용) */
+            /* 🌟 [유튜브 공식 알약 필터 탭 바 - 카테고리 4대 탭] */
             .tab-nav-bar {{
                 display: flex;
-                gap: 5px;
-                margin-bottom: 7px;
-                border-bottom: 1px solid #282828;
-                padding-bottom: 7px;
+                align-items: center;
+                gap: 8px;
+                margin-bottom: 8px;
+                padding: 2px 0 6px 0;
+                overflow-x: auto;
+                scrollbar-width: none;
+                -ms-overflow-style: none;
+                flex-shrink: 0;
+            }}
+            .tab-nav-bar::-webkit-scrollbar {{
+                display: none;
             }}
             .tab-chip {{
-                background: #272727;
+                background-color: #272727;
                 color: #f1f1f1;
-                border: 1px solid #383838;
-                border-radius: 16px;
-                padding: 4px 9px;
-                font-size: 0.74rem;
-                font-weight: 600;
+                border: none;
+                border-radius: 8px;
+                padding: 6px 14px;
+                font-size: 0.82rem;
+                font-weight: 500;
                 cursor: pointer;
-                transition: all 0.15s ease;
-                display: flex;
+                transition: background-color 0.15s ease, color 0.15s ease;
+                display: inline-flex;
                 align-items: center;
-                gap: 4px;
+                gap: 6px;
                 white-space: nowrap;
+                user-select: none;
+                line-height: 1.3;
             }}
             .tab-chip:hover {{
-                background: #383838;
+                background-color: #3f3f3f;
+                color: #ffffff;
             }}
             .tab-chip.active {{
-                background: #f1f1f1 !important;
+                background-color: #ffffff !important;
                 color: #0f0f0f !important;
-                border-color: #ffffff !important;
                 font-weight: 700 !important;
             }}
             
@@ -1339,10 +1745,7 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
             .tab-panel.active {{
                 display: flex;
             }}
-            
-            /* ---------------------------------------------------- */
-            /* 📑 카테고리 1: 정확히 5칸 크기 맞춤 & 3번째 칸 실시간 음성 싱크 */
-            /* ---------------------------------------------------- */
+
             .search-box-wrap {{
                 display: flex;
                 align-items: center;
@@ -1777,6 +2180,61 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
             .dl-act-btn.copy:hover {{
                 background: #303038;
                 color: #fff;
+            }}
+
+            /* 화면 크기에 따른 반응형 미디어 쿼리 */
+            @media (max-width: 900px) {{
+                body {{
+                    overflow-y: auto !important;
+                }}
+                .app-container {{
+                    display: flex !important;
+                    flex-direction: column !important;
+                    height: auto !important;
+                    min-height: 100% !important;
+                }}
+                .left-column {{
+                    height: auto !important;
+                    flex-shrink: 0 !important;
+                }}
+                .player-wrapper {{
+                    max-height: none !important;
+                    width: 100% !important;
+                }}
+                .right-column {{
+                    height: 520px !important;
+                    min-height: 520px !important;
+                    flex-shrink: 0 !important;
+                    margin-top: 10px !important;
+                }}
+            }}
+
+            @media (max-width: 480px) {{
+                .yt-control-row {{
+                    padding: 3px 6px !important;
+                    gap: 4px !important;
+                }}
+                .yt-vol-slider {{
+                    max-width: 45px !important;
+                }}
+                .yt-vol-badge {{
+                    display: none !important;
+                }}
+                .skip-btn {{
+                    padding: 2px 5px !important;
+                    font-size: 0.68rem !important;
+                }}
+                .speed-select {{
+                    padding: 2px 4px !important;
+                    font-size: 0.68rem !important;
+                }}
+                .yt-time-badge {{
+                    font-size: 0.7rem !important;
+                }}
+                .right-column {{
+                    height: 480px !important;
+                    min-height: 480px !important;
+                }}
             }}
         </style>
     </head>
@@ -2349,18 +2807,21 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
             }});
 
             function onFilterTranscript(q) {{
-                var val = q.trim().toLowerCase();
-                if (!val) {{
-                    renderTranscriptList(indexedSegments);
-                    if (currentActiveIdx !== -1) {{
-                        syncPlaybackAndTranscript(true);
-                    }}
-                    return;
+                var val = (q || '').trim().toLowerCase();
+                var filtered = indexedSegments;
+                if (val) {{
+                    filtered = indexedSegments.filter(function(s) {{
+                        return s.text.toLowerCase().indexOf(val) !== -1;
+                    }});
                 }}
-                var filtered = indexedSegments.filter(function(s) {{
-                    return s.text.toLowerCase().indexOf(val) !== -1;
-                }});
                 renderTranscriptList(filtered);
+                var countBadge = document.getElementById('t-count-badge');
+                if (countBadge) {{
+                    countBadge.innerText = val ? filtered.length + '개 구간' : '';
+                }}
+                if (currentActiveIdx !== -1 && !val) {{
+                    syncPlaybackAndTranscript(true);
+                }}
             }}
 
             // 탭 전환
@@ -2526,13 +2987,28 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
                     container.appendChild(card);
                 }});
             }}
+
+            // 브라우저 리사이즈 시 Streamlit iframe 높이 자동 동기화
+            function syncParentFrameHeight() {{
+                try {{
+                    var scrollH = Math.max(645, document.documentElement.scrollHeight, document.body.scrollHeight);
+                    window.parent.postMessage({{ type: "streamlit:setFrameHeight", height: scrollH }}, "*");
+                    if (window.frameElement) {{
+                        window.frameElement.style.height = scrollH + "px";
+                    }}
+                }} catch (e) {{}}
+            }}
+            window.addEventListener('resize', syncParentFrameHeight);
+            window.addEventListener('load', function() {{
+                setTimeout(syncParentFrameHeight, 300);
+            }});
         </script>
     </body>
     </html>
     """
 
-    # 컴포넌트 높이 620px로 지정하여 상단 UI 잘림 없이 한 화면에 완전 렌더링
-    components.html(integrated_html, height=620)
+    # 컴포넌트 높이 645px로 지정하여 와이드/대형 화면에서도 하단 자막 잘림 없이 완전 렌더링
+    components.html(integrated_html, height=645)
 
     # 하단 비디오 상세 정보 바 (토큰 0 캐시 로드 여부 표시)
     uploader_initial = v_uploader[0].upper() if v_uploader else "Y"
@@ -2548,36 +3024,39 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
     """
 
     st.markdown(f"""
-    <div style="background: #181818; border: 1px solid #282828; border-radius: 8px; padding: 4px 14px; height: 34px; display: flex; align-items: center; gap: 10px; overflow: hidden;" title="{v_title}">
-        <div style="width: 22px; height: 22px; min-width: 22px; background: #333333; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 0.72rem; font-weight: 700;">
-            {uploader_initial}
+    <div class="video-info-banner" title="{v_title}">
+        <div class="v-info-left">
+            <div class="v-uploader-avatar">
+                {uploader_initial}
+            </div>
+            <span class="v-info-title">
+                {v_title}
+            </span>
         </div>
-        <span style="font-weight: 700; font-size: 0.88rem; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 58%;">
-            {v_title}
-        </span>
-        <span style="color: #555;">•</span>
-        <span style="color: #aaaaaa; font-size: 0.8rem; white-space: nowrap;">📺 {v_uploader}</span>
-        <span style="color: #555;">•</span>
-        <span style="color: #aaaaaa; font-size: 0.8rem; white-space: nowrap;">조회수 {v_views}회</span>
-        <span style="color: #555;">•</span>
-        <span style="color: #aaaaaa; font-size: 0.8rem; white-space: nowrap;">⏱️ {v_duration_str}</span>
-        {cache_badge_html}
+        <div class="v-info-meta">
+            <span class="v-meta-item">📺 {v_uploader}</span>
+            <span class="v-meta-dot">•</span>
+            <span class="v-meta-item">조회수 {v_views}회</span>
+            <span class="v-meta-dot">•</span>
+            <span class="v-meta-item">⏱️ {v_duration_str}</span>
+            {cache_badge_html}
+        </div>
     </div>
     """, unsafe_allow_html=True)
 
 
 else:
-    # 초기 대기 화면 (중앙 정렬 배너 & 원클릭 샘플 추천 칩)
+    # 초기 대기 화면 (반응형 중앙 정렬 배너)
     st.markdown("""
-    <div style="background: #181818; border-radius: 16px; padding: 2.8rem 2rem; text-align: center; border: 1px dashed #333333; margin-top: 1.2rem;">
+    <div class="home-hero-banner">
         <div style="margin-bottom: 0.8rem;">
             <svg width="60" height="42" viewBox="0 0 32 23" fill="none">
                 <path d="M31.24 3.49C30.87 2.12 29.8 1.05 28.43 0.68C25.96 0 16 0 16 0C16 0 6.04 0 3.57 0.68C2.2 1.05 1.13 2.12 0.76 3.49C0 5.96 0 11.1 0 11.1C0 11.1 0 16.24 0.76 18.71C1.13 20.08 2.2 21.15 3.57 21.52C6.04 22.2 16 22.2 16 22.2C16 22.2 25.96 22.2 28.43 21.52C29.8 21.15 30.87 20.08 31.24 18.71C32 16.24 32 11.1 32 11.1C32 11.1 32 5.96 31.24 3.49Z" fill="#FF0000"/>
                 <polygon points="12.8,15.8 21.2,11.1 12.8,6.4" fill="#FFFFFF"/>
             </svg>
         </div>
-        <h2 style="color: #ffffff; margin-bottom: 0.5rem; font-weight: 800; font-size: 1.5rem;">Google YouTube AI Searcher</h2>
-        <p style="color: #aaaaaa; max-width: 640px; margin: 0 auto 1.5rem auto; font-size: 0.92rem; line-height: 1.6;">
+        <h2 class="home-hero-title">Google YouTube AI Searcher</h2>
+        <p class="home-hero-desc">
             상단 중앙 검색창에 분석할 유튜브 영상 주소를 입력하고 <b>[🔍 검색]</b>을 누르세요.<br>
             <b>실시간 음성-대본 0ms 싱크 전체 대본 뷰</b>, <b>유튜브 공식 호버 타임라인 & 썸네일 미리보기</b>, <b>Gemini 3.8 AI 질의응답</b>, <b>원클릭 파일 다운로드 허브</b>를 지원합니다.
         </p>
@@ -2590,11 +3069,41 @@ else:
     </div>
     """, unsafe_allow_html=True)
 
-    # 원클릭 샘플 추천 테스트 버튼
-    c_s1, c_s2, c_s3 = st.columns([1.8, 2.4, 1.8])
-    with c_s2:
-        if st.button("🚀 샘플 영상 원클릭 즉시 분석 (횟집 수족관 영상)", use_container_width=True):
-            st.session_state.current_url = "https://www.youtube.com/watch?v=IbhBAZNAHvk"
-            st.session_state.trigger_search = True
-            st.rerun()
+    # 보관된 영상이 있을 경우 홈 화면에 "이전에 분석한 영상 보관함 (0토큰 즉시 열기)" 카드 섹션 표시
+    home_cached = get_all_cached_videos()
+    if home_cached:
+        cards_grid_html = '<div class="home-cache-grid">'
+        for cv in home_cached:
+            v_t = cv['title'].replace('"', '&quot;').replace("'", "&#39;")
+            v_u = cv['uploader'].replace('"', '&quot;').replace("'", "&#39;")
+            cards_grid_html += f"""
+            <a href="?load_cache={cv['video_id']}" target="_self" class="home-cache-card" title="{v_t}">
+                <div class="home-card-thumb">
+                    <img src="{cv['thumbnail']}" alt="thumb" onerror="this.src='https://img.youtube.com/vi/{cv['video_id']}/hqdefault.jpg'"/>
+                    <span class="home-card-dur">{cv['duration_str']}</span>
+                </div>
+                <div class="home-card-body">
+                    <div class="home-card-title">{v_t}</div>
+                    <div class="home-card-uploader">📺 {v_u}</div>
+                    <div class="home-card-footer">
+                        <span class="d-token-tag">⚡ 0토큰 로드</span>
+                        <span class="d-date-tag">{cv.get('segment_count', 0)}개 구간</span>
+                    </div>
+                </div>
+            </a>
+            """
+        cards_grid_html += '</div>'
+        
+        st.markdown(f"""
+        <div style="margin-top: 1.8rem; margin-bottom: 0.6rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                <span style="font-size: 1.25rem;">📂</span>
+                <span style="font-size: 1.1rem; font-weight: 700; color: #ffffff;">이전에 분석한 영상 보관함</span>
+                <span style="background: #0e2a47; color: #3ea6ff; border: 1px solid #1c4a75; border-radius: 12px; padding: 2px 10px; font-size: 0.72rem; font-weight: 700;">⚡ 0토큰 즉시 열기</span>
+            </div>
+            <span style="font-size: 0.8rem; color: #888888;">총 {len(home_cached)}개 영상 보관 중</span>
+        </div>
+        {cards_grid_html}
+        """, unsafe_allow_html=True)
+
 

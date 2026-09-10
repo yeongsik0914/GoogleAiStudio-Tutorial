@@ -5,10 +5,17 @@ import yt_dlp
 
 
 def extract_video_id(url: str) -> Optional[str]:
-    """유튜브 URL에서 11자리 비디오 ID를 추출합니다."""
+    """유튜브 URL 또는 11자리 비디오 ID에서 순수 비디오 ID를 추출합니다."""
+    if not url:
+        return None
+    url = url.strip()
+    # 11자리 비디오 ID 직접 입력 지원
+    if re.match(r"^[0-9A-Za-z_-]{11}$", url):
+        return url
     patterns = [
-        r"(?:v=|\/)([0-9A-Za-z_-]{11}).*",
-        r"(?:embed\/|shorts\/|youtu.be\/)([0-9A-Za-z_-]{11})",
+        r"(?:v=|\/vi?\/)([0-9A-Za-z_-]{11})",
+        r"(?:embed\/|shorts\/|youtu\.be\/|live\/)([0-9A-Za-z_-]{11})",
+        r"[?&]v=([0-9A-Za-z_-]{11})",
     ]
     for pattern in patterns:
         match = re.search(pattern, url)
