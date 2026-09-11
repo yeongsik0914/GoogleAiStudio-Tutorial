@@ -1,0 +1,1085 @@
+    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+    
+    * {
+        font-family: 'Pretendard', 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    
+    /* [이중 스크롤바 완전 제거] html, body, .stApp의 스크롤바를 숨기고 stAppViewContainer 단 하나에서만 스크롤 처리 */
+    html, body {
+        background-color: #0f0f0f !important;
+        color: #f1f1f1 !important;
+        overflow: hidden !important;
+        height: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        scrollbar-width: none !important;
+        -ms-overflow-style: none !important;
+    }
+    html::-webkit-scrollbar, body::-webkit-scrollbar {
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
+    }
+    .stApp {
+        background-color: #0f0f0f !important;
+        color: #f1f1f1 !important;
+        overflow: hidden !important;
+        height: 100% !important;
+    }
+    [data-testid="stAppViewContainer"] {
+        background-color: #0f0f0f !important;
+        color: #f1f1f1 !important;
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
+        height: 100% !important;
+        scroll-behavior: smooth !important;
+    }
+    
+    /* 앱 전체 부드럽고 얇은 단일 유튜브 다크 스크롤바 */
+    [data-testid="stAppViewContainer"]::-webkit-scrollbar {
+        width: 8px;
+    }
+    [data-testid="stAppViewContainer"]::-webkit-scrollbar-track {
+        background: #0f0f0f;
+    }
+    [data-testid="stAppViewContainer"]::-webkit-scrollbar-thumb {
+        background: #27272c;
+        border-radius: 4px;
+    }
+    [data-testid="stAppViewContainer"]::-webkit-scrollbar-thumb:hover {
+        background: #3ea6ff;
+    }
+
+    /* iframe 요소의 불필요한 스크롤바 및 테두리 차단 */
+    iframe {
+        border: none !important;
+        outline: none !important;
+    }
+    
+    /* Streamlit 기본 헤더 비활성화 - 상단 검색창 클릭 및 호버 방해 완전 차단 */
+    header[data-testid="stHeader"] {
+        background: transparent !important;
+        height: 0px !important;
+        min-height: 0px !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        overflow: hidden !important;
+        pointer-events: none !important;
+        z-index: 0 !important;
+    }
+    
+    /* Deploy 버튼 및 우측 툴바 완전 숨김 (헤더 겹침 및 클릭 가로채기 방지) */
+    header[data-testid="stHeader"] [data-testid="stToolbar"],
+    div[data-testid="stToolbar"] {
+        display: none !important;
+    }
+    
+    /* 사이드바 열기 버튼(필요 시) 기능 보존 */
+    [data-testid="stSidebarCollapsedControl"] {
+        pointer-events: auto !important;
+        z-index: 999999 !important;
+        top: 8px !important;
+        left: 8px !important;
+    }
+    
+    /* 메인 앱 컨테이너 및 뷰포트 레이어 상위 배치 */
+    [data-testid="stAppViewContainer"] {
+        z-index: 10 !important;
+        position: relative !important;
+    }
+    
+    /* 한 화면 여백 최적화 (상단 UI 잘림 방지) */
+    .block-container {
+        padding-top: 0.6rem !important;
+        padding-bottom: 0.4rem !important;
+        padding-left: 1.2rem !important;
+        padding-right: 1.2rem !important;
+        max-width: 100% !important;
+        position: relative !important;
+        z-index: 20 !important;
+    }
+    
+    /* [상단 헤더 & 검색바] 최상위 레이어 인터랙션 보장 */
+    .yt-nav-header-left {
+        display: flex;
+        align-items: center;
+        height: 38px;
+        position: relative !important;
+        z-index: 100 !important;
+    }
+    /* 유튜브 공식 상단 네비바 헤더 좌측 (메뉴 아이콘 + 유튜브 로고) */
+    .yt-nav-header-left {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        height: 40px;
+    }
+    .yt-menu-icon {
+        width: 38px;
+        height: 38px;
+        min-width: 38px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: background-color 0.15s ease;
+        text-decoration: none !important;
+        color: #ffffff !important;
+    }
+    .yt-menu-icon:hover {
+        background-color: #272727;
+    }
+    .yt-logo-link {
+        display: flex;
+        align-items: center;
+        text-decoration: none !important;
+        cursor: pointer;
+        user-select: none;
+        gap: 8px;
+    }
+    .aiys-cat-logo-img {
+        width: 30px;
+        height: 30px;
+        border-radius: 8px;
+        object-fit: cover;
+        box-shadow: 0 0 10px rgba(62, 166, 255, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        display: inline-block;
+        transition: transform 0.18s ease;
+    }
+    .yt-logo-link:hover .aiys-cat-logo-img {
+        transform: scale(1.08);
+    }
+    .yt-wordmark {
+        font-family: 'Roboto', 'Pretendard', sans-serif;
+        font-weight: 800;
+        font-size: 1.3rem;
+        color: #ffffff;
+        letter-spacing: -0.5px;
+    }
+    
+    /* 상단 우측 퀵 버튼 및 유저 아바타 */
+    .yt-nav-header-right {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 10px;
+        height: 40px;
+    }
+    .yt-create-btn {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: #272727;
+        border-radius: 20px;
+        padding: 0 14px;
+        height: 36px;
+        color: #f1f1f1;
+        font-size: 0.86rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.15s ease;
+        user-select: none;
+    }
+    .yt-create-btn:hover {
+        background: #383838;
+    }
+    .yt-icon-round-btn {
+        width: 38px;
+        height: 38px;
+        min-width: 38px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: background 0.15s ease;
+        color: #f1f1f1;
+    }
+    .yt-icon-round-btn:hover {
+        background: #272727;
+    }
+    .yt-avatar-circle {
+        width: 32px;
+        height: 32px;
+        min-width: 32px;
+        border-radius: 50%;
+        background: #7c4dff;
+        color: #ffffff;
+        font-size: 0.85rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        user-select: none;
+        margin-left: 4px;
+    }
+    
+    /* 유튜브 공식 일체형 검색창 & 마이크 버튼 (상단 헤더 전용) */
+    div[data-testid="stForm"]:has(input[aria-label="유튜브 링크 주소"]),
+    div[data-testid="stForm"]:has(input[id*="yt_url_input_box"]) {
+        border: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        background: transparent !important;
+        position: relative !important;
+        z-index: 100 !important;
+    }
+    div[data-testid="stForm"]:has(input[aria-label="유튜브 링크 주소"]) [data-testid="stHorizontalBlock"],
+    div[data-testid="stForm"]:has(input[id*="yt_url_input_box"]) [data-testid="stHorizontalBlock"] {
+        gap: 0px !important;
+        align-items: center !important;
+    }
+    
+    /* 헤더 검색 인풋창 (좌측 둥근 알약 + 우측 직각 연결) */
+    div[data-testid="stForm"]:has(input[aria-label="유튜브 링크 주소"]) .stTextInput,
+    div[data-testid="stForm"]:has(input[id*="yt_url_input_box"]) .stTextInput {
+        margin: 0 !important;
+        padding: 0 !important;
+        position: relative !important;
+        z-index: 101 !important;
+    }
+    div[data-testid="stForm"]:has(input[aria-label="유튜브 링크 주소"]) .stTextInput > div,
+    div[data-testid="stForm"]:has(input[id*="yt_url_input_box"]) .stTextInput > div {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    div[data-testid="stForm"]:has(input[aria-label="유튜브 링크 주소"]) .stTextInput > div > div,
+    div[data-testid="stForm"]:has(input[id*="yt_url_input_box"]) .stTextInput > div > div {
+        background-color: #121212 !important;
+        border: 1px solid #303030 !important;
+        border-right: none !important;
+        border-radius: 40px 0 0 40px !important;
+        height: 40px !important;
+        min-height: 40px !important;
+        padding: 0 !important;
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+    }
+    div[data-testid="stForm"]:has(input[aria-label="유튜브 링크 주소"]) .stTextInput > div > div:hover,
+    div[data-testid="stForm"]:has(input[id*="yt_url_input_box"]) .stTextInput > div > div:hover {
+        border-color: #444444 !important;
+    }
+    div[data-testid="stForm"]:has(input[aria-label="유튜브 링크 주소"]) .stTextInput > div > div:focus-within,
+    div[data-testid="stForm"]:has(input[id*="yt_url_input_box"]) .stTextInput > div > div:focus-within {
+        border-color: #1c62b9 !important;
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5) !important;
+    }
+    div[data-testid="stForm"]:has(input[aria-label="유튜브 링크 주소"]) .stTextInput input,
+    div[data-testid="stForm"]:has(input[id*="yt_url_input_box"]) .stTextInput input {
+        background-color: transparent !important;
+        color: #f1f1f1 !important;
+        border: none !important;
+        border-radius: 40px 0 0 40px !important;
+        height: 38px !important;
+        padding: 0 18px !important;
+        font-size: 0.92rem !important;
+        box-shadow: none !important;
+        outline: none !important;
+    }
+    
+    /* 헤더 검색 제출 버튼 (좌측 직각 + 우측 둥근 알약 다크 그레이) */
+    div[data-testid="stForm"]:has(input[aria-label="유튜브 링크 주소"]) div[data-testid="stFormSubmitButton"],
+    div[data-testid="stForm"]:has(input[id*="yt_url_input_box"]) div[data-testid="stFormSubmitButton"] {
+        margin: 0 !important;
+        padding: 0 !important;
+        height: 40px !important;
+        display: flex !important;
+        align-items: center !important;
+        width: 100% !important;
+        position: relative !important;
+        z-index: 101 !important;
+    }
+    div[data-testid="stForm"]:has(input[aria-label="유튜브 링크 주소"]) div[data-testid="stFormSubmitButton"] button,
+    div[data-testid="stForm"]:has(input[id*="yt_url_input_box"]) div[data-testid="stFormSubmitButton"] button {
+        width: 100% !important;
+        height: 40px !important;
+        min-height: 40px !important;
+        background-color: #222222 !important;
+        border: 1px solid #303030 !important;
+        border-radius: 0 40px 40px 0 !important;
+        color: #f1f1f1 !important;
+        box-shadow: none !important;
+        transition: background-color 0.15s ease, border-color 0.15s ease !important;
+        cursor: pointer !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+    div[data-testid="stForm"]:has(input[aria-label="유튜브 링크 주소"]) div[data-testid="stFormSubmitButton"] button:hover,
+    div[data-testid="stForm"]:has(input[id*="yt_url_input_box"]) div[data-testid="stFormSubmitButton"] button:hover {
+        background-color: #272727 !important;
+        border-color: #383838 !important;
+        color: #ffffff !important;
+    }
+    div[data-testid="stForm"]:has(input[aria-label="유튜브 링크 주소"]) div[data-testid="stFormSubmitButton"] button:active,
+    div[data-testid="stForm"]:has(input[id*="yt_url_input_box"]) div[data-testid="stFormSubmitButton"] button:active {
+        background-color: #333333 !important;
+    }
+    div[data-testid="stForm"]:has(input[aria-label="유튜브 링크 주소"]) div[data-testid="stFormSubmitButton"] button p,
+    div[data-testid="stForm"]:has(input[id*="yt_url_input_box"]) div[data-testid="stFormSubmitButton"] button p {
+        margin: 0 !important;
+        padding: 0 !important;
+        font-size: 1.1rem !important;
+        color: #f1f1f1 !important;
+        line-height: 1 !important;
+    }
+    
+    /* 음성 마이크 버튼 */
+    .yt-mic-btn {
+        width: 40px;
+        height: 40px;
+        min-width: 40px;
+        border-radius: 50%;
+        background: #222222;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: background-color 0.15s ease;
+        margin-left: 8px;
+    }
+    .yt-mic-btn:hover {
+        background: #2e2e2e;
+    }
+    
+    /* 반응형 사이드 드로어 (분석 보관함 및 카테고리 메뉴) */
+    .yt-drawer-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.72);
+        backdrop-filter: blur(4px);
+        z-index: 99998 !important;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.25s cubic-bezier(0.1, 0.9, 0.2, 1);
+        cursor: pointer;
+    }
+    .yt-drawer-backdrop.open {
+        opacity: 1 !important;
+        pointer-events: auto !important;
+    }
+    .yt-drawer-panel {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 390px;
+        max-width: 88vw;
+        height: 100vh;
+        background: #0f0f0f;
+        border-right: 1px solid #282828;
+        box-shadow: 8px 0 32px rgba(0, 0, 0, 0.9);
+        z-index: 99999 !important;
+        transform: translateX(-100%);
+        transition: transform 0.28s cubic-bezier(0.1, 0.9, 0.2, 1);
+        display: flex;
+        flex-direction: column;
+        box-sizing: border-box;
+    }
+    .yt-drawer-panel.open,
+    body:has(#yt-drawer-toggle:checked) .yt-drawer-panel {
+        transform: translateX(0) !important;
+    }
+    .d-category-section {
+        margin-bottom: 12px;
+    }
+    .d-category-title {
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: #aaaaaa;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+        padding-left: 2px;
+    }
+    .d-category-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+    .d-cat-chip {
+        background: #1e1e1e;
+        color: #f1f1f1;
+        border: 1px solid #2d2d2d;
+        border-radius: 16px;
+        padding: 4px 10px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.15s ease;
+        user-select: none;
+    }
+    .d-cat-chip:hover, .d-cat-chip.active {
+        background: #ffffff;
+        color: #0f0f0f;
+        border-color: #ffffff;
+        font-weight: 700;
+    }
+    .d-search-box {
+        margin-bottom: 10px;
+    }
+    .d-search-input {
+        width: 100%;
+        box-sizing: border-box;
+        background: #141414;
+        border: 1px solid #2a2a2a;
+        border-radius: 8px;
+        color: #f1f1f1;
+        padding: 7px 10px;
+        font-size: 0.78rem;
+        outline: none;
+        transition: border-color 0.2s;
+    }
+    .d-search-input:focus {
+        border-color: #3ea6ff;
+        background: #181818;
+    }
+    .d-panel-header {
+        display: flex;
+        align-items: center;
+        padding: 0 16px;
+        height: 56px;
+        min-height: 56px;
+        border-bottom: 1px solid #202020;
+    }
+    .d-panel-body {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        padding: 12px 14px;
+    }
+    .d-menu-btn {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 14px;
+        background: #181818;
+        border-radius: 10px;
+        color: #f1f1f1 !important;
+        font-weight: 600;
+        font-size: 0.92rem;
+        text-decoration: none !important;
+        transition: background 0.15s ease;
+        border: 1px solid #262626;
+        margin-bottom: 10px;
+    }
+    .d-menu-btn:hover {
+        background: #242424;
+        border-color: #383838;
+    }
+    .d-section-divider {
+        height: 1px;
+        background: #202020;
+        margin: 6px 0 12px 0;
+    }
+    .d-section-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        padding: 0 4px;
+    }
+    .d-count-pill {
+        background: #222222;
+        color: #3ea6ff;
+        border: 1px solid #303030;
+        border-radius: 12px;
+        padding: 2px 8px;
+        font-size: 0.72rem;
+        font-weight: 700;
+    }
+    .d-scroll-area {
+        flex: 1;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding-right: 4px;
+    }
+    .d-scroll-area::-webkit-scrollbar {
+        width: 5px;
+    }
+    .d-scroll-area::-webkit-scrollbar-thumb {
+        background: #2a2a2a;
+        border-radius: 3px;
+    }
+    .d-video-card {
+        display: flex;
+        align-items: center;
+        background: #161616;
+        border: 1px solid #262626;
+        border-radius: 10px;
+        padding: 10px 12px;
+        gap: 10px;
+        transition: all 0.18s ease;
+        position: relative;
+    }
+    .d-video-card:hover {
+        background: #202020;
+        border-color: #3ea6ff;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    }
+    .d-card-link {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none !important;
+        flex: 1;
+        min-width: 0;
+    }
+    .d-dur-tag-inline {
+        background: #242424;
+        color: #aaaaaa;
+        font-size: 0.68rem;
+        font-weight: 600;
+        padding: 1px 6px;
+        border-radius: 4px;
+        border: 1px solid #333333;
+    }
+    .d-info-box {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+    .d-title {
+        color: #f1f1f1;
+        font-size: 0.82rem;
+        font-weight: 600;
+        line-height: 1.3;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .d-uploader {
+        color: #888888;
+        font-size: 0.72rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .d-footer-row {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 1px;
+    }
+    .d-token-tag {
+        background: #0e2a47;
+        color: #3ea6ff;
+        border: 1px solid #1c4a75;
+        border-radius: 8px;
+        padding: 1px 5px;
+        font-size: 0.65rem;
+        font-weight: 700;
+    }
+    .d-date-tag {
+        color: #666;
+        font-size: 0.68rem;
+    }
+    .d-del-btn {
+        width: 28px;
+        height: 28px;
+        min-width: 28px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none !important;
+        opacity: 0.5;
+        transition: all 0.15s ease;
+    }
+    .d-del-btn:hover {
+        opacity: 1;
+        background: rgba(255, 0, 0, 0.15);
+    }
+    .d-empty-box {
+        text-align: center;
+        padding: 40px 16px;
+        color: #777;
+    }
+    .d-panel-footer {
+        padding-top: 10px;
+        border-top: 1px solid #202020;
+        margin-top: 8px;
+    }
+    .d-clear-all-btn {
+        display: block;
+        text-align: center;
+        padding: 7px;
+        font-size: 0.76rem;
+        color: #999 !important;
+        text-decoration: none !important;
+        border-radius: 6px;
+        transition: all 0.15s ease;
+    }
+    .d-clear-all-btn:hover {
+        color: #ff5555 !important;
+        background: #1f1414;
+    }
+    
+    /* 홈 화면 분석 보관함 그리드 카드 */
+    .home-cache-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 16px;
+        margin-top: 14px;
+    }
+    .home-cache-card {
+        background: #181818;
+        border: 1px solid #282828;
+        border-radius: 12px;
+        overflow: hidden;
+        text-decoration: none !important;
+        transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+        display: flex;
+        flex-direction: column;
+    }
+    .home-cache-card:hover {
+        transform: translateY(-2px);
+        border-color: #3ea6ff;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.6);
+    }
+    .home-card-thumb {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 16/9;
+        background: #000;
+    }
+    .home-card-thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .home-card-dur {
+        position: absolute;
+        bottom: 6px;
+        right: 6px;
+        background: rgba(0,0,0,0.85);
+        color: #fff;
+        font-size: 0.7rem;
+        font-weight: 700;
+        padding: 2px 5px;
+        border-radius: 4px;
+    }
+    .home-card-body {
+        padding: 10px 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        flex: 1;
+    }
+    .home-card-title {
+        color: #f1f1f1;
+        font-size: 0.88rem;
+        font-weight: 700;
+        line-height: 1.35;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    .home-card-uploader {
+        color: #aaaaaa;
+        font-size: 0.76rem;
+    }
+    .home-card-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 6px;
+        padding-top: 6px;
+        border-top: 1px solid #242424;
+    }
+
+    /* 모바일 및 좁은 화면에서도 상단 헤더 3대 칼럼을 1줄(가로 flex)로 완벽 유지 */
+    [data-testid="stHorizontalBlock"]:has(.yt-nav-header-left) {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        align-items: center !important;
+        gap: 6px !important;
+    }
+    [data-testid="stHorizontalBlock"]:has(.yt-nav-header-left) > [data-testid="column"]:nth-child(1) {
+        width: auto !important;
+        min-width: fit-content !important;
+        flex: 0 0 auto !important;
+    }
+    [data-testid="stHorizontalBlock"]:has(.yt-nav-header-left) > [data-testid="column"]:nth-child(2) {
+        flex: 1 1 auto !important;
+        min-width: 0 !important;
+    }
+    [data-testid="stHorizontalBlock"]:has(.yt-nav-header-left) > [data-testid="column"]:nth-child(3) {
+        width: auto !important;
+        min-width: fit-content !important;
+        flex: 0 0 auto !important;
+    }
+
+    /* ==================================================== */
+    /*  실시간 대본 AI / Chrome New Tab 스타일 홈 UI     */
+    /* ==================================================== */
+    .google-home-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        max-width: 800px;
+        margin: clamp(30px, 8vh, 75px) auto 0 auto;
+        padding: 0 16px;
+        box-sizing: border-box;
+    }
+    .google-logo-text {
+        font-family: 'Pretendard', 'Google Sans', 'Roboto', -apple-system, sans-serif;
+        font-size: clamp(38px, 5.5vw, 58px);
+        font-weight: 800;
+        color: #ffffff;
+        letter-spacing: -1.5px;
+        text-align: center;
+        margin-bottom: 24px;
+        user-select: none;
+        line-height: 1.15;
+        text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
+    }
+    
+    /* Google / 실시간 대본 AI 화이트 필 검색창 컨테이너 */
+    div[data-testid="stForm"]:has(input[id*="home_url_input_box"]),
+    div[data-testid="stForm"]:has(input[aria-label="유튜브 링크를 입력하세요."]) {
+        width: 100% !important;
+        max-width: 680px !important;
+        margin: 0 auto !important;
+        background: #ffffff !important;
+        border-radius: 28px !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35) !important;
+        padding: 4px 6px 4px 10px !important;
+        border: none !important;
+        display: flex !important;
+        align-items: center !important;
+        transition: box-shadow 0.2s ease !important;
+        box-sizing: border-box !important;
+    }
+    div[data-testid="stForm"]:has(input[id*="home_url_input_box"]):hover,
+    div[data-testid="stForm"]:has(input[id*="home_url_input_box"]):focus-within,
+    div[data-testid="stForm"]:has(input[aria-label="유튜브 링크를 입력하세요."]):hover,
+    div[data-testid="stForm"]:has(input[aria-label="유튜브 링크를 입력하세요."]):focus-within {
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.55) !important;
+    }
+    div[data-testid="stForm"]:has(input[id*="home_url_input_box"]) [data-testid="stHorizontalBlock"],
+    div[data-testid="stForm"]:has(input[aria-label="유튜브 링크를 입력하세요."]) [data-testid="stHorizontalBlock"] {
+        gap: 6px !important;
+        align-items: center !important;
+        width: 100% !important;
+        background: transparent !important;
+    }
+    div[data-testid="stForm"]:has(input[id*="home_url_input_box"]) [data-testid="column"],
+    div[data-testid="stForm"]:has(input[aria-label="유튜브 링크를 입력하세요."]) [data-testid="column"] {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 0 !important;
+    }
+    div[data-testid="stForm"]:has(input[id*="home_url_input_box"]) .stTextInput,
+    div[data-testid="stForm"]:has(input[aria-label="유튜브 링크를 입력하세요."]) .stTextInput {
+        flex: 1 1 auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+    }
+    div[data-testid="stForm"]:has(input[id*="home_url_input_box"]) .stTextInput > div,
+    div[data-testid="stForm"]:has(input[aria-label="유튜브 링크를 입력하세요."]) .stTextInput > div {
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    div[data-testid="stForm"]:has(input[id*="home_url_input_box"]) .stTextInput > div > div,
+    div[data-testid="stForm"]:has(input[aria-label="유튜브 링크를 입력하세요."]) .stTextInput > div > div {
+        background: transparent !important;
+        border: none !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        height: 44px !important;
+        min-height: 44px !important;
+        padding: 0 !important;
+    }
+    div[data-testid="stForm"]:has(input[id*="home_url_input_box"]) .stTextInput input,
+    div[data-testid="stForm"]:has(input[aria-label="유튜브 링크를 입력하세요."]) .stTextInput input {
+        color: #202124 !important;
+        font-size: 1.02rem !important;
+        background: transparent !important;
+        padding: 0 16px 0 16px !important;
+        height: 44px !important;
+        box-shadow: none !important;
+        border: none !important;
+        outline: none !important;
+    }
+    div[data-testid="stForm"]:has(input[id*="home_url_input_box"]) .stTextInput input::placeholder,
+    div[data-testid="stForm"]:has(input[aria-label="유튜브 링크를 입력하세요."]) .stTextInput input::placeholder {
+        color: #5f6368 !important;
+        opacity: 1 !important;
+        font-size: 0.98rem !important;
+    }
+    div[data-testid="stForm"]:has(input[id*="home_url_input_box"]) div[data-testid="stFormSubmitButton"],
+    div[data-testid="stForm"]:has(input[aria-label="유튜브 링크를 입력하세요."]) div[data-testid="stFormSubmitButton"] {
+        width: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        flex: 0 0 auto !important;
+        height: 38px !important;
+    }
+    div[data-testid="stForm"]:has(input[id*="home_url_input_box"]) div[data-testid="stFormSubmitButton"] button,
+    div[data-testid="stForm"]:has(input[aria-label="유튜브 링크를 입력하세요."]) div[data-testid="stFormSubmitButton"] button {
+        background: #0f0f0f !important;
+        border: none !important;
+        border-radius: 20px !important;
+        color: #ffffff !important;
+        font-weight: 700 !important;
+        font-size: 0.92rem !important;
+        height: 38px !important;
+        min-height: 38px !important;
+        padding: 0 22px !important;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2) !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        cursor: pointer !important;
+        transition: all 0.15s ease !important;
+        white-space: nowrap !important;
+    }
+    div[data-testid="stForm"]:has(input[id*="home_url_input_box"]) div[data-testid="stFormSubmitButton"] button:hover,
+    div[data-testid="stForm"]:has(input[aria-label="유튜브 링크를 입력하세요."]) div[data-testid="stFormSubmitButton"] button:hover {
+        background: #272727 !important;
+        color: #ffffff !important;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35) !important;
+    }
+    div[data-testid="stForm"]:has(input[id*="home_url_input_box"]) div[data-testid="stFormSubmitButton"] button p,
+    div[data-testid="stForm"]:has(input[aria-label="유튜브 링크를 입력하세요."]) div[data-testid="stFormSubmitButton"] button p {
+        color: #ffffff !important;
+        font-size: 0.92rem !important;
+        font-weight: 700 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    /* Google Chrome New Tab 원형 바로가기 그리드 */
+    .google-shortcuts-grid {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        gap: 16px;
+        flex-wrap: wrap;
+        margin-top: 32px;
+        max-width: 680px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .google-shortcut-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 86px;
+        text-decoration: none !important;
+        cursor: pointer;
+        border-radius: 8px;
+        padding: 8px 4px;
+        transition: background 0.15s ease;
+    }
+    .google-shortcut-item:hover {
+        background: rgba(255, 255, 255, 0.08);
+    }
+    .google-shortcut-circle {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: #303134;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 8px;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+        transition: background 0.15s ease, transform 0.15s ease;
+        overflow: hidden;
+    }
+    .google-shortcut-item:hover .google-shortcut-circle {
+        background: #3c4043;
+        transform: translateY(-2px);
+    }
+    .google-shortcut-circle img {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+    .google-shortcut-title {
+        color: #e8eaed;
+        font-size: 0.78rem;
+        font-weight: 500;
+        text-align: center;
+        width: 80px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        line-height: 1.3;
+    }
+
+    /* 영상 상세 정보 바 반응형 */
+    .video-info-banner {
+        background: #181818;
+        border: 1px solid #282828;
+        border-radius: 8px;
+        padding: 6px 14px;
+        min-height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 4px;
+    }
+    .v-info-left {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+        flex: 1 1 auto;
+    }
+    .v-uploader-avatar {
+        width: 22px;
+        height: 22px;
+        min-width: 22px;
+        background: #333333;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 0.72rem;
+        font-weight: 700;
+    }
+    .v-info-title {
+        font-weight: 700;
+        font-size: 0.88rem;
+        color: #ffffff;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 600px;
+    }
+    .v-info-meta {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+    .v-meta-item {
+        color: #aaaaaa;
+        font-size: 0.8rem;
+        white-space: nowrap;
+    }
+    .v-meta-dot {
+        color: #555555;
+    }
+
+    /* 반응형 모바일 및 태블릿 미디어 쿼리 */
+    @media (max-width: 768px) {
+        .block-container {
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
+            padding-top: 0.4rem !important;
+        }
+        .yt-create-btn {
+            display: none !important;
+        }
+        .yt-icon-round-btn {
+            display: none !important;
+        }
+        .yt-mic-btn {
+            display: none !important;
+        }
+        .yt-wordmark, .yt-country-code {
+            display: none !important;
+        }
+        .yt-nav-header-left {
+            gap: 8px !important;
+        }
+        .video-info-banner {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 6px;
+            padding: 8px 12px;
+        }
+        .v-info-title {
+            white-space: normal;
+            word-break: break-word;
+            max-width: 100%;
+        }
+        .home-cache-grid {
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+    }
+
+    /* 대본 생성 중 로딩 화면 스타일 */
+    .generating-screen-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 55vh;
+        width: 100%;
+        text-align: center;
+        padding: 60px 20px;
+        box-sizing: border-box;
+        animation: genFadeIn 0.35s ease-out forwards;
+    }
+
+    @keyframes genFadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(8px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .generating-title {
+        color: #ffffff !important;
+        font-size: clamp(34px, 5.5vw, 56px) !important;
+        font-weight: 800 !important;
+        letter-spacing: -1.2px !important;
+        margin: 0 0 34px 0 !important;
+        line-height: 1.25 !important;
+        text-align: center !important;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif !important;
+        text-shadow: 0 2px 14px rgba(255, 255, 255, 0.15), 0 4px 20px rgba(0, 0, 0, 0.7) !important;
+    }
+
+    .generating-spinner {
+        width: 60px;
+        height: 60px;
+        border: 5px solid rgba(255, 255, 255, 0.14);
+        border-top: 5px solid #ffffff;
+        border-right: 5px solid rgba(255, 255, 255, 0.7);
+        border-radius: 50%;
+        animation: genSpinnerRotate 0.85s linear infinite;
+        box-shadow: 0 0 24px rgba(255, 255, 255, 0.12);
+        margin: 0 auto;
+    }
+
+    @keyframes genSpinnerRotate {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
+    }

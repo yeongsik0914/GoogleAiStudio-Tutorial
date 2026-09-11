@@ -1,0 +1,155 @@
+    /* 전체 배경 및 폰트 */
+    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+    * {
+        font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    
+    /* 상단 헤더 바 */
+    .yt-navbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.8rem 1.2rem;
+        background: #0f0f0f;
+        border-radius: 12px;
+        margin-bottom: 1.5rem;
+        border: 1px solid #272727;
+    }
+    .yt-logo {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #ffffff;
+    }
+    .yt-badge {
+        background: #ff0000;
+        color: white;
+        padding: 2px 8px;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    
+    /* 비디오 정보 카드 */
+    .video-card {
+        background: #181818;
+        border-radius: 14px;
+        padding: 1.2rem;
+        margin-top: 1rem;
+        border: 1px solid #2a2a2a;
+    }
+    .video-title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #f1f1f1;
+        margin-bottom: 0.5rem;
+        line-height: 1.4;
+    }
+    .video-meta {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: #aaaaaa;
+        font-size: 0.9rem;
+    }
+    .channel-badge {
+        background: #272727;
+        padding: 4px 10px;
+        border-radius: 20px;
+        color: #e0e0e0;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    /* 우측 패널 카드 */
+    .panel-card {
+        background: #181818;
+        border-radius: 14px;
+        padding: 1.2rem;
+        border: 1px solid #2a2a2a;
+        height: 100%;
+    }
+    .panel-header {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: #ffffff;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    /* 태그 칩 */
+    .keyword-chip {
+        display: inline-block;
+        background: #272727;
+        color: #3ea6ff;
+        padding: 5px 12px;
+        border-radius: 16px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        margin-right: 6px;
+        margin-bottom: 6px;
+    }
+    
+    /* 대화 말풍선 */
+    .chat-bubble-user {
+        background: #2b3945;
+        color: #ffffff;
+        padding: 10px 14px;
+        border-radius: 12px 12px 0 12px;
+        margin-bottom: 8px;
+        font-size: 0.92rem;
+        align-self: flex-end;
+    }
+    .chat-bubble-ai {
+        background: #222222;
+        color: #e0e0e0;
+        padding: 10px 14px;
+        border-radius: 12px 12px 12px 0;
+        margin-bottom: 12px;
+        font-size: 0.92rem;
+        border-left: 3px solid #ff4b4b;
+    }
+    
+    /* 유튜브 공식 알약 검색창 스타일 */
+    div[data-testid="stForm"] {
+        border: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        background: transparent !important;
+    }
+    .stTextInput input {
+        background-color: #121212 !important;
+        color: #f1f1f1 !important;
+        border: 1px solid #333333 !important;
+        border-radius: 20px 0 0 20px !important;
+        height: 38px !important;
+        padding-left: 16px !important;
+        font-size: 0.86rem !important;
+    }
+    .stTextInput input:focus {
+        border-color: #3ea6ff !important;
+        box-shadow: 0 0 0 1px #3ea6ff !important;
+    }
+    div[data-testid="stForm"] .stButton button {
+        background-color: #222222 !important;
+        border: 1px solid #333333 !important;
+        border-left: none !important;
+        border-radius: 0 20px 20px 0 !important;
+        color: #f1f1f1 !important;
+        font-weight: 700 !important;
+        font-size: 0.86rem !important;
+        height: 38px !important;
+        transition: all 0.2s ease !important;
+    }
+    div[data-testid="stForm"] .stButton button:hover {
+        background-color: #ff0000 !important;
+        border-color: #ff0000 !important;
+        color: #ffffff !important;
+    }
+</style>
