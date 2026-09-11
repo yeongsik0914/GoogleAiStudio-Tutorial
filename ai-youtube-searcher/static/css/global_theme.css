@@ -868,6 +868,72 @@
         padding: 0 !important;
     }
 
+    /* HTML 템플릿(templates/index.html) 전용 화이트 필 검색창 스타일 */
+    .home-search-form {
+        width: 100%;
+        max-width: 680px;
+        margin: 0 auto;
+        box-sizing: border-box;
+    }
+    .home-search-pill {
+        width: 100%;
+        background: #ffffff;
+        border-radius: 28px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+        padding: 4px 6px 4px 10px;
+        border: none;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        box-sizing: border-box;
+        transition: box-shadow 0.2s ease;
+    }
+    .home-search-pill:hover,
+    .home-search-pill:focus-within {
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.55);
+    }
+    .home-search-input {
+        flex: 1 1 auto;
+        height: 44px;
+        color: #202124 !important;
+        font-size: 1.02rem !important;
+        background: transparent !important;
+        padding: 0 16px !important;
+        box-shadow: none !important;
+        border: none !important;
+        outline: none !important;
+        box-sizing: border-box;
+        font-family: inherit;
+    }
+    .home-search-input::placeholder {
+        color: #5f6368 !important;
+        opacity: 1 !important;
+        font-size: 0.98rem !important;
+    }
+    .home-search-btn {
+        background: #0f0f0f !important;
+        border: none !important;
+        border-radius: 20px !important;
+        color: #ffffff !important;
+        font-weight: 700 !important;
+        font-size: 0.92rem !important;
+        height: 38px !important;
+        min-height: 38px !important;
+        padding: 0 22px !important;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2) !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        cursor: pointer !important;
+        transition: all 0.15s ease !important;
+        white-space: nowrap !important;
+    }
+    .home-search-btn:hover {
+        background: #272727 !important;
+        color: #ffffff !important;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35) !important;
+    }
+
     /* Google Chrome New Tab 원형 바로가기 그리드 */
     .google-shortcuts-grid {
         display: flex;

@@ -1,4 +1,4 @@
-# 🤖 Repository Guidelines & Agent Standards (AGENTS.md)
+# Repository Guidelines & Agent Standards (AGENTS.md)
 
 > **Universal Coding & Architecture Standards for AI Agents**  
 > 이 문서는 본 저장소(`GoogleAiStudio-Tutorial`)에서 작업하는 모든 AI 코딩 에이전트(Antigravity, Cursor, Copilot, Codex, Claude 등)와 개발자를 위한 공식 아키텍처 및 코딩 표준 규격서입니다.
@@ -30,7 +30,8 @@
    - **20줄 이상**의 스크립트 또는 브라우저 DOM 제어, 이벤트 리스너, IFrame 통신 로직은 반드시 `static/js/*.js` 파일로 분리합니다.
    - f-string 내부에서 자바스크립트 중괄호를 `{{}}`로 이중 이스케이프하는 행위를 전면 금지합니다.
 3. **HTML / 템플릿**:
-   - 구조적 UI 레이아웃 및 컴포넌트 마크업은 `static/templates/*.html` 파일로 분리합니다.
+   - 모든 구조적 UI 마크업, 메인 페이지 템플릿(`index.html`), 컴포넌트 템플릿은 전용 HTML 관리 디렉터리(`templates/*.html`)로 분리합니다.
+   - 메인 랜딩/홈 화면은 반드시 `templates/index.html`을 경유하여 렌더링하도록 표준화합니다.
    - 동적 변수는 안전한 템플릿 치환 방식(`render_template` 또는 JSON config injection)을 사용합니다.
 4. **Python (Backend & App Logic)**:
    - Python 코드는 API 연동, 데이터 파이프라인, 비즈니스 로직, 그리고 정적 자산 로드 및 Streamlit 컴포넌트 마운트 역할에 집중합니다.
@@ -43,15 +44,19 @@
 
 ```text
 [project-root]/
+├── templates/                      # 전용 HTML 마크업 및 페이지 템플릿 관리 디렉터리
+│   ├── index.html                  # 메인 홈/랜딩 페이지 구조 템플릿
+│   ├── navbar.html                 # 글로벌 상단 네비게이션 바 템플릿
+│   ├── drawer.html                 # 반응형 사이드 드로어 메뉴 템플릿
+│   └── player_component.html       # 일체형 플레이어 구조 템플릿
 ├── static/                         # 프론트엔드 정적 자산 전용 디렉터리
 │   ├── css/                        # 스타일시트 (.css)
 │   │   ├── global_theme.css        # 전역 레이아웃 및 테마 스타일
-│   │   └── [component].css         # 컴포넌트별 개별 스타일
+│   │   └── player_component.css    # 컴포넌트별 개별 스타일
 │   ├── js/                         # 프론트엔드 스크립트 (.js)
-│   │   ├── [feature].js            # 기능별 JavaScript 모듈
-│   │   └── [component].js          # 컴포넌트 인터랙션 스크립트
-│   └── templates/                  # HTML 마크업 템플릿 (.html)
-│       └── [component].html        # 컴포넌트 구조 템플릿
+│   │   ├── drawer.js               # 사이드바/드로어 제어 모듈
+│   │   └── player_component.js     # 컴포넌트 인터랙션 스크립트
+│   └── templates/                  # 하위 호환 템플릿 백업 디렉터리
 ├── assets/                         # 정적 이미지, 아이콘, 폰트 등 미디어 파일
 ├── downloads/                      # 임시 다운로드 오디오/비디오 저장소 (git 미포함)
 ├── ui_loader.py                    # CSS, JS, HTML 템플릿 로딩 & 렌더링 헬퍼 모듈
@@ -74,6 +79,7 @@ import os
 from pathlib import Path
 from typing import Dict, Any
 
+TEMPLATES_DIR = Path(__file__).resolve().parent / "templates"
 STATIC_DIR = Path(__file__).resolve().parent / "static"
 
 def load_css(filename: str) -> str:
@@ -86,29 +92,55 @@ def load_js(filename: str) -> str:
     path = STATIC_DIR / "js" / filename
     return path.read_text(encoding="utf-8")
 
+def load_template(filename: str) -> str:
+    """templates/ (또는 static/templates/) 하위의 HTML 파일을 UTF-8로 읽어옵니다."""
+    path = TEMPLATES_DIR / filename
+    if not path.exists():
+        path = STATIC_DIR / "templates" / filename
+    return path.read_text(encoding="utf-8")
+
 def render_template(filename: str, context: Dict[str, Any] = None) -> str:
-    """static/templates/ 하위의 HTML 템플릿을 읽고 context 변수를 치환합니다."""
-    path = STATIC_DIR / "templates" / filename
-    template = path.read_text(encoding="utf-8")
+    """HTML 템플릿을 읽고 context 변수를 치환합니다."""
+    template = load_template(filename)
     if context:
         for k, v in context.items():
             template = template.replace(f"{{{{{k}}}}}", str(v))
     return template
+
+def render_index_html(home_title: str = "실시간 대본 AI") -> str:
+    """메인 홈 화면 템플릿(templates/index.html)을 렌더링합니다."""
+    return render_template("index.html", {"home_title": home_title})
+
+def render_navbar_html(cat_icon_b64: str) -> str:
+    """상단 네비바 템플릿(templates/navbar.html)을 렌더링합니다."""
+    return render_template("navbar.html", {"cat_icon_b64": cat_icon_b64})
 ```
 
 ### `app.py`에서의 적용 표준
 ```python
 import streamlit as st
 import streamlit.components.v1 as components
-from ui_loader import load_css, load_js, render_template
+from ui_loader import (
+    load_css,
+    load_js,
+    render_template,
+    render_index_html,
+    render_navbar_html,
+)
 
 # 1. 전역 스타일 주입
 st.markdown(f"<style>{load_css('global_theme.css')}</style>", unsafe_allow_html=True)
 
-# 2. 브라우저 스크립트 주입
+# 2. 글로벌 상단 네비바 템플릿 렌더링
+st.markdown(render_navbar_html(cat_icon_b64), unsafe_allow_html=True)
+
+# 3. 브라우저 스크립트 주입
 components.html(f"<script>{load_js('drawer.js')}</script>", height=0)
 
-# 3. 일체형 컴포넌트 렌더링
+# 4. 메인 홈 화면 렌더링 (templates/index.html 템플릿 적용)
+st.markdown(render_index_html(), unsafe_allow_html=True)
+
+# 5. 일체형 컴포넌트 렌더링
 html_output = render_template("player_component.html", context={"v_id": video_id})
 components.html(html_output, height=645)
 ```
@@ -117,19 +149,19 @@ components.html(html_output, height=645)
 
 ## 5. 언어별 코딩 및 품질 규칙
 
-### 🐍 Python
+### Python
 - **모듈 탐색 경로 (`sys.path`) 보장**: 서브 프로젝트 진입점(`app.py`) 최상단에는 실행 위치(CWD)와 무관하게 로컬 모듈(`ui_loader`, 엔진 파일 등)을 안전하게 임포트할 수 있도록 `APP_DIR = os.path.dirname(os.path.abspath(__file__)); if APP_DIR not in sys.path: sys.path.insert(0, APP_DIR)`을 반드시 선언합니다.
 - **인코딩**: Windows 환경 호환성을 위해 모든 파일 open 및 텍스트 입출력에 반드시 `encoding="utf-8"`을 명시합니다.
 - **경로 처리**: OS 독립적인 `pathlib.Path` 또는 `os.path.join`을 사용하여 경로 구분자 역슬래시(`\`) 하드코딩 문제를 방지합니다.
 - **모듈화**: 비즈니스 로직(다운로더, STT 엔진, QA 엔진, 캐시 매니저)은 단일 책임 원칙(SRP)에 따라 개별 `.py` 파일로 분리합니다.
 - **예외 처리**: AI API 호출, 파일 I/O, 네트워크 작업 시 명확한 try-except 블록 및 사용자 친화적인 에러 메시지를 제공합니다.
 
-### 🎨 CSS
+### CSS
 - **순수 CSS 작성**: Python 문자열이 아니므로 모든 블록은 표준 CSS 중괄호 `{ ... }`를 단독 사용합니다.
 - **변수 및 테마**: 색상, 폰트, 여백 등 반복되는 스타일 속성은 `:root` CSS 커스텀 속성(`--yt-spec-text-primary`, `--yt-brand-red`)으로 관리합니다.
 - **클래스 네이밍**: BEM(Block Element Modifier) 또는 직관적인 케밥 케이스(`video-card`, `chat-bubble-user`)를 준수합니다.
 
-### ⚡ JavaScript
+### JavaScript
 - **엄격 모드 (Strict Mode)**: 모든 스크립트 모듈은 즉시 실행 함수(IIFE) 또는 `use strict;`로 래핑하여 전역 네임스페이스 오염을 방지합니다.
 - **방어적 DOM 접근**: IFrame 간 통신(`window.parent`)이나 DOM 탐색 시 `try { ... } catch(e) { ... }` 및 null 체크를 필수로 적용합니다.
 - **파라미터 주입**: 동적 데이터는 HTML의 `data-*` 속성이나 정형화된 JSON script 태그(`<script type="application/json">`) 또는 템플릿 치환 토큰을 통해 안전하게 파싱합니다.

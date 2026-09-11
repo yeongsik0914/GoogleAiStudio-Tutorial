@@ -18,6 +18,8 @@ from ui_loader import (
     load_js,
     render_drawer_html,
     render_player_component,
+    render_index_html,
+    render_navbar_html,
 )
 from downloader import extract_video_id, get_video_info, download_audio
 from transcribe_engine import transcribe_with_timestamps, format_seconds
@@ -59,8 +61,15 @@ st.set_page_config(
 st.markdown(f"<style>{load_css('global_theme.css')}</style>", unsafe_allow_html=True)
 
 
-# --- [홈 복귀 및 캐시 로드/삭제 핸들러] ---
+# --- [홈 복귀 및 캐시 로드/삭제/URL 파라미터 핸들러] ---
 q_params = st.query_params
+
+query_url = q_params.get("url")
+if query_url:
+    st.session_state.current_url = query_url.strip()
+    st.session_state.trigger_search = True
+    st.query_params.clear()
+    st.rerun()
 
 if q_params.get("home") == "true" or q_params.get("reset") == "true":
     for key in ["video_id", "video_info", "audio_path", "transcript_data", "chapters_data", "chat_messages", "current_url", "from_cache", "trigger_search", "is_analyzing", "target_analyze_url", "target_v_id"]:
@@ -136,22 +145,10 @@ with st.sidebar:
         st.success("Gemini API 연결 완료")
 
 
-# --- [핵심] 상단 네비바 (햄버거 메뉴 카테고리 및 로고 아이콘만 유지) ---
+# --- [핵심] 상단 네비바 (templates/navbar.html 템플릿 렌더링) ---
 is_video_loaded = bool(st.session_state.video_id and st.session_state.video_info and st.session_state.transcript_data)
 
-st.markdown(f"""
-<div class="yt-nav-header-left" style="margin-bottom: 6px;">
-    <button type="button" id="yt-hamburger-btn" class="yt-menu-icon" title="이전 목록 열기" style="background:none; border:none; padding:0; cursor:pointer; display:flex; align-items:center; justify-content:center;">
-        <svg viewBox="0 0 24 24" width="22" height="22" fill="#ffffff">
-            <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
-        </svg>
-    </button>
-    <a href="?home=true" target="_self" class="yt-logo-link" title="홈으로 돌아가기">
-        <img src="data:image/png;base64,{CAT_ICON_B64}" alt="AIYS" class="aiys-cat-logo-img" />
-        <span class="yt-wordmark">AIYS</span>
-    </a>
-</div>
-""", unsafe_allow_html=True)
+st.markdown(render_navbar_html(CAT_ICON_B64), unsafe_allow_html=True)
 
 url_input = ""
 search_submit = False
@@ -360,31 +357,7 @@ elif st.session_state.video_id and st.session_state.video_info and st.session_st
 
 
 else:
-    # --- 실시간 대본 AI 홈 화면 ---
-    def on_home_search_submit():
-        st.session_state.trigger_search = True
-
-    # "실시간 대본 AI" 로고 텍스트
-    st.markdown("""<div class="google-home-container">
-<div class="google-logo-text">실시간 대본 AI</div>
-</div>""", unsafe_allow_html=True)
-
-    # 화이트 필 검색창 (검색 인풋 + '출력' 버튼만 유지)
-    with st.form("google_home_search_form", clear_on_submit=False, border=False):
-        c_in, c_submit = st.columns([85, 15], gap="small")
-        with c_in:
-            st.text_input(
-                "유튜브 링크를 입력하세요.",
-                value="",
-                placeholder="유튜브 링크를 입력하세요.",
-                label_visibility="collapsed",
-                key="home_url_input_box",
-            )
-        with c_submit:
-            home_submitted = st.form_submit_button("출력", on_click=on_home_search_submit, use_container_width=True)
-
-    if home_submitted and not st.session_state.get("trigger_search", False):
-        st.session_state.trigger_search = True
-        st.rerun()
+    # --- 실시간 대본 AI 메인 홈 화면 (templates/index.html 템플릿 렌더링) ---
+    st.markdown(render_index_html(), unsafe_allow_html=True)
 
 

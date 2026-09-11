@@ -8,7 +8,8 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-# static 디렉터리 경로 설정 (OS 독립적)
+# static 및 templates 디렉터리 경로 설정 (OS 독립적)
+TEMPLATES_DIR = Path(__file__).resolve().parent / "templates"
 STATIC_DIR = Path(__file__).resolve().parent / "static"
 
 
@@ -39,11 +40,13 @@ def load_js(filename: str) -> str:
 @lru_cache(maxsize=32)
 def load_template(filename: str) -> str:
     """
-    static/templates/ 경로에서 HTML 템플릿 파일을 UTF-8로 읽어옵니다.
+    templates/ 또는 static/templates/ 경로에서 HTML 템플릿 파일을 UTF-8로 읽어옵니다.
     """
-    file_path = STATIC_DIR / "templates" / filename
+    file_path = TEMPLATES_DIR / filename
     if not file_path.exists():
-        raise FileNotFoundError(f"HTML 템플릿 파일을 찾을 수 없습니다: {file_path}")
+        file_path = STATIC_DIR / "templates" / filename
+    if not file_path.exists():
+        raise FileNotFoundError(f"HTML 템플릿 파일을 찾을 수 없습니다: {filename}")
     return file_path.read_text(encoding="utf-8")
 
 
@@ -56,6 +59,20 @@ def render_template(filename: str, context: Optional[Dict[str, Any]] = None) -> 
         for key, val in context.items():
             content = content.replace(f"{{{{{key}}}}}", str(val))
     return content
+
+
+def render_index_html(home_title: str = "실시간 대본 AI") -> str:
+    """
+    메인 홈 화면 템플릿(templates/index.html)을 렌더링합니다.
+    """
+    return render_template("index.html", {"home_title": home_title})
+
+
+def render_navbar_html(cat_icon_b64: str) -> str:
+    """
+    상단 글로벌 네비바 템플릿(templates/navbar.html)을 렌더링합니다.
+    """
+    return render_template("navbar.html", {"cat_icon_b64": cat_icon_b64})
 
 
 def render_drawer_html(
