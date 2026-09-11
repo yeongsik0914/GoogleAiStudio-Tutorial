@@ -28,9 +28,17 @@ if sys.platform == "win32":
 
 load_dotenv()
 
+# 흰고양이 앱 아이콘 로드 및 Base64 인코딩
+CAT_ICON_PATH = os.path.join(os.path.dirname(__file__), "assets", "white_cat_icon_opt.png")
+CAT_ICON_B64 = ""
+if os.path.exists(CAT_ICON_PATH):
+    with open(CAT_ICON_PATH, "rb") as _f:
+        CAT_ICON_B64 = base64.b64encode(_f.read()).decode("utf-8")
+
 # --- 페이지 설정 (와이드 모드, 사이드바 기본 축소) ---
 st.set_page_config(
-    page_title="AI 유튜브 검색기",
+    page_title="AIYS - AI 유튜브 검색기",
+    page_icon=CAT_ICON_PATH if os.path.exists(CAT_ICON_PATH) else None,
     layout="wide",
     initial_sidebar_state="collapsed",
 )
@@ -177,22 +185,27 @@ st.markdown("""
         text-decoration: none !important;
         cursor: pointer;
         user-select: none;
+        gap: 8px;
+    }
+    .aiys-cat-logo-img {
+        width: 30px;
+        height: 30px;
+        border-radius: 8px;
+        object-fit: cover;
+        box-shadow: 0 0 10px rgba(62, 166, 255, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        display: inline-block;
+        transition: transform 0.18s ease;
+    }
+    .yt-logo-link:hover .aiys-cat-logo-img {
+        transform: scale(1.08);
     }
     .yt-wordmark {
         font-family: 'Roboto', 'Pretendard', sans-serif;
-        font-weight: 700;
-        font-size: 1.25rem;
+        font-weight: 800;
+        font-size: 1.3rem;
         color: #ffffff;
-        letter-spacing: -0.8px;
-        margin-left: 4px;
-    }
-    .yt-country-code {
-        font-size: 0.65rem;
-        color: #aaaaaa;
-        font-weight: 400;
-        vertical-align: top;
-        margin-top: -6px;
-        margin-left: 3px;
+        letter-spacing: -0.5px;
     }
     
     /* 상단 우측 퀵 버튼 및 유저 아바타 */
@@ -1202,7 +1215,7 @@ with st.sidebar:
 # --- [핵심] 상단 네비바 (햄버거 메뉴 카테고리 및 로고 아이콘만 유지) ---
 is_video_loaded = bool(st.session_state.video_id and st.session_state.video_info and st.session_state.transcript_data)
 
-st.markdown("""
+st.markdown(f"""
 <div class="yt-nav-header-left" style="margin-bottom: 6px;">
     <button type="button" id="yt-hamburger-btn" class="yt-menu-icon" title="이전 목록 열기" style="background:none; border:none; padding:0; cursor:pointer; display:flex; align-items:center; justify-content:center;">
         <svg viewBox="0 0 24 24" width="22" height="22" fill="#ffffff">
@@ -1210,12 +1223,8 @@ st.markdown("""
         </svg>
     </button>
     <a href="?home=true" target="_self" class="yt-logo-link" title="홈으로 돌아가기">
-        <svg width="28" height="20" viewBox="0 0 32 23" fill="none">
-            <path d="M31.24 3.49C30.87 2.12 29.8 1.05 28.43 0.68C25.96 0 16 0 16 0C16 0 6.04 0 3.57 0.68C2.2 1.05 1.13 2.12 0.76 3.49C0 5.96 0 11.1 0 11.1C0 11.1 0 16.24 0.76 18.71C1.13 20.08 2.2 21.15 3.57 21.52C6.04 22.2 16 22.2 16 22.2C16 22.2 25.96 22.2 28.43 21.52C29.8 21.15 30.87 20.08 31.24 18.71C32 16.24 32 11.1 32 11.1C32 11.1 32 5.96 31.24 3.49Z" fill="#FF0000"/>
-            <polygon points="12.8,15.8 21.2,11.1 12.8,6.4" fill="#FFFFFF"/>
-        </svg>
-        <span class="yt-wordmark">YouTube</span>
-        <span class="yt-country-code">KR</span>
+        <img src="data:image/png;base64,{CAT_ICON_B64}" alt="AIYS" class="aiys-cat-logo-img" />
+        <span class="yt-wordmark">AIYS</span>
     </a>
 </div>
 """, unsafe_allow_html=True)
