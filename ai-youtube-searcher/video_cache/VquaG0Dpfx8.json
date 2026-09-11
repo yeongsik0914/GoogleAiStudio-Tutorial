@@ -1,0 +1,445 @@
+{
+  "video_id": "VquaG0Dpfx8",
+  "url": "https://youtube.com/shorts/VquaG0Dpfx8?si=PZE1IAi2lTy2aPdw",
+  "video_info": {
+    "id": "VquaG0Dpfx8",
+    "title": "‘가장 좋지 않은 경기’ 홍명보 감독 인터뷰 #bbc #bbcnews코리아",
+    "thumbnail": "https://i.ytimg.com/vi/VquaG0Dpfx8/maxresdefault.jpg",
+    "duration": 45,
+    "uploader": "BBC News 코리아",
+    "view_count": 770432,
+    "url": "https://www.youtube.com/watch?v=VquaG0Dpfx8"
+  },
+  "audio_path": "downloads\\VquaG0Dpfx8.m4a",
+  "transcript_data": {
+    "full_text": "오늘 우리는 분명히 이 월드컵 세 경기 중에 가장 좋지 않은 음 경기를 한 거는 맞습니다. 어 이런 식으로 결과가 나오면은 뭐 물론 여러 가지 이유를 댈 수도 있지만은 이런 큰 무대에서 어떤 결과는 저는 모든 게 감독의 책임이라고 생각해요. 결과적으로는 모든 것들이 어 제가 판단하고 결정하는 거였는데 거기에서 잘못 판단하고 결정하고 했으니깐 결과가 좋지 않은 게 나온다고 생각해요. 뭐 그 이상도 없고 그 이하도 전 없다고 생각해요.",
+    "segments": [
+      {
+        "start": 0.1,
+        "end": 5.0,
+        "time_str": "00:00",
+        "text": "오늘 우리는 분명히 이 월드컵 세 경기 중에 가장 좋지",
+        "speaker": "spk:0"
+      },
+      {
+        "start": 5.0,
+        "end": 9.0,
+        "time_str": "00:05",
+        "text": "않은 음 경기를 한 거는 맞습니다.",
+        "speaker": "spk:0"
+      },
+      {
+        "start": 10.2,
+        "end": 15.0,
+        "time_str": "00:10",
+        "text": "어 이런 식으로 결과가 나오면은 뭐 물론 여러 가지 이유를",
+        "speaker": "spk:0"
+      },
+      {
+        "start": 15.2,
+        "end": 20.0,
+        "time_str": "00:15",
+        "text": "댈 수도 있지만은 이런 큰 무대에서 어떤",
+        "speaker": "spk:0"
+      },
+      {
+        "start": 20.0,
+        "end": 25.5,
+        "time_str": "00:20",
+        "text": "결과는 저는 모든 게 감독의 책임이라고",
+        "speaker": "spk:0"
+      },
+      {
+        "start": 25.5,
+        "end": 30.0,
+        "time_str": "00:25",
+        "text": "생각해요. 결과적으로는 모든 것들이 어",
+        "speaker": "spk:0"
+      },
+      {
+        "start": 30.0,
+        "end": 35.4,
+        "time_str": "00:30",
+        "text": "제가 판단하고 결정하는 거였는데 거기에서 잘못 판단하고",
+        "speaker": "spk:0"
+      },
+      {
+        "start": 36.1,
+        "end": 40.6,
+        "time_str": "00:36",
+        "text": "결정하고 했으니깐 결과가 좋지 않은 게",
+        "speaker": "spk:0"
+      },
+      {
+        "start": 40.6,
+        "end": 44.9,
+        "time_str": "00:40",
+        "text": "나온다고 생각해요. 뭐 그 이상도 없고 그 이하도 전 없다고 생각해요.",
+        "speaker": "spk:0"
+      }
+    ],
+    "raw_words": [
+      {
+        "word": "오늘",
+        "start": 0.1,
+        "end": 0.3
+      },
+      {
+        "word": "우리는",
+        "start": 1.1,
+        "end": 1.4
+      },
+      {
+        "word": "분명히",
+        "start": 1.4,
+        "end": 2.1
+      },
+      {
+        "word": "이",
+        "start": 2.8,
+        "end": 2.9
+      },
+      {
+        "word": "월드컵",
+        "start": 2.9,
+        "end": 3.3
+      },
+      {
+        "word": "세",
+        "start": 3.3,
+        "end": 3.4
+      },
+      {
+        "word": "경기",
+        "start": 3.4,
+        "end": 3.8
+      },
+      {
+        "word": "중에",
+        "start": 3.8,
+        "end": 4.0
+      },
+      {
+        "word": "가장",
+        "start": 4.0,
+        "end": 4.5
+      },
+      {
+        "word": "좋지",
+        "start": 4.5,
+        "end": 5.0
+      },
+      {
+        "word": "않은",
+        "start": 5.0,
+        "end": 5.3
+      },
+      {
+        "word": "음",
+        "start": 5.6,
+        "end": 5.7
+      },
+      {
+        "word": "경기를",
+        "start": 6.7,
+        "end": 7.4
+      },
+      {
+        "word": "한",
+        "start": 7.7,
+        "end": 7.8
+      },
+      {
+        "word": "거는",
+        "start": 7.8,
+        "end": 8.3
+      },
+      {
+        "word": "맞습니다.",
+        "start": 8.5,
+        "end": 9.0
+      },
+      {
+        "word": "어",
+        "start": 10.2,
+        "end": 10.4
+      },
+      {
+        "word": "이런",
+        "start": 10.4,
+        "end": 10.6
+      },
+      {
+        "word": "식으로",
+        "start": 10.6,
+        "end": 11.5
+      },
+      {
+        "word": "결과가",
+        "start": 11.5,
+        "end": 11.9
+      },
+      {
+        "word": "나오면은",
+        "start": 11.9,
+        "end": 12.9
+      },
+      {
+        "word": "뭐",
+        "start": 13.0,
+        "end": 13.1
+      },
+      {
+        "word": "물론",
+        "start": 13.1,
+        "end": 13.4
+      },
+      {
+        "word": "여러",
+        "start": 13.4,
+        "end": 13.6
+      },
+      {
+        "word": "가지",
+        "start": 13.6,
+        "end": 14.2
+      },
+      {
+        "word": "이유를",
+        "start": 14.3,
+        "end": 15.0
+      },
+      {
+        "word": "댈",
+        "start": 15.2,
+        "end": 15.3
+      },
+      {
+        "word": "수도",
+        "start": 15.3,
+        "end": 15.6
+      },
+      {
+        "word": "있지만은",
+        "start": 15.6,
+        "end": 16.4
+      },
+      {
+        "word": "이런",
+        "start": 17.1,
+        "end": 17.4
+      },
+      {
+        "word": "큰",
+        "start": 17.4,
+        "end": 17.6
+      },
+      {
+        "word": "무대에서",
+        "start": 17.6,
+        "end": 18.9
+      },
+      {
+        "word": "어떤",
+        "start": 19.7,
+        "end": 20.0
+      },
+      {
+        "word": "결과는",
+        "start": 20.0,
+        "end": 21.0
+      },
+      {
+        "word": "저는",
+        "start": 21.4,
+        "end": 21.9
+      },
+      {
+        "word": "모든",
+        "start": 22.4,
+        "end": 22.7
+      },
+      {
+        "word": "게",
+        "start": 22.7,
+        "end": 22.9
+      },
+      {
+        "word": "감독의",
+        "start": 23.0,
+        "end": 24.2
+      },
+      {
+        "word": "책임이라고",
+        "start": 25.0,
+        "end": 25.5
+      },
+      {
+        "word": "생각해요.",
+        "start": 25.5,
+        "end": 26.2
+      },
+      {
+        "word": "결과적으로는",
+        "start": 26.6,
+        "end": 27.7
+      },
+      {
+        "word": "모든",
+        "start": 27.8,
+        "end": 28.0
+      },
+      {
+        "word": "것들이",
+        "start": 28.0,
+        "end": 28.5
+      },
+      {
+        "word": "어",
+        "start": 29.6,
+        "end": 30.0
+      },
+      {
+        "word": "제가",
+        "start": 30.0,
+        "end": 30.4
+      },
+      {
+        "word": "판단하고",
+        "start": 30.4,
+        "end": 31.0
+      },
+      {
+        "word": "결정하는",
+        "start": 31.0,
+        "end": 31.4
+      },
+      {
+        "word": "거였는데",
+        "start": 31.4,
+        "end": 32.1
+      },
+      {
+        "word": "거기에서",
+        "start": 32.1,
+        "end": 33.0
+      },
+      {
+        "word": "잘못",
+        "start": 33.0,
+        "end": 33.5
+      },
+      {
+        "word": "판단하고",
+        "start": 34.5,
+        "end": 35.4
+      },
+      {
+        "word": "결정하고",
+        "start": 36.1,
+        "end": 36.6
+      },
+      {
+        "word": "했으니깐",
+        "start": 36.6,
+        "end": 37.4
+      },
+      {
+        "word": "결과가",
+        "start": 37.7,
+        "end": 38.1
+      },
+      {
+        "word": "좋지",
+        "start": 38.1,
+        "end": 38.6
+      },
+      {
+        "word": "않은",
+        "start": 39.2,
+        "end": 40.4
+      },
+      {
+        "word": "게",
+        "start": 40.5,
+        "end": 40.6
+      },
+      {
+        "word": "나온다고",
+        "start": 40.6,
+        "end": 41.2
+      },
+      {
+        "word": "생각해요.",
+        "start": 41.2,
+        "end": 41.9
+      },
+      {
+        "word": "뭐",
+        "start": 42.1,
+        "end": 42.4
+      },
+      {
+        "word": "그",
+        "start": 42.5,
+        "end": 42.7
+      },
+      {
+        "word": "이상도",
+        "start": 42.7,
+        "end": 43.1
+      },
+      {
+        "word": "없고",
+        "start": 43.1,
+        "end": 43.5
+      },
+      {
+        "word": "그",
+        "start": 43.5,
+        "end": 43.6
+      },
+      {
+        "word": "이하도",
+        "start": 43.6,
+        "end": 44.0
+      },
+      {
+        "word": "전",
+        "start": 44.0,
+        "end": 44.2
+      },
+      {
+        "word": "없다고",
+        "start": 44.2,
+        "end": 44.5
+      },
+      {
+        "word": "생각해요.",
+        "start": 44.5,
+        "end": 44.9
+      }
+    ]
+  },
+  "chapters_data": [
+    {
+      "start_seconds": 0.0,
+      "time_str": "00:00",
+      "title": "아쉬운 경기력 인정",
+      "summary": "월드컵 세 경기 중 가장 좋지 않은 경기를 치렀음을 솔직하게 인정합니다."
+    },
+    {
+      "start_seconds": 10.0,
+      "time_str": "00:10",
+      "title": "감독으로서 책임 통감",
+      "summary": "결과에 대해 핑계를 대기보다 큰 무대에서의 결과는 모두 감독의 책임이라고 밝힙니다."
+    },
+    {
+      "start_seconds": 25.0,
+      "time_str": "00:25",
+      "title": "판단과 결정에 대한 반성",
+      "summary": "자신의 잘못된 판단과 결정이 좋지 않은 결과로 이어졌음을 인정하며 말을 맺습니다."
+    }
+  ],
+  "cached_at": "2026-09-11 13:55"
+}

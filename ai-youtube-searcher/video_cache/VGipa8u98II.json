@@ -1,0 +1,245 @@
+{
+  "video_id": "VGipa8u98II",
+  "url": "https://www.youtube.com/shorts/VGipa8u98II",
+  "video_info": {
+    "id": "VGipa8u98II",
+    "title": "\"마지막 월드컵?\" 질문에 손흥민 반응",
+    "thumbnail": "https://i.ytimg.com/vi/VGipa8u98II/maxresdefault.jpg",
+    "duration": 25,
+    "uploader": "엠빅뉴스",
+    "view_count": 926980,
+    "url": "https://www.youtube.com/watch?v=VGipa8u98II"
+  },
+  "audio_path": "downloads\\VGipa8u98II.m4a",
+  "transcript_data": {
+    "full_text": "제가 마지막 월드컵이라고 단정지어서 얘기한 적은 단 한 번도 없기 때문에 저는 누가 얘기해도 뭐 언제든지 제가 하는 게 가장 중요하다고 생각을 했고 어디까지나 뭐 얘기하시는 건 자유지만 제가 결정해서 잘 선택할 수 있도록 하겠습니다.",
+    "segments": [
+      {
+        "start": 8.9,
+        "end": 13.7,
+        "time_str": "00:08",
+        "text": "제가 마지막 월드컵이라고 단정지어서 얘기한 적은 단 한 번도 없기 때문에 저는",
+        "speaker": "spk:0"
+      },
+      {
+        "start": 13.7,
+        "end": 18.6,
+        "time_str": "00:13",
+        "text": "누가 얘기해도 뭐 언제든지 제가 하는 게 가장 중요하다고 생각을 했고",
+        "speaker": "spk:0"
+      },
+      {
+        "start": 18.9,
+        "end": 23.6,
+        "time_str": "00:18",
+        "text": "어디까지나 뭐 얘기하시는 건 자유지만 제가 결정해서 잘 선택할",
+        "speaker": "spk:0"
+      },
+      {
+        "start": 23.6,
+        "end": 24.3,
+        "time_str": "00:23",
+        "text": "수 있도록 하겠습니다.",
+        "speaker": "spk:0"
+      }
+    ],
+    "raw_words": [
+      {
+        "word": "제가",
+        "start": 8.9,
+        "end": 9.1
+      },
+      {
+        "word": "마지막",
+        "start": 9.1,
+        "end": 9.4
+      },
+      {
+        "word": "월드컵이라고",
+        "start": 9.8,
+        "end": 10.8
+      },
+      {
+        "word": "단정지어서",
+        "start": 11.0,
+        "end": 11.5
+      },
+      {
+        "word": "얘기한",
+        "start": 11.5,
+        "end": 11.8
+      },
+      {
+        "word": "적은",
+        "start": 11.8,
+        "end": 12.0
+      },
+      {
+        "word": "단",
+        "start": 12.0,
+        "end": 12.2
+      },
+      {
+        "word": "한",
+        "start": 12.2,
+        "end": 12.3
+      },
+      {
+        "word": "번도",
+        "start": 12.3,
+        "end": 12.6
+      },
+      {
+        "word": "없기",
+        "start": 12.6,
+        "end": 12.8
+      },
+      {
+        "word": "때문에",
+        "start": 12.8,
+        "end": 13.1
+      },
+      {
+        "word": "저는",
+        "start": 13.4,
+        "end": 13.7
+      },
+      {
+        "word": "누가",
+        "start": 13.7,
+        "end": 14.0
+      },
+      {
+        "word": "얘기해도",
+        "start": 14.0,
+        "end": 14.5
+      },
+      {
+        "word": "뭐",
+        "start": 14.5,
+        "end": 14.7
+      },
+      {
+        "word": "언제든지",
+        "start": 15.3,
+        "end": 16.0
+      },
+      {
+        "word": "제가",
+        "start": 16.3,
+        "end": 16.6
+      },
+      {
+        "word": "하는",
+        "start": 16.6,
+        "end": 16.8
+      },
+      {
+        "word": "게",
+        "start": 16.8,
+        "end": 16.9
+      },
+      {
+        "word": "가장",
+        "start": 16.9,
+        "end": 17.2
+      },
+      {
+        "word": "중요하다고",
+        "start": 17.2,
+        "end": 17.8
+      },
+      {
+        "word": "생각을",
+        "start": 17.8,
+        "end": 18.1
+      },
+      {
+        "word": "했고",
+        "start": 18.1,
+        "end": 18.6
+      },
+      {
+        "word": "어디까지나",
+        "start": 18.9,
+        "end": 19.7
+      },
+      {
+        "word": "뭐",
+        "start": 20.0,
+        "end": 20.1
+      },
+      {
+        "word": "얘기하시는",
+        "start": 20.1,
+        "end": 20.7
+      },
+      {
+        "word": "건",
+        "start": 20.7,
+        "end": 20.8
+      },
+      {
+        "word": "자유지만",
+        "start": 20.8,
+        "end": 21.3
+      },
+      {
+        "word": "제가",
+        "start": 22.1,
+        "end": 22.3
+      },
+      {
+        "word": "결정해서",
+        "start": 22.3,
+        "end": 23.0
+      },
+      {
+        "word": "잘",
+        "start": 23.2,
+        "end": 23.3
+      },
+      {
+        "word": "선택할",
+        "start": 23.3,
+        "end": 23.6
+      },
+      {
+        "word": "수",
+        "start": 23.6,
+        "end": 23.7
+      },
+      {
+        "word": "있도록",
+        "start": 23.7,
+        "end": 24.0
+      },
+      {
+        "word": "하겠습니다.",
+        "start": 24.0,
+        "end": 24.3
+      }
+    ]
+  },
+  "chapters_data": [
+    {
+      "start_seconds": 8.0,
+      "time_str": "00:08",
+      "title": "월드컵 은퇴설 일축",
+      "summary": "마지막 월드컵이라고 단정 지어 이야기한 적이 없음을 분명히 밝힙니다."
+    },
+    {
+      "start_seconds": 13.0,
+      "time_str": "00:13",
+      "title": "자신의 의지 강조",
+      "summary": "주변의 여러 이야기보다 본인의 생각과 실천이 가장 중요하다고 강조합니다."
+    },
+    {
+      "start_seconds": 18.0,
+      "time_str": "00:18",
+      "title": "거취에 대한 직접 결정",
+      "summary": "남들의 의견과 상관없이 자신의 미래와 선택은 스스로 신중히 결정하겠다고 전합니다."
+    }
+  ],
+  "cached_at": "2026-09-11 13:47"
+}
