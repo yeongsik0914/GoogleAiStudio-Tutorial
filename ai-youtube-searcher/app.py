@@ -31,7 +31,6 @@ load_dotenv()
 # --- 페이지 설정 (와이드 모드, 사이드바 기본 축소) ---
 st.set_page_config(
     page_title="AI 유튜브 검색기",
-    page_icon="▶️",
     layout="wide",
     initial_sidebar_state="collapsed",
 )
@@ -254,8 +253,9 @@ st.markdown("""
         margin-left: 4px;
     }
     
-    /* 유튜브 공식 일체형 검색창 & 마이크 버튼 (Image 2 완벽 구현) */
-    div[data-testid="stForm"] {
+    /* 유튜브 공식 일체형 검색창 & 마이크 버튼 (상단 헤더 전용) */
+    div[data-testid="stForm"]:has(input[aria-label="유튜브 링크 주소"]),
+    div[data-testid="stForm"]:has(input[id*="yt_url_input_box"]) {
         border: none !important;
         padding: 0 !important;
         margin: 0 !important;
@@ -263,23 +263,27 @@ st.markdown("""
         position: relative !important;
         z-index: 100 !important;
     }
-    div[data-testid="stForm"] [data-testid="stHorizontalBlock"] {
+    div[data-testid="stForm"]:has(input[aria-label="유튜브 링크 주소"]) [data-testid="stHorizontalBlock"],
+    div[data-testid="stForm"]:has(input[id*="yt_url_input_box"]) [data-testid="stHorizontalBlock"] {
         gap: 0px !important;
         align-items: center !important;
     }
     
-    /* 검색 인풋창 (좌측 둥근 알약 + 우측 직각 연결) */
-    .stTextInput {
+    /* 헤더 검색 인풋창 (좌측 둥근 알약 + 우측 직각 연결) */
+    div[data-testid="stForm"]:has(input[aria-label="유튜브 링크 주소"]) .stTextInput,
+    div[data-testid="stForm"]:has(input[id*="yt_url_input_box"]) .stTextInput {
         margin: 0 !important;
         padding: 0 !important;
         position: relative !important;
         z-index: 101 !important;
     }
-    .stTextInput > div {
+    div[data-testid="stForm"]:has(input[aria-label="유튜브 링크 주소"]) .stTextInput > div,
+    div[data-testid="stForm"]:has(input[id*="yt_url_input_box"]) .stTextInput > div {
         margin: 0 !important;
         padding: 0 !important;
     }
-    .stTextInput > div > div {
+    div[data-testid="stForm"]:has(input[aria-label="유튜브 링크 주소"]) .stTextInput > div > div,
+    div[data-testid="stForm"]:has(input[id*="yt_url_input_box"]) .stTextInput > div > div {
         background-color: #121212 !important;
         border: 1px solid #303030 !important;
         border-right: none !important;
@@ -290,14 +294,17 @@ st.markdown("""
         box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2) !important;
         transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
     }
-    .stTextInput > div > div:hover {
+    div[data-testid="stForm"]:has(input[aria-label="유튜브 링크 주소"]) .stTextInput > div > div:hover,
+    div[data-testid="stForm"]:has(input[id*="yt_url_input_box"]) .stTextInput > div > div:hover {
         border-color: #444444 !important;
     }
-    .stTextInput > div > div:focus-within {
+    div[data-testid="stForm"]:has(input[aria-label="유튜브 링크 주소"]) .stTextInput > div > div:focus-within,
+    div[data-testid="stForm"]:has(input[id*="yt_url_input_box"]) .stTextInput > div > div:focus-within {
         border-color: #1c62b9 !important;
         box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5) !important;
     }
-    .stTextInput input {
+    div[data-testid="stForm"]:has(input[aria-label="유튜브 링크 주소"]) .stTextInput input,
+    div[data-testid="stForm"]:has(input[id*="yt_url_input_box"]) .stTextInput input {
         background-color: transparent !important;
         color: #f1f1f1 !important;
         border: none !important;
@@ -309,8 +316,9 @@ st.markdown("""
         outline: none !important;
     }
     
-    /* 검색 제출 버튼 (좌측 직각 + 우측 둥근 알약 다크 그레이) */
-    div[data-testid="stFormSubmitButton"] {
+    /* 헤더 검색 제출 버튼 (좌측 직각 + 우측 둥근 알약 다크 그레이) */
+    div[data-testid="stForm"]:has(input[aria-label="유튜브 링크 주소"]) div[data-testid="stFormSubmitButton"],
+    div[data-testid="stForm"]:has(input[id*="yt_url_input_box"]) div[data-testid="stFormSubmitButton"] {
         margin: 0 !important;
         padding: 0 !important;
         height: 40px !important;
@@ -320,8 +328,8 @@ st.markdown("""
         position: relative !important;
         z-index: 101 !important;
     }
-    div[data-testid="stFormSubmitButton"] button,
-    div[data-testid="stForm"] button {
+    div[data-testid="stForm"]:has(input[aria-label="유튜브 링크 주소"]) div[data-testid="stFormSubmitButton"] button,
+    div[data-testid="stForm"]:has(input[id*="yt_url_input_box"]) div[data-testid="stFormSubmitButton"] button {
         width: 100% !important;
         height: 40px !important;
         min-height: 40px !important;
@@ -336,18 +344,18 @@ st.markdown("""
         align-items: center !important;
         justify-content: center !important;
     }
-    div[data-testid="stFormSubmitButton"] button:hover,
-    div[data-testid="stForm"] button:hover {
+    div[data-testid="stForm"]:has(input[aria-label="유튜브 링크 주소"]) div[data-testid="stFormSubmitButton"] button:hover,
+    div[data-testid="stForm"]:has(input[id*="yt_url_input_box"]) div[data-testid="stFormSubmitButton"] button:hover {
         background-color: #272727 !important;
         border-color: #383838 !important;
         color: #ffffff !important;
     }
-    div[data-testid="stFormSubmitButton"] button:active,
-    div[data-testid="stForm"] button:active {
+    div[data-testid="stForm"]:has(input[aria-label="유튜브 링크 주소"]) div[data-testid="stFormSubmitButton"] button:active,
+    div[data-testid="stForm"]:has(input[id*="yt_url_input_box"]) div[data-testid="stFormSubmitButton"] button:active {
         background-color: #333333 !important;
     }
-    div[data-testid="stFormSubmitButton"] button p,
-    div[data-testid="stForm"] button p {
+    div[data-testid="stForm"]:has(input[aria-label="유튜브 링크 주소"]) div[data-testid="stFormSubmitButton"] button p,
+    div[data-testid="stForm"]:has(input[id*="yt_url_input_box"]) div[data-testid="stFormSubmitButton"] button p {
         margin: 0 !important;
         padding: 0 !important;
         font-size: 1.1rem !important;
@@ -543,7 +551,7 @@ st.markdown("""
         background: #161616;
         border: 1px solid #262626;
         border-radius: 10px;
-        padding: 8px 10px;
+        padding: 10px 12px;
         gap: 10px;
         transition: all 0.18s ease;
         position: relative;
@@ -562,37 +570,21 @@ st.markdown("""
         flex: 1;
         min-width: 0;
     }
-    .d-thumb-box {
-        position: relative;
-        width: 86px;
-        height: 52px;
-        min-width: 86px;
-        border-radius: 6px;
-        overflow: hidden;
-        background: #000;
-    }
-    .d-thumb-img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-    .d-dur-tag {
-        position: absolute;
-        bottom: 3px;
-        right: 4px;
-        background: rgba(0, 0, 0, 0.85);
-        color: #fff;
+    .d-dur-tag-inline {
+        background: #242424;
+        color: #aaaaaa;
         font-size: 0.68rem;
-        font-weight: 700;
-        padding: 1px 4px;
+        font-weight: 600;
+        padding: 1px 6px;
         border-radius: 4px;
+        border: 1px solid #333333;
     }
     .d-info-box {
         flex: 1;
         min-width: 0;
         display: flex;
         flex-direction: column;
-        gap: 3px;
+        gap: 4px;
     }
     .d-title {
         color: #f1f1f1;
@@ -767,27 +759,209 @@ st.markdown("""
         flex: 0 0 auto !important;
     }
 
-    /* 초기 대기 화면 반응형 히어로 배너 */
-    .home-hero-banner {
-        background: #181818;
-        border-radius: 16px;
-        padding: clamp(1.4rem, 3.5vw, 2.6rem) clamp(1rem, 3vw, 2rem);
-        text-align: center;
-        border: 1px dashed #333333;
-        margin-top: 1.2rem;
+    /* ==================================================== */
+    /*  실시간 대본 AI / Chrome New Tab 스타일 홈 UI     */
+    /* ==================================================== */
+    .google-home-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        max-width: 800px;
+        margin: clamp(30px, 8vh, 75px) auto 0 auto;
+        padding: 0 16px;
+        box-sizing: border-box;
     }
-    .home-hero-title {
-        color: #ffffff;
-        margin-bottom: 0.5rem;
+    .google-logo-text {
+        font-family: 'Pretendard', 'Google Sans', 'Roboto', -apple-system, sans-serif;
+        font-size: clamp(38px, 5.5vw, 58px);
         font-weight: 800;
-        font-size: clamp(1.2rem, 3.8vw, 1.5rem);
+        color: #ffffff;
+        letter-spacing: -1.5px;
+        text-align: center;
+        margin-bottom: 24px;
+        user-select: none;
+        line-height: 1.15;
+        text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
     }
-    .home-hero-desc {
-        color: #aaaaaa;
-        max-width: 640px;
-        margin: 0 auto 1.5rem auto;
-        font-size: 0.9rem;
-        line-height: 1.6;
+    
+    /* Google / 실시간 대본 AI 화이트 필 검색창 컨테이너 */
+    div[data-testid="stForm"]:has(input[id*="home_url_input_box"]),
+    div[data-testid="stForm"]:has(input[aria-label="유튜브 링크를 입력하세요."]) {
+        width: 100% !important;
+        max-width: 680px !important;
+        margin: 0 auto !important;
+        background: #ffffff !important;
+        border-radius: 28px !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35) !important;
+        padding: 4px 6px 4px 10px !important;
+        border: none !important;
+        display: flex !important;
+        align-items: center !important;
+        transition: box-shadow 0.2s ease !important;
+        box-sizing: border-box !important;
+    }
+    div[data-testid="stForm"]:has(input[id*="home_url_input_box"]):hover,
+    div[data-testid="stForm"]:has(input[id*="home_url_input_box"]):focus-within,
+    div[data-testid="stForm"]:has(input[aria-label="유튜브 링크를 입력하세요."]):hover,
+    div[data-testid="stForm"]:has(input[aria-label="유튜브 링크를 입력하세요."]):focus-within {
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.55) !important;
+    }
+    div[data-testid="stForm"]:has(input[id*="home_url_input_box"]) [data-testid="stHorizontalBlock"],
+    div[data-testid="stForm"]:has(input[aria-label="유튜브 링크를 입력하세요."]) [data-testid="stHorizontalBlock"] {
+        gap: 6px !important;
+        align-items: center !important;
+        width: 100% !important;
+        background: transparent !important;
+    }
+    div[data-testid="stForm"]:has(input[id*="home_url_input_box"]) [data-testid="column"],
+    div[data-testid="stForm"]:has(input[aria-label="유튜브 링크를 입력하세요."]) [data-testid="column"] {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 0 !important;
+    }
+    div[data-testid="stForm"]:has(input[id*="home_url_input_box"]) .stTextInput,
+    div[data-testid="stForm"]:has(input[aria-label="유튜브 링크를 입력하세요."]) .stTextInput {
+        flex: 1 1 auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+    }
+    div[data-testid="stForm"]:has(input[id*="home_url_input_box"]) .stTextInput > div,
+    div[data-testid="stForm"]:has(input[aria-label="유튜브 링크를 입력하세요."]) .stTextInput > div {
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    div[data-testid="stForm"]:has(input[id*="home_url_input_box"]) .stTextInput > div > div,
+    div[data-testid="stForm"]:has(input[aria-label="유튜브 링크를 입력하세요."]) .stTextInput > div > div {
+        background: transparent !important;
+        border: none !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        height: 44px !important;
+        min-height: 44px !important;
+        padding: 0 !important;
+    }
+    div[data-testid="stForm"]:has(input[id*="home_url_input_box"]) .stTextInput input,
+    div[data-testid="stForm"]:has(input[aria-label="유튜브 링크를 입력하세요."]) .stTextInput input {
+        color: #202124 !important;
+        font-size: 1.02rem !important;
+        background: transparent !important;
+        padding: 0 16px 0 16px !important;
+        height: 44px !important;
+        box-shadow: none !important;
+        border: none !important;
+        outline: none !important;
+    }
+    div[data-testid="stForm"]:has(input[id*="home_url_input_box"]) .stTextInput input::placeholder,
+    div[data-testid="stForm"]:has(input[aria-label="유튜브 링크를 입력하세요."]) .stTextInput input::placeholder {
+        color: #5f6368 !important;
+        opacity: 1 !important;
+        font-size: 0.98rem !important;
+    }
+    div[data-testid="stForm"]:has(input[id*="home_url_input_box"]) div[data-testid="stFormSubmitButton"],
+    div[data-testid="stForm"]:has(input[aria-label="유튜브 링크를 입력하세요."]) div[data-testid="stFormSubmitButton"] {
+        width: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        flex: 0 0 auto !important;
+        height: 38px !important;
+    }
+    div[data-testid="stForm"]:has(input[id*="home_url_input_box"]) div[data-testid="stFormSubmitButton"] button,
+    div[data-testid="stForm"]:has(input[aria-label="유튜브 링크를 입력하세요."]) div[data-testid="stFormSubmitButton"] button {
+        background: #0f0f0f !important;
+        border: none !important;
+        border-radius: 20px !important;
+        color: #ffffff !important;
+        font-weight: 700 !important;
+        font-size: 0.92rem !important;
+        height: 38px !important;
+        min-height: 38px !important;
+        padding: 0 22px !important;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2) !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        cursor: pointer !important;
+        transition: all 0.15s ease !important;
+        white-space: nowrap !important;
+    }
+    div[data-testid="stForm"]:has(input[id*="home_url_input_box"]) div[data-testid="stFormSubmitButton"] button:hover,
+    div[data-testid="stForm"]:has(input[aria-label="유튜브 링크를 입력하세요."]) div[data-testid="stFormSubmitButton"] button:hover {
+        background: #272727 !important;
+        color: #ffffff !important;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35) !important;
+    }
+    div[data-testid="stForm"]:has(input[id*="home_url_input_box"]) div[data-testid="stFormSubmitButton"] button p,
+    div[data-testid="stForm"]:has(input[aria-label="유튜브 링크를 입력하세요."]) div[data-testid="stFormSubmitButton"] button p {
+        color: #ffffff !important;
+        font-size: 0.92rem !important;
+        font-weight: 700 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    /* Google Chrome New Tab 원형 바로가기 그리드 */
+    .google-shortcuts-grid {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        gap: 16px;
+        flex-wrap: wrap;
+        margin-top: 32px;
+        max-width: 680px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .google-shortcut-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 86px;
+        text-decoration: none !important;
+        cursor: pointer;
+        border-radius: 8px;
+        padding: 8px 4px;
+        transition: background 0.15s ease;
+    }
+    .google-shortcut-item:hover {
+        background: rgba(255, 255, 255, 0.08);
+    }
+    .google-shortcut-circle {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: #303134;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 8px;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+        transition: background 0.15s ease, transform 0.15s ease;
+        overflow: hidden;
+    }
+    .google-shortcut-item:hover .google-shortcut-circle {
+        background: #3c4043;
+        transform: translateY(-2px);
+    }
+    .google-shortcut-circle img {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+    .google-shortcut-title {
+        color: #e8eaed;
+        font-size: 0.78rem;
+        font-weight: 500;
+        text-align: center;
+        width: 80px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        line-height: 1.3;
     }
 
     /* 영상 상세 정보 바 반응형 */
@@ -886,6 +1060,64 @@ st.markdown("""
             gap: 12px;
         }
     }
+
+    /* 대본 생성 중 로딩 화면 스타일 */
+    .generating-screen-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 55vh;
+        width: 100%;
+        text-align: center;
+        padding: 60px 20px;
+        box-sizing: border-box;
+        animation: genFadeIn 0.35s ease-out forwards;
+    }
+
+    @keyframes genFadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(8px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .generating-title {
+        color: #ffffff !important;
+        font-size: clamp(34px, 5.5vw, 56px) !important;
+        font-weight: 800 !important;
+        letter-spacing: -1.2px !important;
+        margin: 0 0 34px 0 !important;
+        line-height: 1.25 !important;
+        text-align: center !important;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif !important;
+        text-shadow: 0 2px 14px rgba(255, 255, 255, 0.15), 0 4px 20px rgba(0, 0, 0, 0.7) !important;
+    }
+
+    .generating-spinner {
+        width: 60px;
+        height: 60px;
+        border: 5px solid rgba(255, 255, 255, 0.14);
+        border-top: 5px solid #ffffff;
+        border-right: 5px solid rgba(255, 255, 255, 0.7);
+        border-radius: 50%;
+        animation: genSpinnerRotate 0.85s linear infinite;
+        box-shadow: 0 0 24px rgba(255, 255, 255, 0.12);
+        margin: 0 auto;
+    }
+
+    @keyframes genSpinnerRotate {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -894,7 +1126,7 @@ st.markdown("""
 q_params = st.query_params
 
 if q_params.get("home") == "true" or q_params.get("reset") == "true":
-    for key in ["video_id", "video_info", "audio_path", "transcript_data", "chapters_data", "chat_messages", "current_url", "from_cache", "trigger_search"]:
+    for key in ["video_id", "video_info", "audio_path", "transcript_data", "chapters_data", "chat_messages", "current_url", "from_cache", "trigger_search", "is_analyzing", "target_analyze_url", "target_v_id"]:
         if key in st.session_state:
             del st.session_state[key]
     st.query_params.clear()
@@ -913,7 +1145,7 @@ if load_cache_id:
         st.session_state.chat_messages = []
         st.session_state.from_cache = True
         st.query_params.clear()
-        st.toast("⚡ 분석 보관함에서 0토큰으로 대본을 불러왔습니다!", icon="🚀")
+        st.toast("분석 보관함에서 대본을 불러왔습니다.")
         st.rerun()
 
 del_cache_id = q_params.get("delete_cache")
@@ -943,11 +1175,17 @@ if "chat_messages" not in st.session_state:
     st.session_state.chat_messages = []
 if "current_url" not in st.session_state:
     st.session_state.current_url = ""
+if "is_analyzing" not in st.session_state:
+    st.session_state.is_analyzing = False
+if "target_analyze_url" not in st.session_state:
+    st.session_state.target_analyze_url = ""
+if "target_v_id" not in st.session_state:
+    st.session_state.target_v_id = ""
 
 
 # --- 사이드바 설정 ---
 with st.sidebar:
-    st.header("⚙️ Gemini API 설정")
+    st.header("Gemini API 설정")
     env_api_key = os.environ.get("GEMINI_API_KEY", "")
     api_key_input = st.text_input(
         "Gemini API Key",
@@ -956,74 +1194,34 @@ with st.sidebar:
         help=".env 파일 또는 직접 입력 가능",
     )
     if not api_key_input:
-        st.warning("⚠️ Gemini API 키를 입력해주세요.")
+        st.warning("Gemini API 키를 입력해주세요.")
     else:
-        st.success("✅ Gemini API 연결 완료")
+        st.success("Gemini API 연결 완료")
 
 
-# --- [핵심] 유튜브 공식 상단 네비바 ---
-col_head_left, col_head_center, col_head_right = st.columns([2.0, 5.8, 2.2], gap="small")
+# --- [핵심] 상단 네비바 (햄버거 메뉴 카테고리 및 로고 아이콘만 유지) ---
+is_video_loaded = bool(st.session_state.video_id and st.session_state.video_info and st.session_state.transcript_data)
 
-with col_head_left:
-    st.markdown("""
-    <div class="yt-nav-header-left">
-        <button type="button" id="yt-hamburger-btn" class="yt-menu-icon" title="카테고리 메뉴 및 보관함 열기" style="background:none; border:none; padding:0; cursor:pointer; display:flex; align-items:center; justify-content:center;">
-            <svg viewBox="0 0 24 24" width="22" height="22" fill="#ffffff">
-                <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
-            </svg>
-        </button>
-        <a href="?home=true" target="_self" class="yt-logo-link" title="YouTube 홈으로 돌아가기">
-            <svg width="28" height="20" viewBox="0 0 32 23" fill="none">
-                <path d="M31.24 3.49C30.87 2.12 29.8 1.05 28.43 0.68C25.96 0 16 0 16 0C16 0 6.04 0 3.57 0.68C2.2 1.05 1.13 2.12 0.76 3.49C0 5.96 0 11.1 0 11.1C0 11.1 0 16.24 0.76 18.71C1.13 20.08 2.2 21.15 3.57 21.52C6.04 22.2 16 22.2 16 22.2C16 22.2 25.96 22.2 28.43 21.52C29.8 21.15 30.87 20.08 31.24 18.71C32 16.24 32 11.1 32 11.1C32 11.1 32 5.96 31.24 3.49Z" fill="#FF0000"/>
-                <polygon points="12.8,15.8 21.2,11.1 12.8,6.4" fill="#FFFFFF"/>
-            </svg>
-            <span class="yt-wordmark">YouTube</span>
-            <span class="yt-country-code">KR</span>
-        </a>
-    </div>
-    """, unsafe_allow_html=True)
+st.markdown("""
+<div class="yt-nav-header-left" style="margin-bottom: 6px;">
+    <button type="button" id="yt-hamburger-btn" class="yt-menu-icon" title="이전 목록 열기" style="background:none; border:none; padding:0; cursor:pointer; display:flex; align-items:center; justify-content:center;">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="#ffffff">
+            <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+        </svg>
+    </button>
+    <a href="?home=true" target="_self" class="yt-logo-link" title="홈으로 돌아가기">
+        <svg width="28" height="20" viewBox="0 0 32 23" fill="none">
+            <path d="M31.24 3.49C30.87 2.12 29.8 1.05 28.43 0.68C25.96 0 16 0 16 0C16 0 6.04 0 3.57 0.68C2.2 1.05 1.13 2.12 0.76 3.49C0 5.96 0 11.1 0 11.1C0 11.1 0 16.24 0.76 18.71C1.13 20.08 2.2 21.15 3.57 21.52C6.04 22.2 16 22.2 16 22.2C16 22.2 25.96 22.2 28.43 21.52C29.8 21.15 30.87 20.08 31.24 18.71C32 16.24 32 11.1 32 11.1C32 11.1 32 5.96 31.24 3.49Z" fill="#FF0000"/>
+            <polygon points="12.8,15.8 21.2,11.1 12.8,6.4" fill="#FFFFFF"/>
+        </svg>
+        <span class="yt-wordmark">YouTube</span>
+        <span class="yt-country-code">KR</span>
+    </a>
+</div>
+""", unsafe_allow_html=True)
 
-with col_head_center:
-    c_s_form, c_s_mic = st.columns([91, 9], gap="small")
-    with c_s_form:
-        with st.form("yt_search_form", clear_on_submit=False, border=False):
-            c_search_in, c_search_btn = st.columns([88, 12], gap="small")
-            with c_search_in:
-                url_input = st.text_input(
-                    "유튜브 링크 주소",
-                    value=st.session_state.current_url,
-                    placeholder="검색할 유튜브 영상 링크 입력 (예: https://www.youtube.com/watch?v=...)",
-                    label_visibility="collapsed",
-                    key="yt_url_input_box",
-                )
-            with c_search_btn:
-                search_submit = st.form_submit_button("🔍", type="primary", use_container_width=True)
-    with c_s_mic:
-        st.markdown("""
-        <div class="yt-mic-btn" title="음성으로 검색">
-            <svg viewBox="0 0 24 24" width="19" height="19" fill="#f1f1f1">
-                <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm-1-9c0-.55.45-1 1-1s1 .45 1 1v6c0 .55-.45 1-1 1s-1-.45-1-1V5zm6 6c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
-            </svg>
-        </div>
-        """, unsafe_allow_html=True)
-
-with col_head_right:
-    st.markdown("""
-    <div class="yt-nav-header-right">
-        <div class="yt-create-btn" title="만들기">
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="#ffffff">
-                <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
-            </svg>
-            <span>만들기</span>
-        </div>
-        <div class="yt-icon-round-btn" title="알림">
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="#ffffff">
-                <path d="M10 20h4c0 1.1-.9 2-2 2s-2-.9-2-2zm10-2v-1l-2-2v-6c0-3.07-1.63-5.64-4.5-6.32V2c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 3.36 6 5.92 6 9v6l-2 2v1h16zm-3-2H7v-7c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5v7z"/>
-            </svg>
-        </div>
-        <div class="yt-avatar-circle" title="계정">10</div>
-    </div>
-    """, unsafe_allow_html=True)
+url_input = ""
+search_submit = False
 
 # --- [반응형 사이드 드로어 마크업 & 카테고리 목록 & 캐시 보관함] ---
 cached_videos_list = get_all_cached_videos()
@@ -1035,15 +1233,12 @@ if cached_videos_list:
         v_u_esc = cv['uploader'].replace('"', '&quot;').replace("'", "&#39;")
         cached_cards_html += f"""<div class="d-video-card" data-title="{v_t_esc.lower()}" data-uploader="{v_u_esc.lower()}">
 <a href="?load_cache={cv['video_id']}" target="_self" class="d-card-link" title="{v_t_esc}">
-<div class="d-thumb-box">
-<img src="{cv['thumbnail']}" alt="thumb" class="d-thumb-img" onerror="this.src='https://img.youtube.com/vi/{cv['video_id']}/hqdefault.jpg'"/>
-<span class="d-dur-tag">{cv['duration_str']}</span>
-</div>
 <div class="d-info-box">
 <div class="d-title">{v_t_esc}</div>
-<div class="d-uploader">📺 {v_u_esc}</div>
+<div class="d-uploader">{v_u_esc}</div>
 <div class="d-footer-row">
-<span class="d-token-tag">⚡ 0토큰 로드</span>
+<span class="d-dur-tag-inline">{cv['duration_str']}</span>
+<span class="d-token-tag">저장됨</span>
 <span class="d-date-tag">{cv.get('segment_count', 0)}개 구간</span>
 </div>
 </div>
@@ -1056,12 +1251,11 @@ if cached_videos_list:
 </div>"""
 else:
     cached_cards_html = """<div class="d-empty-box">
-<div style="font-size: 2.2rem; margin-bottom: 8px;">📂</div>
 <div style="font-weight: 700; color: #ffffff; margin-bottom: 4px; font-size: 0.95rem;">보관된 영상이 없습니다</div>
-<div style="font-size: 0.8rem; color: #888888; line-height: 1.4;">상단에서 유튜브 링크를 분석하면<br>여기에 자동으로 영구 보관되어<br>언제든 0토큰으로 대본을 다시 볼 수 있습니다.</div>
+<div style="font-size: 0.8rem; color: #888888; line-height: 1.4;">상단에서 유튜브 링크를 분석하면<br>여기에 자동으로 영구 보관되어<br>언제든 대본을 다시 볼 수 있습니다.</div>
 </div>"""
 
-clear_btn_html = f'<div class="d-panel-footer"><a href="?clear_all_cache=true" target="_self" class="d-clear-all-btn" onclick="return confirm(\'정말 모든 분석 캐시를 삭제하시겠습니까?\');">🗑️ 전체 보관함 비우기</a></div>' if cached_videos_list else ''
+clear_btn_html = f'<div class="d-panel-footer"><a href="?clear_all_cache=true" target="_self" class="d-clear-all-btn" onclick="return confirm(\'정말 모든 분석 캐시를 삭제하시겠습니까?\');">전체 보관함 비우기</a></div>' if cached_videos_list else ''
 
 raw_drawer_html = f"""
 <div id="yt-drawer-backdrop" class="yt-drawer-backdrop" title="메뉴 닫기"></div>
@@ -1072,41 +1266,17 @@ raw_drawer_html = f"""
 <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
 </svg>
 </button>
-<a href="?home=true" target="_self" class="yt-logo-link" style="margin-left: 12px;" title="YouTube 홈">
-<svg width="28" height="20" viewBox="0 0 32 23" fill="none">
-<path d="M31.24 3.49C30.87 2.12 29.8 1.05 28.43 0.68C25.96 0 16 0 16 0C16 0 6.04 0 3.57 0.68C2.2 1.05 1.13 2.12 0.76 3.49C0 5.96 0 11.1 0 11.1C0 11.1 0 16.24 0.76 18.71C1.13 20.08 2.2 21.15 3.57 21.52C6.04 22.2 16 22.2 16 22.2C16 22.2 25.96 22.2 28.43 21.52C29.8 21.15 30.87 20.08 31.24 18.71C32 16.24 32 11.1 32 11.1C32 11.1 32 5.96 31.24 3.49Z" fill="#FF0000"/>
-<polygon points="12.8,15.8 21.2,11.1 12.8,6.4" fill="#FFFFFF"/>
-</svg>
-<span class="yt-wordmark">YouTube</span>
-<span class="yt-country-code">KR</span>
-</a>
+<span style="font-weight: 700; font-size: 1.05rem; color: #ffffff; margin-left: 12px; letter-spacing: -0.3px;">이전 목록</span>
 </div>
 <div class="d-panel-body">
-<a href="?home=true" target="_self" class="d-menu-btn" title="새로운 영상 분석 홈 화면">
-<span style="font-size: 1.15rem;">🏠</span>
-<span>홈 (새 영상 검색)</span>
-</a>
-<div class="d-category-section">
-<div class="d-category-title">🏷️ 카테고리 목록</div>
-<div class="d-category-chips">
-<button type="button" class="d-cat-chip active" onclick="if(window.parent.filterDrawerCategory)window.parent.filterDrawerCategory('all', this);">전체</button>
-<button type="button" class="d-cat-chip" onclick="if(window.parent.filterDrawerCategory)window.parent.filterDrawerCategory('지식', this);">🎓 지식/강의</button>
-<button type="button" class="d-cat-chip" onclick="if(window.parent.filterDrawerCategory)window.parent.filterDrawerCategory('IT', this);">💻 IT/테크</button>
-<button type="button" class="d-cat-chip" onclick="if(window.parent.filterDrawerCategory)window.parent.filterDrawerCategory('뉴스', this);">📰 뉴스/시사</button>
-<button type="button" class="d-cat-chip" onclick="if(window.parent.filterDrawerCategory)window.parent.filterDrawerCategory('음악', this);">🎵 음악/오디오</button>
-<button type="button" class="d-cat-chip" onclick="if(window.parent.filterDrawerCategory)window.parent.filterDrawerCategory('게임', this);">🎮 게임/엔터</button>
-</div>
-</div>
-<div class="d-section-divider"></div>
 <div class="d-section-header">
 <div style="display: flex; align-items: center; gap: 6px;">
-<span style="font-size: 1.05rem;">📁</span>
 <span style="font-weight: 700; font-size: 0.95rem; color: #ffffff;">분석 완료 영상 목록</span>
 </div>
 <span class="d-count-pill">{len(cached_videos_list)}개 저장</span>
 </div>
 <div class="d-search-box">
-<input type="text" id="d-drawer-search-input" placeholder="🔍 보관된 영상 검색..." oninput="if(window.parent.filterDrawerVideos)window.parent.filterDrawerVideos(this.value)" class="d-search-input" />
+<input type="text" id="d-drawer-search-input" placeholder="보관된 영상 검색..." oninput="if(window.parent.filterDrawerVideos)window.parent.filterDrawerVideos(this.value)" class="d-search-input" />
 </div>
 <div class="d-scroll-area" id="d-video-list-scroll">
 {cached_cards_html}
@@ -1255,7 +1425,12 @@ os.makedirs(download_dir, exist_ok=True)
 
 
 # --- 검색 및 분석 실행 ---
-target_url = (url_input or "").strip() or st.session_state.get("yt_url_input_box", "").strip() or st.session_state.get("current_url", "").strip()
+target_url = (
+    st.session_state.get("home_url_input_box", "").strip()
+    or (url_input or "").strip()
+    or st.session_state.get("yt_url_input_box", "").strip()
+    or st.session_state.get("current_url", "").strip()
+)
 
 if search_submit or st.session_state.get("trigger_search", False):
     st.session_state.trigger_search = False
@@ -1277,57 +1452,68 @@ if search_submit or st.session_state.get("trigger_search", False):
                 st.session_state.current_url = cached_data.get("url", target_url)
                 st.session_state.chat_messages = []
                 st.session_state.from_cache = True
-                st.toast("⚡ 이전에 분석된 영상입니다! Gemini API 토큰 소모 없이 이전 데이터를 활용하여 즉시 대본 페이지를 불러왔습니다.", icon="🚀")
+                st.toast("이전에 분석된 영상입니다. 대본 페이지를 불러왔습니다.")
                 st.rerun()
             elif not api_key_input.strip():
                 st.error("신규 영상 분석을 위해 사이드바에서 Gemini API 키를 입력해주세요.")
             else:
-                # [핵심 2] 신규 영상인 경우: 오디오 다운로드 및 Gemini 3.5 STT & 3.8 챕터 생성
+                # [핵심 2] 신규 영상인 경우: 대본 생성 로딩 화면으로 전환 후 즉시 실행
                 st.session_state.current_url = target_url
-                status_holder = st.empty()
-                with status_holder.status("🎬 유튜브 영상 분석 및 AI 데이터 생성 중...", expanded=True) as status:
-                    try:
-                        status.write("📥 1/3: 영상 메타데이터 조회 및 오디오 추출...")
-                        audio_path, video_info = download_audio(target_url, output_dir=download_dir)
-                        st.session_state.video_id = v_id
-                        st.session_state.video_info = video_info
-                        st.session_state.audio_path = audio_path
-
-                        status.write("🎙️ 2/3: `gemini-3.5-transcribe` 모델로 실시간 타임스탬프 전사 추출...")
-                        transcript_res = transcribe_with_timestamps(audio_path, api_key=api_key_input.strip())
-                        st.session_state.transcript_data = transcript_res
-
-                        status.write("🏷️ 3/3: `gemini-3.8-flash` 모델로 주제별 챕터 및 핵심 요약 추출...")
-                        chapters = extract_video_chapters(
-                            segments=transcript_res.get("segments", []),
-                            full_text=transcript_res.get("full_text", ""),
-                            api_key=api_key_input.strip(),
-                        )
-                        st.session_state.chapters_data = chapters
-                        st.session_state.chat_messages = []
-                        st.session_state.from_cache = False
-
-                        # [핵심 3] 다음 재호출 시 0토큰으로 즉시 로드할 수 있도록 로컬 캐시에 자동 영구 저장
-                        save_to_cache(
-                            video_id=v_id,
-                            video_info=video_info,
-                            audio_path=audio_path,
-                            transcript_data=transcript_res,
-                            chapters_data=chapters,
-                            url=target_url,
-                        )
-
-                        status.update(label="🎉 영상 분석 및 카테고리 보관 완료!", state="complete", expanded=False)
-                        status_holder.empty()
-                        st.rerun()
-
-                    except Exception as e:
-                        status.update(label="❌ 오류 발생", state="error", expanded=True)
-                        st.error(f"오류 상세: {e}")
+                st.session_state.is_analyzing = True
+                st.session_state.target_analyze_url = target_url
+                st.session_state.target_v_id = v_id
+                st.rerun()
 
 
-# --- 메인 구글 유튜브 스타일 일체형 통합 웹 앱 ---
-if st.session_state.video_id and st.session_state.video_info and st.session_state.transcript_data:
+# --- 메인 화면 분기 (1: 대본 생성 중 로딩 화면 / 2: 분석 완료 대본 워크스페이스 / 3: 홈 검색 화면) ---
+if st.session_state.get("is_analyzing", False):
+    # 흰색 큰 텍스트 "대본 생성중" + 중앙 회전 로딩 스피너
+    st.markdown("""
+    <div class="generating-screen-container">
+        <h1 class="generating-title">대본 생성중</h1>
+        <div class="generating-spinner"></div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    t_url = st.session_state.get("target_analyze_url", "")
+    t_vid = st.session_state.get("target_v_id", "")
+    try:
+        audio_path, video_info = download_audio(t_url, output_dir=download_dir)
+        transcript_res = transcribe_with_timestamps(audio_path, api_key=api_key_input.strip())
+        chapters = extract_video_chapters(
+            segments=transcript_res.get("segments", []),
+            full_text=transcript_res.get("full_text", ""),
+            api_key=api_key_input.strip(),
+        )
+        st.session_state.video_id = t_vid
+        st.session_state.video_info = video_info
+        st.session_state.audio_path = audio_path
+        st.session_state.transcript_data = transcript_res
+        st.session_state.chapters_data = chapters
+        st.session_state.chat_messages = []
+        st.session_state.from_cache = False
+
+        # 다음 재호출 시 0토큰으로 즉시 로드할 수 있도록 로컬 캐시에 자동 영구 저장
+        save_to_cache(
+            video_id=t_vid,
+            video_info=video_info,
+            audio_path=audio_path,
+            transcript_data=transcript_res,
+            chapters_data=chapters,
+            url=t_url,
+        )
+
+        st.session_state.is_analyzing = False
+        st.rerun()
+
+    except Exception as e:
+        st.session_state.is_analyzing = False
+        st.error(f"대본 생성 중 오류가 발생했습니다: {e}")
+        if st.button("홈 화면으로 돌아가기"):
+            st.session_state.clear()
+            st.rerun()
+
+elif st.session_state.video_id and st.session_state.video_info and st.session_state.transcript_data:
     v_id = st.session_state.video_id
     v_info = st.session_state.video_info
     t_data = st.session_state.transcript_data
@@ -1365,10 +1551,7 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
     segments_count_val = len(segments_list)
     uploader_initial = v_uploader[0].upper() if v_uploader else "Y"
     is_from_cache = st.session_state.get("from_cache", False)
-    if is_from_cache:
-        cache_badge_html = '<span style="margin-left: auto; color: #10b981; font-size: 0.72rem; font-weight: 700; background: #0c291e; border: 1px solid #165b40; padding: 2px 9px; border-radius: 12px; white-space: nowrap;">⚡ 로컬 캐시 (토큰 0 소모)</span>'
-    else:
-        cache_badge_html = '<span style="margin-left: auto; color: #3ea6ff; font-size: 0.72rem; font-weight: 700; background: #0f2338; border: 1px solid #1d466e; padding: 2px 9px; border-radius: 12px; white-space: nowrap;">✨ Gemini 3.5 신규 분석</span>'
+    cache_badge_html = ""
 
     # 전체 화면을 하나로 통합한 일체형 컴포넌트 HTML (좌측 플레이어/타임라인/상세정보 + 우측 4대 탭)
     integrated_html = f"""
@@ -1404,7 +1587,7 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
                 transition: all 0.25s ease;
             }}
             
-            /* 🎬 유튜브 공식 영화관 모드 (Theater Mode) 전폭 레이아웃 */
+            /*  유튜브 공식 영화관 모드 (Theater Mode) 전폭 레이아웃 */
             .app-container.theater-mode {{
                 display: flex !important;
                 flex-direction: column !important;
@@ -1446,7 +1629,7 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
             }}
             
             /* ==================================================== */
-            /* 📺 좌측: 비디오 플레이어 + 타임라인 + 컨트롤 + 자막   */
+            /*  좌측: 비디오 플레이어 + 타임라인 + 컨트롤 + 자막   */
             /* ==================================================== */
             .left-column {{
                 display: flex;
@@ -1458,12 +1641,12 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
                 justify-content: flex-start;
             }}
             
-            /* [핵심] 대형/와이드 화면에서도 하단 컨트롤과 실시간 대사, 비디오 정보바가 잘리지 않도록 높이 자동 제한 */
+            /* 대형/와이드 화면에서도 하단 컨트롤과 비디오 정보바가 잘리지 않도록 높이 자동 최적화 */
             .player-wrapper {{
                 position: relative;
                 width: 100%;
                 max-width: 100%;
-                max-height: calc(100% - 156px);
+                max-height: calc(100% - 90px);
                 aspect-ratio: 16 / 9;
                 margin: 0 auto;
                 background: #000;
@@ -1786,7 +1969,7 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
                 text-shadow: 0 1px 3px rgba(0,0,0,0.8);
             }}
 
-            /* 📺 영상 상세 정보 바 (100% 반응형 일체형 배너) */
+            /*  영상 상세 정보 바 (100% 반응형 일체형 배너) */
             .video-info-banner {{
                 background: #161616;
                 border: 1px solid #282828;
@@ -1871,7 +2054,7 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
             }}
             
             /* ========================================= */
-            /* 📑💬 우측: 카테고리 4대 탭 통합 사이드 패널 */
+            /*  우측: 카테고리 4대 탭 통합 사이드 패널 */
             /* ========================================= */
             .right-column {{
                 background: #181818;
@@ -1885,7 +2068,7 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
                 overflow: hidden;
             }}
             
-            /* 🌟 [유튜브 공식 알약 필터 탭 바 - 카테고리 4대 탭] */
+            /*  [유튜브 공식 알약 필터 탭 바 - 카테고리 4대 탭] */
             .tab-nav-bar {{
                 display: flex;
                 align-items: center;
@@ -2099,7 +2282,7 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
             }}
             
             /* ------------------------------------- */
-            /* 💬 카테고리 2: Gemini AI 챗봇           */
+            /*  카테고리 2: Gemini AI 챗봇           */
             /* ------------------------------------- */
             .preset-chips-row {{
                 display: flex;
@@ -2190,7 +2373,7 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
             }}
             
             /* ------------------------------------- */
-            /* 🏷️ 카테고리 3: 주제별 챕터 요약        */
+            /*  카테고리 3: 주제별 챕터 요약        */
             /* ------------------------------------- */
             .chapters-scroll-view {{
                 flex: 1;
@@ -2251,7 +2434,7 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
             }}
             
             /* ------------------------------------- */
-            /* 📥 카테고리 4: 대본 및 오디오 다운로드 허브 */
+            /*  카테고리 4: 대본 및 오디오 다운로드 허브 */
             /* ------------------------------------- */
             .dl-panel-container {{
                 flex: 1;
@@ -2440,7 +2623,7 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
     <body>
         <div class="app-container">
             <!-- ============================================== -->
-            <!-- 📺 [좌측]: 비디오 + 타임라인 + 컨트롤 + 라이브자막 -->
+            <!--  [좌측]: 비디오 + 타임라인 + 컨트롤 + 라이브자막 -->
             <!-- ============================================== -->
             <div class="left-column">
                 <!-- 좌우 공백 없이 100% 꽉 채운 16:9 비디오 플레이어 -->
@@ -2474,8 +2657,8 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
                         <span class="yt-vol-badge" id="vol-badge">100%</span>
                     </div>
                     <div class="yt-ctrl-center">
-                        <button class="skip-btn" onclick="skipRelative(-5)" title="5초 뒤로 (J)">⏪ -5s</button>
-                        <button class="skip-btn" onclick="skipRelative(5)" title="5초 앞으로 (L)">+5s ⏩</button>
+                        <button class="skip-btn" onclick="skipRelative(-5)" title="5초 뒤로 (J)">-5s</button>
+                        <button class="skip-btn" onclick="skipRelative(5)" title="5초 앞으로 (L)">+5s</button>
                         <select class="speed-select" onchange="changeSpeed(this.value)" id="speed-selector" title="재생 속도 조절">
                             <option value="0.75">0.75x</option>
                             <option value="1.0" selected>1.0x (보통)</option>
@@ -2486,9 +2669,9 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
                     </div>
                     <div class="yt-ctrl-right">
                         <div class="yt-time-badge">
-                            ⏱️ <span id="time-current">00:00</span> / <span id="time-total">00:00</span>
+                            <span id="time-current">00:00</span> / <span id="time-total">00:00</span>
                         </div>
-                        <!-- 🎬 유튜브 공식 영화관 모드 (Theater Mode) 버튼 -->
+                        <!-- 유튜브 공식 영화관 모드 (Theater Mode) 버튼 -->
                         <button class="ctrl-icon-btn yt-theater-btn" id="theater-toggle-btn" onclick="toggleTheaterMode()" title="영화관 모드 (t)">
                             <svg id="theater-icon-enter" viewBox="0 0 24 24" width="18" height="18" fill="#f1f1f1">
                                 <path d="M19 6H5c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 10H5V8h14v8z"/>
@@ -2497,7 +2680,7 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
                                 <path d="M19 7H5c-1.1 0-2 .9-2 2v6c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zm0 8H5V9h14v6z"/>
                             </svg>
                         </button>
-                        <!-- ⛶ 전체화면 버튼 -->
+                        <!-- 전체화면 버튼 -->
                         <button class="ctrl-icon-btn yt-fs-btn" id="fs-toggle-btn" onclick="toggleFullscreen()" title="전체화면 (f)">
                             <svg viewBox="0 0 24 24" width="17" height="17" fill="#f1f1f1">
                                 <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
@@ -2506,47 +2689,31 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
                     </div>
                 </div>
 
-                <!-- 실시간 라이브 자막 -->
-                <div class="yt-live-caption-box">
-                    <div class="yt-live-head">
-                        <div class="yt-live-tag">
-                            <span class="yt-live-dot"></span>
-                            <span>실시간 대사</span>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <button class="copy-caption-btn" onclick="copyLiveCaption()" id="copy-cap-btn" title="현재 대사 복사">📋 복사</button>
-                            <div class="yt-live-time" id="live-time-display">00:00</div>
-                        </div>
-                    </div>
-                    <div class="yt-live-text" id="live-text-display">영상을 재생하면 실시간 음성에 맞추어 대사가 출력됩니다.</div>
-                </div>
-
-                <!-- 📺 영상 상세 정보 배너 (일체형 반응형 배너) -->
+                <!-- 영상 상세 정보 배너 (일체형 반응형 배너) -->
                 <div class="video-info-banner" title="{v_title}">
                     <div class="v-info-left">
                         <div class="v-uploader-avatar">{uploader_initial}</div>
                         <span class="v-info-title">{v_title}</span>
                     </div>
                     <div class="v-info-meta">
-                        <span class="v-meta-item">📺 {v_uploader}</span>
+                        <span class="v-meta-item">{v_uploader}</span>
                         <span class="v-meta-dot">•</span>
                         <span class="v-meta-item">조회수 {v_views}회</span>
                         <span class="v-meta-dot">•</span>
-                        <span class="v-meta-item">⏱️ {v_duration_str}</span>
-                        {cache_badge_html}
+                        <span class="v-meta-item">{v_duration_str}</span>
                     </div>
                 </div>
             </div>
 
             <!-- ============================================== -->
-            <!-- 📑💬 [우측]: 카테고리 4대 탭 통합 사이드 패널   -->
+            <!-- [우측]: 카테고리 4대 탭 통합 사이드 패널   -->
             <!-- ============================================== -->
             <div class="right-column">
                 <div class="tab-nav-bar">
-                    <button class="tab-chip active" id="tab-btn-transcript" onclick="switchTab('transcript')">📑 대본</button>
-                    <button class="tab-chip" id="tab-btn-chat" onclick="switchTab('chat')">💬 Gemini 챗봇</button>
-                    <button class="tab-chip" id="tab-btn-chapters" onclick="switchTab('chapters')">🏷️ 챕터</button>
-                    <button class="tab-chip" id="tab-btn-download" onclick="switchTab('download')">📥 다운로드</button>
+                    <button class="tab-chip active" id="tab-btn-transcript" onclick="switchTab('transcript')">대본</button>
+                    <button class="tab-chip" id="tab-btn-chat" onclick="switchTab('chat')">Gemini 챗봇</button>
+                    <button class="tab-chip" id="tab-btn-chapters" onclick="switchTab('chapters')">챕터</button>
+                    <button class="tab-chip" id="tab-btn-download" onclick="switchTab('download')">다운로드</button>
                 </div>
 
                 <!-- 1. 시간대별 대본 탭 (5칸 맞춤 & 3번째 칸 실시간 음성 대본 싱크) -->
@@ -2565,16 +2732,16 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
                 <!-- 2. Gemini AI 챗봇 탭 -->
                 <div class="tab-panel" id="panel-chat">
                     <div class="preset-chips-row">
-                        <span class="preset-chip" onclick="askPreset('이 영상의 가장 중요한 핵심 내용을 3줄로 요약해줘.')">📌 3줄 핵심 요약</span>
-                        <span class="preset-chip" onclick="askPreset('영상의 최종 결론과 화자의 핵심 메시지는 뭐야?')">🎯 최종 결론</span>
-                        <span class="preset-chip" onclick="askPreset('영상에서 다루는 주요 이슈와 원인은 무엇인가요?')">🔍 주요 원인 분석</span>
-                        <span class="preset-chip" onclick="askPreset('영상 속에 등장하는 핵심 개념과 키워드를 정리해줘.')">💡 핵심 키워드 정리</span>
-                        <span class="preset-chip" onclick="askPreset('영상 내용 중 시청자가 꼭 알아야 할 주요 사실(Fact)을 Q&A로 정리해줘.')">❓ Q&A 팩트체크</span>
+                        <span class="preset-chip" onclick="askPreset('이 영상의 가장 중요한 핵심 내용을 3줄로 요약해줘.')">3줄 핵심 요약</span>
+                        <span class="preset-chip" onclick="askPreset('영상의 최종 결론과 화자의 핵심 메시지는 뭐야?')">최종 결론</span>
+                        <span class="preset-chip" onclick="askPreset('영상에서 다루는 주요 이슈와 원인은 무엇인가요?')">주요 원인 분석</span>
+                        <span class="preset-chip" onclick="askPreset('영상 속에 등장하는 핵심 개념과 키워드를 정리해줘.')">핵심 키워드 정리</span>
+                        <span class="preset-chip" onclick="askPreset('영상 내용 중 시청자가 꼭 알아야 할 주요 사실(Fact)을 Q&A로 정리해줘.')">Q&A 팩트체크</span>
                     </div>
 
                     <div class="chat-messages-container" id="chat-box">
                         <div class="chat-bubble-a">
-                            🤖 <b>Gemini 3.8 Flash 어시스턴트:</b><br>
+                            <b>Gemini AI 어시스턴트:</b><br>
                             영상 내용에 대해 궁금한 점을 질문해보세요. 상단 추천 질문 칩을 누르거나 직접 입력하시면 관련 영상 구간과 함께 즉시 답변해 드립니다.
                         </div>
                     </div>
@@ -2596,10 +2763,10 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
                         <!-- 1. 전체 대본 카드 -->
                         <div class="dl-card">
                             <div class="dl-card-header">
-                                <div class="dl-card-icon">📄</div>
+                                <div class="dl-card-icon">TXT</div>
                                 <div>
                                     <div class="dl-card-title">전체 텍스트 대본 (.txt)</div>
-                                    <div class="dl-card-desc">Gemini AI가 고정밀 전사한 텍스트 대본 파일</div>
+                                    <div class="dl-card-desc">Gemini AI가 전사한 텍스트 대본 파일</div>
                                 </div>
                             </div>
                             <div class="dl-meta-chips">
@@ -2607,16 +2774,16 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
                                 <span class="dl-chip">UTF-8 포맷</span>
                             </div>
                             <div class="dl-card-actions">
-                                <button class="dl-act-btn primary" onclick="downloadTranscriptTxt(false)">📥 텍스트 다운로드</button>
-                                <button class="dl-act-btn secondary" onclick="downloadTranscriptTxt(true)">⏱️ 타임스탬프 포함</button>
-                                <button class="dl-act-btn copy" id="copy-all-btn" onclick="copyAllTranscript()">📋 전체 복사</button>
+                                <button class="dl-act-btn primary" onclick="downloadTranscriptTxt(false)">텍스트 다운로드</button>
+                                <button class="dl-act-btn secondary" onclick="downloadTranscriptTxt(true)">타임스탬프 포함</button>
+                                <button class="dl-act-btn copy" id="copy-all-btn" onclick="copyAllTranscript()">전체 복사</button>
                             </div>
                         </div>
 
                         <!-- 2. 고음질 오디오 카드 -->
                         <div class="dl-card">
                             <div class="dl-card-header">
-                                <div class="dl-card-icon">🎵</div>
+                                <div class="dl-card-icon">MP3</div>
                                 <div>
                                     <div class="dl-card-title">고음질 원본 오디오 (.m4a)</div>
                                     <div class="dl-card-desc">유튜브 원본 고음질 AAC/M4A 스트림 파일</div>
@@ -2627,7 +2794,7 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
                                 <span class="dl-chip">길이: {v_duration_str}</span>
                             </div>
                             <div class="dl-card-actions">
-                                <button class="dl-act-btn primary audio" onclick="downloadAudioFile()">🎵 고음질 오디오 다운로드</button>
+                                <button class="dl-act-btn primary audio" onclick="downloadAudioFile()">고음질 오디오 다운로드</button>
                             </div>
                         </div>
                     </div>
@@ -2754,11 +2921,11 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
                 if (!txt) return;
                 var btn = document.getElementById('copy-cap-btn');
                 navigator.clipboard.writeText(txt).then(function() {{
-                    btn.innerText = "✅ 복사됨";
-                    setTimeout(function() {{ btn.innerText = "📋 복사"; }}, 1500);
+                    btn.innerText = "복사됨";
+                    setTimeout(function() {{ btn.innerText = "복사"; }}, 1500);
                 }}).catch(function() {{
-                    btn.innerText = "❌ 실패";
-                    setTimeout(function() {{ btn.innerText = "📋 복사"; }}, 1500);
+                    btn.innerText = "실패";
+                    setTimeout(function() {{ btn.innerText = "복사"; }}, 1500);
                 }});
             }}
 
@@ -2800,8 +2967,8 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
                 navigator.clipboard.writeText(fullText).then(function() {{
                     var btn = document.getElementById('copy-all-btn');
                     if (btn) {{
-                        btn.innerText = "✅ 전체 복사 완료";
-                        setTimeout(function() {{ btn.innerText = "📋 전체 복사"; }}, 1500);
+                        btn.innerText = "전체 복사 완료";
+                        setTimeout(function() {{ btn.innerText = "전체 복사"; }}, 1500);
                     }}
                 }});
             }}
@@ -2930,11 +3097,13 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
                     }}
                 }}
 
-                // 3. 자막 및 3번째 칸 현재 음성 대본 동기화
+                // 3. 3번째 칸 현재 음성 대본 동기화
                 if (targetIdx !== -1) {{
                     var curSeg = segments[targetIdx];
-                    document.getElementById('live-time-display').innerText = curSeg.time_str;
-                    document.getElementById('live-text-display').innerText = curSeg.text;
+                    var liveTimeEl = document.getElementById('live-time-display');
+                    if (liveTimeEl) liveTimeEl.innerText = curSeg.time_str;
+                    var liveTextEl = document.getElementById('live-text-display');
+                    if (liveTextEl) liveTextEl.innerText = curSeg.text;
 
                     if (targetIdx !== currentActiveIdx || forceSync) {{
                         currentActiveIdx = targetIdx;
@@ -2947,9 +3116,6 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
                             activeEl.classList.add('active');
 
                             if (!isUserScrolling || forceSync) {{
-                                // [핵심] 첫 대본이 3번째 칸에서 시작하여 시간 경과에 따라 위로 올라가도록 스크롤 동기화
-                                // 상단에 2칸의 빈 공간이 있으므로, targetIdx번째 발화 카드가 정확히 3번째 칸에 오기 위한 스크롤 위치:
-                                // targetScrollTop = targetIdx * (slotH + gap)
                                 var slotH = activeEl.offsetHeight;
                                 var gap = 7;
                                 var targetScrollTop = targetIdx * (slotH + gap);
@@ -3014,7 +3180,7 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
 
                     card.innerHTML = 
                         '<div class="t-slot-header">' +
-                            '<span class="t-time-btn">⏱️ ' + s.time_str + '</span>' +
+                            '<span class="t-time-btn">' + s.time_str + '</span>' +
                             '<span class="t-live-badge"><span class="t-pulse-dot"></span>현재 음성 대본</span>' +
                         '</div>' +
                         '<div class="t-content">' + s.text + '</div>';
@@ -3083,19 +3249,19 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
 
                 var uMsg = document.createElement('div');
                 uMsg.className = 'chat-bubble-u';
-                uMsg.innerHTML = '🙋 <b>질문:</b> ' + question;
+                uMsg.innerHTML = '<b>질문:</b> ' + question;
                 chatBox.appendChild(uMsg);
                 inputEl.value = "";
 
                 var loadMsg = document.createElement('div');
                 loadMsg.className = 'chat-bubble-a';
                 loadMsg.id = 'chat-loading-item';
-                loadMsg.innerHTML = '🤖 <b>Gemini 3.8 Flash:</b> 답변을 생성하고 있습니다... ⏳';
+                loadMsg.innerHTML = '<b>Gemini AI:</b> 답변을 생성하고 있습니다...';
                 chatBox.appendChild(loadMsg);
                 chatBox.scrollTop = chatBox.scrollHeight;
 
                 if (!apiKey) {{
-                    loadMsg.innerHTML = '⚠️ 좌측 사이드바에서 Gemini API 키를 먼저 입력해주세요.';
+                    loadMsg.innerHTML = '좌측 사이드바에서 Gemini API 키를 먼저 입력해주세요.';
                     return;
                 }}
 
@@ -3126,16 +3292,48 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
                         "```"
                     ].join(nl);
 
-                    var resp = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=" + apiKey, {{
-                        method: "POST",
-                        headers: {{ "Content-Type": "application/json" }},
-                        body: JSON.stringify({{
-                            contents: [{{ parts: [{{ text: promptText }}] }}]
-                        }})
-                    }});
+                    var modelsToTry = ["gemini-3.5-flash", "gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-3-flash-preview", "gemini-3.8-flash"];
+                    var data = null;
+                    var lastErrorMsg = "";
 
-                    var data = await resp.json();
-                    var rawText = data.candidates[0].content.parts[0].text;
+                    for (var m = 0; m < modelsToTry.length; m++) {{
+                        var modelName = modelsToTry[m];
+                        try {{
+                            var resp = await fetch("https://generativelanguage.googleapis.com/v1beta/models/" + modelName + ":generateContent?key=" + apiKey, {{
+                                method: "POST",
+                                headers: {{ "Content-Type": "application/json" }},
+                                body: JSON.stringify({{
+                                    contents: [{{ parts: [{{ text: promptText }}] }}]
+                                }})
+                            }});
+
+                            var resJson = await resp.json();
+                            if (resp.ok && resJson && resJson.candidates && resJson.candidates.length > 0 && resJson.candidates[0].content) {{
+                                data = resJson;
+                                break;
+                            }} else if (resJson && resJson.error) {{
+                                lastErrorMsg = resJson.error.message || ("오류 코드 " + resJson.error.code);
+                            }}
+                        }} catch(netErr) {{
+                            lastErrorMsg = netErr.message;
+                        }}
+                    }}
+
+                    if (!data || !data.candidates || data.candidates.length === 0 || !data.candidates[0].content) {{
+                        throw new Error(lastErrorMsg || "API 응답을 수신하지 못했습니다. 잠시 후 다시 시도해주세요.");
+                    }}
+
+                    var parts = data.candidates[0].content.parts || [];
+                    var rawText = "";
+                    for (var p = 0; p < parts.length; p++) {{
+                        if (parts[p].text) {{
+                            rawText += parts[p].text;
+                        }}
+                    }}
+
+                    if (!rawText.trim()) {{
+                        throw new Error("답변 텍스트를 추출할 수 없습니다.");
+                    }}
                     
                     var answerText = rawText;
                     var relTs = "00:00";
@@ -3161,12 +3359,12 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
                     if (relSec > 0 || relTs !== "00:00") {{
                         tsButton = '<div style="margin-top: 6px;">' +
                             '<button onclick="jumpTo(' + relSec + ')" style="background: #0f2b4c; border: 1px solid #3ea6ff; color: #3ea6ff; font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 4px; cursor: pointer;">' +
-                            '⏱️ 구간 바로가기: [' + relTs + '] (' + Math.floor(relSec) + '초)</button></div>';
+                            '구간 바로가기: [' + relTs + '] (' + Math.floor(relSec) + '초)</button></div>';
                     }}
 
                     aMsg.innerHTML = '<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px;">' +
-                        '<span>🤖 <b>Gemini 3.8 Flash:</b></span>' +
-                        '<button onclick="copyChatText(this)" style="background: transparent; border: none; color: #888; font-size: 0.7rem; cursor: pointer;">📋 복사</button>' +
+                        '<span><b>Gemini AI:</b></span>' +
+                        '<button onclick="copyChatText(this)" style="background: transparent; border: none; color: #888; font-size: 0.7rem; cursor: pointer;">복사</button>' +
                         '</div>' +
                         '<div class="chat-text-content">' + answerText.split(nl).join('<br>') + '</div>' + tsButton;
                     chatBox.appendChild(aMsg);
@@ -3177,7 +3375,7 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
                     var errMsg = document.createElement('div');
                     errMsg.className = 'chat-bubble-a';
                     errMsg.style.borderColor = '#ff4b4b';
-                    errMsg.innerHTML = '⚠️ 답변 생성 중 오류가 발생했습니다: ' + err.message;
+                    errMsg.innerHTML = '답변 생성 중 오류가 발생했습니다: ' + err.message;
                     chatBox.appendChild(errMsg);
                     chatBox.scrollTop = chatBox.scrollHeight;
                 }}
@@ -3188,8 +3386,8 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
                 var contentEl = parent.querySelector('.chat-text-content');
                 if (contentEl) {{
                     navigator.clipboard.writeText(contentEl.innerText).then(function() {{
-                        btn.innerText = "✅ 완료";
-                        setTimeout(function() {{ btn.innerText = "📋 복사"; }}, 1500);
+                        btn.innerText = "완료";
+                        setTimeout(function() {{ btn.innerText = "복사"; }}, 1500);
                     }});
                 }}
             }}
@@ -3219,7 +3417,7 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
                 }});
             }}
 
-            // 🎬 유튜브 공식 영화관 모드 (Theater Mode) 토글 함수
+            //  유튜브 공식 영화관 모드 (Theater Mode) 토글 함수
             function toggleTheaterMode() {{
                 isTheaterMode = !isTheaterMode;
                 var container = document.querySelector('.app-container');
@@ -3256,7 +3454,7 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
                 setTimeout(syncParentFrameHeight, 350);
             }}
 
-            // ⛶ 전체화면 토글 함수
+            //  전체화면 토글 함수
             function toggleFullscreen() {{
                 var elem = document.querySelector('.player-wrapper') || document.documentElement;
                 if (!document.fullscreenElement) {{
@@ -3274,7 +3472,7 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
                 }}
             }}
 
-            // ⌨️ 키보드 단축키 (t: 영화관 모드, f: 전체화면, m: 음소거)
+            //  키보드 단축키 (t: 영화관 모드, f: 전체화면, m: 음소거)
             document.addEventListener('keydown', function(e) {{
                 var target = e.target;
                 if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) {{
@@ -3292,7 +3490,7 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
                 }}
             }});
 
-            // 📐 뷰 모드 및 반응형 화면 너비에 따른 최적 iframe 높이 정밀 계산 (중간 빈 공간/늘어짐 현상 원천 차단)
+            //  뷰 모드 및 반응형 화면 너비에 따른 최적 iframe 높이 정밀 계산 (중간 빈 공간/늘어짐 현상 원천 차단)
             function calculateOptimalHeight() {{
                 if (isTheaterMode) {{
                     var leftCol = document.querySelector('.left-column');
@@ -3361,64 +3559,31 @@ if st.session_state.video_id and st.session_state.video_info and st.session_stat
 
 
 else:
-    # 초기 대기 화면 (반응형 중앙 정렬 배너)
-    st.markdown("""
-    <div class="home-hero-banner">
-        <div style="margin-bottom: 0.8rem;">
-            <svg width="60" height="42" viewBox="0 0 32 23" fill="none">
-                <path d="M31.24 3.49C30.87 2.12 29.8 1.05 28.43 0.68C25.96 0 16 0 16 0C16 0 6.04 0 3.57 0.68C2.2 1.05 1.13 2.12 0.76 3.49C0 5.96 0 11.1 0 11.1C0 11.1 0 16.24 0.76 18.71C1.13 20.08 2.2 21.15 3.57 21.52C6.04 22.2 16 22.2 16 22.2C16 22.2 25.96 22.2 28.43 21.52C29.8 21.15 30.87 20.08 31.24 18.71C32 16.24 32 11.1 32 11.1C32 11.1 32 5.96 31.24 3.49Z" fill="#FF0000"/>
-                <polygon points="12.8,15.8 21.2,11.1 12.8,6.4" fill="#FFFFFF"/>
-            </svg>
-        </div>
-        <h2 class="home-hero-title">Google YouTube AI Searcher</h2>
-        <p class="home-hero-desc">
-            상단 중앙 검색창에 분석할 유튜브 영상 주소를 입력하고 <b>[🔍 검색]</b>을 누르세요.<br>
-            <b>실시간 음성-대본 0ms 싱크 전체 대본 뷰</b>, <b>유튜브 공식 호버 타임라인 & 썸네일 미리보기</b>, <b>Gemini 3.8 AI 질의응답</b>, <b>원클릭 파일 다운로드 허브</b>를 지원합니다.
-        </p>
-        <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
-            <span style="background: #272727; color: #ff4b4b; padding: 6px 14px; border-radius: 18px; font-size: 0.82rem; font-weight: 600;">🎞️ 유튜브 호버 타임라인 & 썸네일</span>
-            <span style="background: #272727; color: #3ea6ff; padding: 6px 14px; border-radius: 18px; font-size: 0.82rem; font-weight: 600;">⚡ 실시간 음성-대본 0ms 싱크</span>
-            <span style="background: #272727; color: #10b981; padding: 6px 14px; border-radius: 18px; font-size: 0.82rem; font-weight: 600;">📑 실시간 음성 싱크 전체 대본</span>
-            <span style="background: #272727; color: #f59e0b; padding: 6px 14px; border-radius: 18px; font-size: 0.82rem; font-weight: 600;">📥 대본 & 오디오 다운로드 허브</span>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+    # --- 실시간 대본 AI 홈 화면 ---
+    def on_home_search_submit():
+        st.session_state.trigger_search = True
 
-    # 보관된 영상이 있을 경우 홈 화면에 "이전에 분석한 영상 보관함 (0토큰 즉시 열기)" 카드 섹션 표시
-    home_cached = get_all_cached_videos()
-    if home_cached:
-        cards_grid_html = '<div class="home-cache-grid">'
-        for cv in home_cached:
-            v_t = cv['title'].replace('"', '&quot;').replace("'", "&#39;")
-            v_u = cv['uploader'].replace('"', '&quot;').replace("'", "&#39;")
-            cards_grid_html += f"""
-            <a href="?load_cache={cv['video_id']}" target="_self" class="home-cache-card" title="{v_t}">
-                <div class="home-card-thumb">
-                    <img src="{cv['thumbnail']}" alt="thumb" onerror="this.src='https://img.youtube.com/vi/{cv['video_id']}/hqdefault.jpg'"/>
-                    <span class="home-card-dur">{cv['duration_str']}</span>
-                </div>
-                <div class="home-card-body">
-                    <div class="home-card-title">{v_t}</div>
-                    <div class="home-card-uploader">📺 {v_u}</div>
-                    <div class="home-card-footer">
-                        <span class="d-token-tag">⚡ 0토큰 로드</span>
-                        <span class="d-date-tag">{cv.get('segment_count', 0)}개 구간</span>
-                    </div>
-                </div>
-            </a>
-            """
-        cards_grid_html += '</div>'
-        
-        st.markdown(f"""
-        <div style="margin-top: 1.8rem; margin-bottom: 0.6rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
-            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                <span style="font-size: 1.25rem;">📂</span>
-                <span style="font-size: 1.1rem; font-weight: 700; color: #ffffff;">이전에 분석한 영상 보관함</span>
-                <span style="background: #0e2a47; color: #3ea6ff; border: 1px solid #1c4a75; border-radius: 12px; padding: 2px 10px; font-size: 0.72rem; font-weight: 700;">⚡ 0토큰 즉시 열기</span>
-            </div>
-            <span style="font-size: 0.8rem; color: #888888;">총 {len(home_cached)}개 영상 보관 중</span>
-        </div>
-        {cards_grid_html}
-        """, unsafe_allow_html=True)
+    # "실시간 대본 AI" 로고 텍스트
+    st.markdown("""<div class="google-home-container">
+<div class="google-logo-text">실시간 대본 AI</div>
+</div>""", unsafe_allow_html=True)
+
+    # 화이트 필 검색창 (검색 인풋 + '출력' 버튼만 유지)
+    with st.form("google_home_search_form", clear_on_submit=False, border=False):
+        c_in, c_submit = st.columns([85, 15], gap="small")
+        with c_in:
+            st.text_input(
+                "유튜브 링크를 입력하세요.",
+                value="",
+                placeholder="유튜브 링크를 입력하세요.",
+                label_visibility="collapsed",
+                key="home_url_input_box",
+            )
+        with c_submit:
+            home_submitted = st.form_submit_button("출력", on_click=on_home_search_submit, use_container_width=True)
+
+    if home_submitted and not st.session_state.get("trigger_search", False):
+        st.session_state.trigger_search = True
+        st.rerun()
 
 

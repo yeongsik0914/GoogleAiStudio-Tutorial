@@ -96,7 +96,7 @@ def answer_question_with_timestamps(
 ```"""
 
     response = client.models.generate_content(
-        model="gemini-3.8-flash",
+        model="gemini-3.5-flash",
         contents=system_prompt,
     )
 
@@ -178,7 +178,7 @@ def extract_video_chapters(
 
     try:
         response = client.models.generate_content(
-            model="gemini-3.8-flash",
+            model="gemini-3.5-flash",
             contents=prompt,
         )
         raw = response.text or ""
